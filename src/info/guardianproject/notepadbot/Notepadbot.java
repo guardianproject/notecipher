@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.android.demo.notepad3;
+package info.guardianproject.notepadbot;
+
+import com.android.demo.notepad3.R;
 
 import android.app.ListActivity;
 import android.content.Intent;

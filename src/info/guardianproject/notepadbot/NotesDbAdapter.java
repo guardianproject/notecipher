@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.android.demo.notepad3;
+package info.guardianproject.notepadbot;
 
 import android.content.ContentValues;
 import android.content.Context;
