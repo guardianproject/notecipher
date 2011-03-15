@@ -20,8 +20,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLCipherDatabase;
+import android.database.sqlite.SQLCipherOpenHelper;
 import android.util.Log;
 
 /**
@@ -42,7 +42,7 @@ public class NotesDbAdapter {
 
     private static final String TAG = "NotesDbAdapter";
     private DatabaseHelper mDbHelper;
-    private SQLiteDatabase mDb;
+    private SQLCipherDatabase mDb;
     
     /**
      * Database creation sql statement
@@ -57,20 +57,20 @@ public class NotesDbAdapter {
 
     private final Context mCtx;
 
-    private static class DatabaseHelper extends SQLiteOpenHelper {
+    private static class DatabaseHelper extends SQLCipherOpenHelper {
 
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
 
         @Override
-        public void onCreate(SQLiteDatabase db) {
+        public void onCreate(SQLCipherDatabase db) {
 
             db.execSQL(DATABASE_CREATE);
         }
 
         @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        public void onUpgrade(SQLCipherDatabase db, int oldVersion, int newVersion) {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
             db.execSQL("DROP TABLE IF EXISTS notes");

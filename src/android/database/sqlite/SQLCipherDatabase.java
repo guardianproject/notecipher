@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package info.guardianproject.database.sqlite;
+package android.database.sqlite;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.SQLException;
-import android.database.sqlite.DatabaseObjectNotClosedException; // @hide
 import android.database.sqlite.SQLiteClosable;
-import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
-import android.database.sqlite.SQLiteDirectCursorDriver; // @hide
-import android.database.sqlite.SQLiteQueryBuilder;
-import android.database.sqlite.SQLiteStatement;
-import android.database.sqlite.SQLiteTransactionListener;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
-import info.guardianproject.database.sqlite.SQLiteDebug.DbStats;
+import android.database.sqlite.SQLiteDebug.DbStats;
+import android.database.sqlite.SQLiteQueryBuilder;
+import android.database.sqlite.SQLCipherStatement;
+import android.database.sqlite.SQLiteTransactionListener;
 import android.os.Debug;
 import android.os.SystemClock;
 //import android.os.SystemProperties;
@@ -55,6 +52,8 @@ import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
+import com.google.android.collect.Maps;
+
 /**
  * Exposes methods to manage a SQLite database.
  * <p>SQLiteDatabase has methods to create, delete, execute SQL commands, and
@@ -70,7 +69,7 @@ import java.util.regex.Pattern;
  * if you wire it up correctly (XXX a link needed!), and <code>UNICODE</code>, which
  * is the Unicode Collation Algorithm and not tailored to the current locale.
  */
-public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
+public class SQLCipherDatabase extends SQLiteClosable {
     private static final String TAG = "Database";
     private static final int EVENT_DB_OPERATION = 52000;
     private static final int EVENT_DB_CORRUPT = 75004;
@@ -112,7 +111,9 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
     /**
      * When a constraint violation occurs, the one row that contains
      * the constraint violation is not inserted or changed.
-     * But the command continues executing normally. Other rows before and
+     * But the command continues executing normally. Other rows import info.guardianproject.database.sqlite.SQLiteDebug;
+import info.guardianproject.database.sqlite.SQLiteDebug.DbStats;
+before and
      * after the row that contained the constraint violation continue to be
      * inserted or updated normally. No error is returned.
      */
@@ -259,10 +260,28 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
     private int mFlags;
 
     /** The optional factory to use when creating new Cursors */
-    private android.database.sqlite.SQLiteDatabase.CursorFactory mFactory;
+    private SQLiteDatabase.CursorFactory mFactory;
 
     private WeakHashMap<android.database.sqlite.SQLiteClosable, Object> mPrograms;
 
+    /**
+     * for each instance of this class, a cache is maintained to store
+     * the compiled query statement ids returned by sqlite database.
+     *     key = sql statement with "?" for bind args
+     *     value = {@link SQLiteCompiledSql}
+     * If an application opens the database and keeps it open during its entire life, then
+     * there will not be an overhead of compilation of sql statements by sqlite.
+     *
+     * why is this cache NOT static? because sqlite attaches compiledsql statements to the
+     * struct created when {@link SQLiteDatabase#openDatabase(String, CursorFactory, int)} is
+     * invoked.
+     *
+     * this cache has an upper limit of mMaxSqlCacheSize (settable by calling the method
+     * (@link setMaxCacheSize(int)}). its default is 0 - i.e., no caching by default because
+     * most of the apps don't use "?" syntax in their sql, caching is not useful for them.
+     */
+    /* package */ Map<String, SQLCipherCompiledSql> mCompiledQueries = Maps.newHashMap();
+    
     /**
      * @hide
      */
@@ -384,6 +403,8 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      */
     private void lockForced() {
         mLock.lock();
+        // TODO do we need SQLiteDebug?
+        /*
         if (SQLiteDebug.DEBUG_LOCK_TIME_TRACKING) {
             if (mLock.getHoldCount() == 1) {
                 // Use elapsed real-time since the CPU may sleep when waiting for IO
@@ -391,6 +412,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
                 mLockAcquiredThreadTime = Debug.threadCpuTimeNanos();
             }
         }
+        */
     }
 
     /**
@@ -400,11 +422,13 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      */
     /* package */ void unlock() {
         if (!mLockingEnabled) return;
+        // TODO do we need SQLiteDebug?
+        /*
         if (SQLiteDebug.DEBUG_LOCK_TIME_TRACKING) {
             if (mLock.getHoldCount() == 1) {
                 checkLockHoldTime();
             }
-        }
+        } */
         mLock.unlock();
     }
 
@@ -414,11 +438,14 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * @see #unlockForced()
      */
     private void unlockForced() {
+        // TODO do we need SQLiteDebug?
+    	/*
         if (SQLiteDebug.DEBUG_LOCK_TIME_TRACKING) {
             if (mLock.getHoldCount() == 1) {
                 checkLockHoldTime();
             }
         }
+        */
         mLock.unlock();
     }
 
@@ -439,11 +466,15 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
                 mLastLockMessageTime = elapsedTime;
                 String msg = "lock held on " + mPath + " for " + lockedTime + "ms. Thread time was "
                         + threadTime + "ms";
+                // TODO do we need SQLiteDebug?
+                /*
                 if (SQLiteDebug.DEBUG_LOCK_TIME_TRACKING_STACK_TRACE) {
                     Log.d(TAG, msg, new Exception());
                 } else {
                     Log.d(TAG, msg);
                 }
+                */
+                Log.d(TAG, msg);
             }
         }
     }
@@ -807,17 +838,20 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * @return the newly opened database
      * @throws SQLiteException if the database cannot be opened
      */
-    public static SQLiteDatabase openDatabase(String path, CursorFactory factory, int flags) {
-        SQLiteDatabase sqliteDatabase = null;
+    public static SQLCipherDatabase openDatabase(String path, CursorFactory factory, int flags) {
+        SQLCipherDatabase sqliteDatabase = null;
         try {
             // Open the database.
-            sqliteDatabase = new SQLiteDatabase(path, factory, flags);
+            sqliteDatabase = new SQLCipherDatabase(path, factory, flags);
+            // TODO do we need SQLiteDebug?
+            /*
             if (SQLiteDebug.DEBUG_SQL_STATEMENTS) {
                 sqliteDatabase.enableSqlTracing(path);
             }
             if (SQLiteDebug.DEBUG_SQL_TIME) {
                 sqliteDatabase.enableSqlProfiling(path);
             }
+            */
         } catch (SQLiteDatabaseCorruptException e) {
             // Try to recover from this, if we can.
             // TODO: should we do this for other open failures?
@@ -827,24 +861,24 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
                 // delete is only for non-memory database files
                 new File(path).delete();
             }
-            sqliteDatabase = new SQLiteDatabase(path, factory, flags);
+            sqliteDatabase = new SQLCipherDatabase(path, factory, flags);
         }
         ActiveDatabases.getInstance().mActiveDatabases.add(
-                new WeakReference<SQLiteDatabase>(sqliteDatabase));
+                new WeakReference<SQLCipherDatabase>(sqliteDatabase));
         return sqliteDatabase;
     }
 
     /**
      * Equivalent to openDatabase(file.getPath(), factory, CREATE_IF_NECESSARY).
      */
-    public static SQLiteDatabase openOrCreateDatabase(File file, CursorFactory factory) {
+    public static SQLCipherDatabase openOrCreateDatabase(File file, CursorFactory factory) {
         return openOrCreateDatabase(file.getPath(), factory);
     }
 
     /**
      * Equivalent to openDatabase(path, factory, CREATE_IF_NECESSARY).
      */
-    public static SQLiteDatabase openOrCreateDatabase(String path, CursorFactory factory) {
+    public static SQLCipherDatabase openOrCreateDatabase(String path, CursorFactory factory) {
         return openDatabase(path, factory, CREATE_IF_NECESSARY);
     }
 
@@ -859,7 +893,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      *            cursor when query is called
      * @return a SQLiteDatabase object, or null if the database can't be created
      */
-    public static SQLiteDatabase create(CursorFactory factory) {
+    public static SQLCipherDatabase create(CursorFactory factory) {
         // This is a magic string with special meaning for SQLite.
         return openDatabase(":memory:", factory, CREATE_IF_NECESSARY);
     }
@@ -887,12 +921,9 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
         while (iter.hasNext()) {
             Map.Entry<SQLiteClosable, Object> entry = iter.next();
             SQLiteClosable program = entry.getKey();
-            // TODO this call is protected to the android.database.sqlite package
-            /*
             if (program != null) {
                 program.onAllReferencesReleasedFromContainer();
             }
-            */
         }
     }
 
@@ -907,14 +938,13 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * @return the database version
      */
     public int getVersion() {
-        SQLiteStatement prog = null;
+        SQLCipherStatement prog = null;
         lock();
         if (!isOpen()) {
             throw new IllegalStateException("database not open");
         }
         try {
-        	// TODO convert this to a non-compiled statement, i.e. execSQL
-            prog = new SQLiteStatement(this, "PRAGMA user_version;");
+            prog = new SQLCipherStatement(this, "PRAGMA user_version;");
             long version = prog.simpleQueryForLong();
             return (int) version;
         } finally {
@@ -938,14 +968,13 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * @return the new maximum database size
      */
     public long getMaximumSize() {
-        SQLiteStatement prog = null;
+        SQLCipherStatement prog = null;
         lock();
         if (!isOpen()) {
             throw new IllegalStateException("database not open");
         }
         try {
-        	// TODO convert this to a non-compiled statement, i.e. execSQL
-            prog = new SQLiteStatement(this,
+            prog = new SQLCipherStatement(this,
                     "PRAGMA max_page_count;");
             long pageCount = prog.simpleQueryForLong();
             return pageCount * getPageSize();
@@ -963,7 +992,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * @return the new maximum database size
      */
     public long setMaximumSize(long numBytes) {
-        SQLiteStatement prog = null;
+        SQLCipherStatement prog = null;
         lock();
         if (!isOpen()) {
             throw new IllegalStateException("database not open");
@@ -975,8 +1004,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
             if ((numBytes % pageSize) != 0) {
                 numPages++;
             }
-        	// TODO convert this to a non-compiled statement, i.e. execSQL
-            prog = new SQLiteStatement(this,
+            prog = new SQLCipherStatement(this,
                     "PRAGMA max_page_count = " + numPages);
             long newPageCount = prog.simpleQueryForLong();
             return newPageCount * pageSize;
@@ -992,14 +1020,13 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * @return the database page size, in bytes
      */
     public long getPageSize() {
-        SQLiteStatement prog = null;
+        SQLCipherStatement prog = null;
         lock();
         if (!isOpen()) {
             throw new IllegalStateException("database not open");
         }
         try {
-        	// TODO convert this to a non-compiled statement, i.e. execSQL
-            prog = new SQLiteStatement(this,
+            prog = new SQLCipherStatement(this,
                     "PRAGMA page_size;");
             long size = prog.simpleQueryForLong();
             return size;
@@ -1122,6 +1149,30 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
     }
 
     /**
+     * Compiles an SQL statement into a reusable pre-compiled statement object.
+     * The parameters are identical to {@link #execSQL(String)}. You may put ?s in the
+     * statement and fill in those values with {@link SQLiteProgram#bindString}
+     * and {@link SQLiteProgram#bindLong} each time you want to run the
+     * statement. Statements may not return result sets larger than 1x1.
+     *
+     * @param sql The raw SQL statement, may contain ? for unknown values to be
+     *            bound later.
+     * @return A pre-compiled {@link SQLiteStatement} object. Note that
+     * {@link SQLiteStatement}s are not synchronized, see the documentation for more details.
+     */
+    public SQLCipherStatement compileStatement(String sql) throws SQLException {
+        lock();
+        if (!isOpen()) {
+            throw new IllegalStateException("database not open");
+        }
+        try {
+            return new SQLCipherStatement(this, sql);
+        } finally {
+            unlock();
+        }
+    }
+
+    /**
      * Query the given URL, returning a {@link Cursor} over the result set.
      *
      * @param distinct true if you want each row to be unique, false otherwise.
@@ -1191,6 +1242,8 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      * @see Cursor
      */
+    // we are not currently using a CursorFactory to create cursors
+    /*
     public Cursor queryWithFactory(CursorFactory cursorFactory,
             boolean distinct, String table, String[] columns,
             String selection, String[] selectionArgs, String groupBy,
@@ -1204,6 +1257,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
         return rawQueryWithFactory(
                 cursorFactory, sql, selectionArgs, findEditTable(table));
     }
+    */
 
     /**
      * Query the given table, returning a {@link Cursor} over the result set.
@@ -1290,7 +1344,57 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
     public Cursor rawQuery(String sql, String[] selectionArgs) {
-        return rawQueryWithFactory(null, sql, selectionArgs, null);
+        if (!isOpen()) {
+            throw new IllegalStateException("database not open");
+        }
+        long timeStart = 0;
+
+        if (Config.LOGV || mSlowQueryThreshold != -1) {
+            timeStart = System.currentTimeMillis();
+        }
+
+        Cursor cursor = null;
+        try { // from SQLiteDirectCursorDriver.java
+            // TODO port this SQLiteDirectCursorDriver code to SQLCipher
+        	// compile the query
+            SQLiteQuery query = new SQLiteQuery(mDatabase, mSql, 0, selectionArgs);
+
+            try {
+                // Arg binding
+                int numArgs = selectionArgs == null ? 0 : selectionArgs.length;
+                for (int i = 0; i < numArgs; i++) {
+                    query.bindString(i + 1, selectionArgs[i]);
+                }
+
+                // Create the cursor
+                cursor = new SQLCipherCursor(mDatabase, this, null, query);
+                //mQuery = query;
+                query = null;
+            } finally {
+                // Make sure this object is cleaned up if something happens
+                if (query != null) query.close();
+            }
+        } finally {
+            if (Config.LOGV || mSlowQueryThreshold != -1) {
+
+                // Force query execution
+                int count = -1;
+                if (cursor != null) {
+                    count = cursor.getCount();
+                }
+
+                long duration = System.currentTimeMillis() - timeStart;
+
+                if (Config.LOGV || duration >= mSlowQueryThreshold) {
+                    Log.v("Cursor",
+                          "query (" + duration + " ms): " + sql + ", args are "
+                                  + (selectionArgs != null
+                                  ? TextUtils.join(",", selectionArgs)
+                                  : "<null>")  + ", count is " + count);
+                }
+            }
+        }
+        return cursor;
     }
 
     /**
@@ -1305,6 +1409,8 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
+    // we're going without a CursorFactory for now, we don't need to support subclasses of our Cursor
+    /* 
     public Cursor rawQueryWithFactory(
             CursorFactory cursorFactory, String sql, String[] selectionArgs,
             String editTable) {
@@ -1318,7 +1424,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
         }
 
         // TODO replace this with our own SQLiteDirectCursorDriver that accepts our own SQLiteDatabase
-        SQLiteCursorDriver driver = new SQLiteDirectCursorDriver(this, sql, editTable);
+        SQLiteCursorDriver driver = new SQLCipherDirectCursorDriver(this, sql, editTable);
 
         Cursor cursor = null;
         try {
@@ -1347,6 +1453,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
         }
         return cursor;
     }
+    */
 
     /**
      * Runs the provided SQL and returns a cursor over the result set.
@@ -1366,6 +1473,8 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * hidden.
      * @hide
      */
+    // we're going without a CursorFactory for now, we don't need to support subclasses of our Cursor
+    /* 
     public Cursor rawQuery(String sql, String[] selectionArgs,
             int initialRead, int maxRead) {
         SQLiteCursor c = (SQLiteCursor)rawQueryWithFactory(
@@ -1373,6 +1482,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
         c.setLoadStyle(initialRead, maxRead);
         return c;
     }
+    */
 
     /**
      * Convenience method for inserting a row into the database.
@@ -1512,7 +1622,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
         sql.append(");");
 
         lock();
-        SQLiteStatement statement = null;
+        SQLCipherStatement statement = null;
         try {
         	// TODO replace with non-compiled SQL query
             statement = compileStatement(sql.toString());
@@ -1566,7 +1676,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
         if (!isOpen()) {
             throw new IllegalStateException("database not open");
         }
-        SQLiteStatement statement = null;
+        SQLCipherStatement statement = null;
         try {
         	// TODO replace with non-compiled SQL query
             statement = compileStatement("DELETE FROM " + table
@@ -1649,9 +1759,8 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
         if (!isOpen()) {
             throw new IllegalStateException("database not open");
         }
-        SQLiteStatement statement = null;
+        SQLCipherStatement statement = null;
         try {
-        	// TODO replace with non-compiled SQL query
             statement = compileStatement(sql.toString());
 
             // Bind the values
@@ -1744,7 +1853,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
         if (!isOpen()) {
             throw new IllegalStateException("database not open");
         }
-        SQLiteStatement statement = null;
+        SQLCipherStatement statement = null;
         try {
         	// TODO replace with non-compiled SQL query
             statement = compileStatement(sql);
@@ -1785,7 +1894,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * @param flags 0 or {@link #NO_LOCALIZED_COLLATORS}.  If the database file already
      *              exists, mFlags will be updated appropriately.
      */
-    private SQLiteDatabase(String path, CursorFactory factory, int flags) {
+    private SQLCipherDatabase(String path, CursorFactory factory, int flags) {
         if (path == null) {
             throw new IllegalArgumentException("path should not be null");
         }
@@ -1796,18 +1905,24 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
         mStackTrace = new DatabaseObjectNotClosedException().fillInStackTrace();
         mFactory = factory;
         dbopen(mPath, mFlags);
+        // TODO do we need SQLiteDebug?
+        /*
         if (SQLiteDebug.DEBUG_SQL_CACHE) {
             mTimeOpened = getTime();
         }
+        */
         mPrograms = new WeakHashMap<android.database.sqlite.SQLiteClosable,Object>();
         try {
             setLocale(Locale.getDefault());
         } catch (RuntimeException e) {
             Log.e(TAG, "Failed to setLocale() when constructing, closing the database", e);
             dbclose();
+            // TODO do we need SQLiteDebug?
+            /*
             if (SQLiteDebug.DEBUG_SQL_CACHE) {
                 mTimeClosed = getTime();
             }
+            */
             throw e;
         }
     }
@@ -1943,10 +2058,173 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
         }
     }
 
+    /*
+     * ============================================================================
+     *
+     *       The following methods deal with compiled-sql cache
+     * ============================================================================
+     */
+    /**
+     * adds the given sql and its compiled-statement-id-returned-by-sqlite to the
+     * cache of compiledQueries attached to 'this'.
+     *
+     * if there is already a {@link SQLiteCompiledSql} in compiledQueries for the given sql,
+     * the new {@link SQLiteCompiledSql} object is NOT inserted into the cache (i.e.,the current
+     * mapping is NOT replaced with the new mapping).
+     */
+    /* package */ void addToCompiledQueries(String sql, SQLCipherCompiledSql compiledStatement) {
+        if (mMaxSqlCacheSize == 0) {
+            // for this database, there is no cache of compiled sql.
+            if (SQLiteDebug.DEBUG_SQL_CACHE) {
+                Log.v(TAG, "|NOT adding_sql_to_cache|" + getPath() + "|" + sql);
+            }
+            return;
+        }
+
+        SQLCipherCompiledSql compiledSql = null;
+        synchronized(mCompiledQueries) {
+            // don't insert the new mapping if a mapping already exists
+            compiledSql = mCompiledQueries.get(sql);
+            if (compiledSql != null) {
+                return;
+            }
+            // add this <sql, compiledStatement> to the cache
+            if (mCompiledQueries.size() == mMaxSqlCacheSize) {
+                /*
+                 * cache size of {@link #mMaxSqlCacheSize} is not enough for this app.
+                 * log a warning MAX_WARNINGS_ON_CACHESIZE_CONDITION times
+                 * chances are it is NOT using ? for bindargs - so caching is useless.
+                 * TODO: either let the callers set max cchesize for their app, or intelligently
+                 * figure out what should be cached for a given app.
+                 */
+                if (++mCacheFullWarnings == MAX_WARNINGS_ON_CACHESIZE_CONDITION) {
+                    Log.w(TAG, "Reached MAX size for compiled-sql statement cache for database " +
+                            getPath() + "; i.e., NO space for this sql statement in cache: " +
+                            sql + ". Please change your sql statements to use '?' for " +
+                            "bindargs, instead of using actual values");
+                }
+                // don't add this entry to cache
+            } else {
+                // cache is NOT full. add this to cache.
+                mCompiledQueries.put(sql, compiledStatement);
+                if (SQLiteDebug.DEBUG_SQL_CACHE) {
+                    Log.v(TAG, "|adding_sql_to_cache|" + getPath() + "|" +
+                            mCompiledQueries.size() + "|" + sql);
+                }
+            }
+        }
+        return;
+    }
+
+
+    private void deallocCachedSqlStatements() {
+        synchronized (mCompiledQueries) {
+            for (SQLCipherCompiledSql compiledSql : mCompiledQueries.values()) {
+                compiledSql.releaseSqlStatement();
+            }
+            mCompiledQueries.clear();
+        }
+    }
+
+    /**
+     * from the compiledQueries cache, returns the compiled-statement-id for the given sql.
+     * returns null, if not found in the cache.
+     */
+    /* package */ SQLCipherCompiledSql getCompiledStatementForSql(String sql) {
+    	SQLCipherCompiledSql compiledStatement = null;
+        boolean cacheHit;
+        synchronized(mCompiledQueries) {
+            if (mMaxSqlCacheSize == 0) {
+                // for this database, there is no cache of compiled sql.
+                if (SQLiteDebug.DEBUG_SQL_CACHE) {
+                    Log.v(TAG, "|cache NOT found|" + getPath());
+                }
+                return null;
+            }
+            cacheHit = (compiledStatement = mCompiledQueries.get(sql)) != null;
+        }
+        if (cacheHit) {
+            mNumCacheHits++;
+        } else {
+            mNumCacheMisses++;
+        }
+
+        if (SQLiteDebug.DEBUG_SQL_CACHE) {
+            Log.v(TAG, "|cache_stats|" +
+                    getPath() + "|" + mCompiledQueries.size() +
+                    "|" + mNumCacheHits + "|" + mNumCacheMisses +
+                    "|" + cacheHit + "|" + mTimeOpened + "|" + mTimeClosed + "|" + sql);
+        }
+        return compiledStatement;
+    }
+
+    /**
+     * returns true if the given sql is cached in compiled-sql cache.
+     * @hide
+     */
+    public boolean isInCompiledSqlCache(String sql) {
+        synchronized(mCompiledQueries) {
+            return mCompiledQueries.containsKey(sql);
+        }
+    }
+
+    /**
+     * purges the given sql from the compiled-sql cache.
+     * @hide
+     */
+    public void purgeFromCompiledSqlCache(String sql) {
+        synchronized(mCompiledQueries) {
+            mCompiledQueries.remove(sql);
+        }
+    }
+
+    /**
+     * remove everything from the compiled sql cache
+     * @hide
+     */
+    public void resetCompiledSqlCache() {
+        synchronized(mCompiledQueries) {
+            mCompiledQueries.clear();
+        }
+    }
+
+    /**
+     * return the current maxCacheSqlCacheSize
+     * @hide
+     */
+    public synchronized int getMaxSqlCacheSize() {
+        return mMaxSqlCacheSize;
+    }
+
+    /**
+     * set the max size of the compiled sql cache for this database after purging the cache.
+     * (size of the cache = number of compiled-sql-statements stored in the cache).
+     *
+     * max cache size can ONLY be increased from its current size (default = 0).
+     * if this method is called with smaller size than the current value of mMaxSqlCacheSize,
+     * then IllegalStateException is thrown
+     *
+     * synchronized because we don't want t threads to change cache size at the same time.
+     * @param cacheSize the size of the cache. can be (0 to MAX_SQL_CACHE_SIZE)
+     * @throws IllegalStateException if input cacheSize > MAX_SQL_CACHE_SIZE or < 0 or
+     * < the value set with previous setMaxSqlCacheSize() call.
+     *
+     * @hide
+     */
+    public synchronized void setMaxSqlCacheSize(int cacheSize) {
+        if (cacheSize > MAX_SQL_CACHE_SIZE || cacheSize < 0) {
+            throw new IllegalStateException("expected value between 0 and " + MAX_SQL_CACHE_SIZE);
+        } else if (cacheSize < mMaxSqlCacheSize) {
+            throw new IllegalStateException("cannot set cacheSize to a value less than the value " +
+                    "set with previous setMaxSqlCacheSize() call.");
+        }
+        mMaxSqlCacheSize = cacheSize;
+    }
+
     static class ActiveDatabases {
         private static final ActiveDatabases activeDatabases = new ActiveDatabases();
-        private HashSet<WeakReference<SQLiteDatabase>> mActiveDatabases =
-            new HashSet<WeakReference<SQLiteDatabase>>();
+        private HashSet<WeakReference<SQLCipherDatabase>> mActiveDatabases =
+            new HashSet<WeakReference<SQLCipherDatabase>>();
         private ActiveDatabases() {} // disable instantiation of this class
         static ActiveDatabases getInstance() {return activeDatabases;}
     }
@@ -1957,8 +2235,8 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      */
     /* package */ static ArrayList<DbStats> getDbStats() {
         ArrayList<DbStats> dbStatsList = new ArrayList<DbStats>();
-        for (WeakReference<SQLiteDatabase> w : ActiveDatabases.getInstance().mActiveDatabases) {
-            SQLiteDatabase db = w.get();
+        for (WeakReference<SQLCipherDatabase> w : ActiveDatabases.getInstance().mActiveDatabases) {
+            SQLCipherDatabase db = w.get();
             if (db == null || !db.isOpen()) {
                 continue;
             }
@@ -2009,14 +2287,14 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * NO JAVA locks are held in this method.
      * TODO: use this to do all pragma's in this class
      */
-    private static long getPragmaVal(SQLiteDatabase db, String pragma) {
+    private static long getPragmaVal(SQLCipherDatabase db, String pragma) {
         if (!db.isOpen()) {
             return 0;
         }
-        SQLiteStatement prog = null;
+        SQLCipherStatement prog = null;
         try {
         	// TODO replace with non-compiled query
-            prog = new SQLiteStatement(db, "PRAGMA " + pragma);
+            prog = new SQLCipherStatement(db, "PRAGMA " + pragma);
             long val = prog.simpleQueryForLong();
             return val;
         } finally {
@@ -2029,7 +2307,7 @@ public class SQLiteDatabase extends android.database.sqlite.SQLiteClosable {
      * including the main database
      * TODO: move this to {@link DatabaseUtils}
      */
-    private static ArrayList<Pair<String, String>> getAttachedDbs(SQLiteDatabase dbObj) {
+    private static ArrayList<Pair<String, String>> getAttachedDbs(SQLCipherDatabase dbObj) {
         if (!dbObj.isOpen()) {
             return null;
         }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package info.guardianproject.database.sqlite;
+package android.database.sqlite;
 
 import java.util.ArrayList;
 
@@ -147,7 +147,7 @@ public final class SQLiteDebug {
     public static PagerStats getDatabaseInfo() {
         PagerStats stats = new PagerStats();
         getPagerStats(stats);
-        stats.dbStats = SQLiteDatabase.getDbStats();
+        stats.dbStats = SQLCipherDatabase.getDbStats();
         return stats;
     }
 

@@ -20,7 +20,7 @@ package android.database.sqlite;
  * so this is just a shell for Eclipse to be happy */
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.database.sqlite.SQLCipherDatabase.CursorFactory;
 
 /**
  * A cursor driver that uses the given query directly.
@@ -29,12 +29,12 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
  */
 public class SQLiteDirectCursorDriver implements SQLiteCursorDriver {
     private String mEditTable; 
-    private SQLiteDatabase mDatabase;
+    private SQLCipherDatabase mDatabase;
     private Cursor mCursor;
     private String mSql;
-    private SQLiteQuery mQuery;
+    private SQLCipherQuery mQuery;
 
-    public SQLiteDirectCursorDriver(SQLiteDatabase db, String sql, String editTable) {
+    public SQLiteDirectCursorDriver(SQLCipherDatabase db, String sql, String editTable) {
         mDatabase = db;
         mEditTable = editTable;
         mSql = sql;

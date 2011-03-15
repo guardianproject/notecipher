@@ -16,9 +16,6 @@
 
 package android.database.sqlite;
 
-/* we need some of this stuff that is @hide hidden in the SDK, 
- * so this is just a shell for Eclipse to be happy */
-
 import android.database.AbstractWindowedCursor;
 import android.database.CursorWindow;
 import android.database.DataSetObserver;
@@ -31,6 +28,7 @@ import android.text.TextUtils;
 import android.util.Config;
 import android.util.Log;
 
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -38,13 +36,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A Cursor implementation that exposes results from a query on a
- * {@link SQLCipherDatabase}.
+ * {@link SQLiteDatabase}.
  *
  * SQLiteCursor is not internally synchronized so code using a SQLiteCursor from multiple
  * threads should perform its own synchronization when using the SQLiteCursor.
  */
-public class SQLiteCursor extends AbstractWindowedCursor {
-    static final String TAG = "Cursor";
+public class SQLCipherCursor extends AbstractWindowedCursor {
+    static final String TAG = "SQLCipherCursor";
     static final int NO_COUNT = -1;
 
     /** The name of the table to edit */
@@ -145,8 +143,26 @@ public class SQLiteCursor extends AbstractWindowedCursor {
      */
     protected MainThreadNotificationHandler mNotificationHandler;    
     
+    protected void notifyDataSetChange() {
+        Log.e(TAG, "notifyDataSetChange is not implemented!");
+    }
+    
     public void registerDataSetObserver(DataSetObserver observer) {
-    	// deleted contents to eliminate errors
+        super.registerDataSetObserver(observer);
+        if ((Integer.MAX_VALUE != mMaxRead || Integer.MAX_VALUE != mInitialRead) && 
+                mNotificationHandler == null) {
+            queryThreadLock();
+            try {
+                mNotificationHandler = new MainThreadNotificationHandler();
+                if (mPendingData) {
+                    notifyDataSetChange();
+                    mPendingData = false;
+                }
+            } finally {
+                queryThreadUnlock();
+            }
+        }
+        
     }
     
     /**
@@ -163,9 +179,41 @@ public class SQLiteCursor extends AbstractWindowedCursor {
      * @param query the rest of the query terms
      *     cursor is finalized
      */
-    public SQLiteCursor(SQLCipherDatabase db, SQLiteCursorDriver driver,
+    public SQLCipherCursor(SQLCipherDatabase db, SQLiteCursorDriver driver,
             String editTable, SQLCipherQuery query) {
-    	// deleted contents to eliminate errors
+        // The AbstractCursor constructor needs to do some setup.
+        super();
+        mStackTrace = new DatabaseObjectNotClosedException().fillInStackTrace();
+        mDatabase = db;
+        mDriver = driver;
+        mEditTable = editTable;
+        mColumnNameMap = null;
+        mQuery = query;
+
+        try {
+            db.lock();
+
+            // Setup the list of columns
+            int columnCount = mQuery.columnCountLocked();
+            mColumns = new String[columnCount];
+
+            // Read in all column names
+            for (int i = 0; i < columnCount; i++) {
+                String columnName = mQuery.columnNameLocked(i);
+                mColumns[i] = columnName;
+                if (Config.LOGV) {
+                    Log.v("DatabaseWindow", "mColumns[" + i + "] is "
+                            + mColumns[i]);
+                }
+    
+                // Make note of the row ID column index for quick access to it
+                if ("_id".equals(columnName)) {
+                    mRowIdColumnIndex = i;
+                }
+            }
+        } finally {
+            db.unlock();
+        }
     }
 
     /**
@@ -195,7 +243,26 @@ public class SQLiteCursor extends AbstractWindowedCursor {
     }
 
     private void fillWindow (int startPos) {
-    	// deleted contents to eliminate errors
+        if (mWindow == null) {
+            // If there isn't a window set already it will only be accessed locally
+            mWindow = new CursorWindow(true /* the window is local only */);
+        } else {
+            mCursorState++;
+                queryThreadLock();
+                try {
+                    mWindow.clear();
+                } finally {
+                    queryThreadUnlock();
+                }
+        }
+        mWindow.setStartPosition(startPos);
+        mCount = mQuery.fillWindow(mWindow, mInitialRead, 0);
+        // return -1 means not finished
+        if (mCount == NO_COUNT){
+            mCount = startPos + mInitialRead;
+            Thread t = new Thread(new QueryThread(mCursorState), "query thread");
+            t.start();
+        } 
     }
 
     @Override
@@ -259,8 +326,48 @@ public class SQLiteCursor extends AbstractWindowedCursor {
 
     @Override
     public boolean requery() {
-    	// deleted contents to eliminate errors
-        return false;
+        if (isClosed()) {
+            return false;
+        }
+        long timeStart = 0;
+        if (Config.LOGV) {
+            timeStart = System.currentTimeMillis();
+        }
+        /*
+         * Synchronize on the database lock to ensure that mCount matches the
+         * results of mQuery.requery().
+         */
+        mDatabase.lock();
+        try {
+            if (mWindow != null) {
+                mWindow.clear();
+            }
+            mPos = -1;
+            // This one will recreate the temp table, and get its count
+            mDriver.cursorRequeried(this);
+            mCount = NO_COUNT;
+            mCursorState++;
+            queryThreadLock();
+            try {
+                mQuery.requery();
+            } finally {
+                queryThreadUnlock();
+            }
+        } finally {
+            mDatabase.unlock();
+        }
+
+        if (Config.LOGV) {
+            Log.v("DatabaseWindow", "closing window in requery()");
+            Log.v(TAG, "--- Requery()ed cursor " + this + ": " + mQuery);
+        }
+
+        boolean result = super.requery();
+        if (Config.LOGV) {
+            long timeEnd = System.currentTimeMillis();
+            Log.v(TAG, "requery (" + (timeEnd - timeStart) + " ms): " + mDriver.toString());
+        }
+        return result;
     }
 
     @Override
@@ -290,6 +397,24 @@ public class SQLiteCursor extends AbstractWindowedCursor {
      */
     @Override
     protected void finalize() {
-    	// deleted contents to eliminate errors
+        try {
+            // if the cursor hasn't been closed yet, close it first
+            if (mWindow != null) {
+                int len = mQuery.mSql.length();
+                Log.e(TAG, "Finalizing a Cursor that has not been deactivated or closed. " +
+                        "database = " + mDatabase.getPath() + ", table = " + mEditTable +
+                        ", query = " + mQuery.mSql.substring(0, (len > 100) ? 100 : len),
+                        mStackTrace);
+                close();
+                SQLiteDebug.notifyActiveCursorFinalized();
+            } else {
+                if (Config.LOGV) {
+                    Log.v(TAG, "Finalizing cursor on database = " + mDatabase.getPath() +
+                            ", table = " + mEditTable + ", query = " + mQuery.mSql);
+                }
+            }
+        } finally {
+            super.finalize();
+        }
     }
 }
