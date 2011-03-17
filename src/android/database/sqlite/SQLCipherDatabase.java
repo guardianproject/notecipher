@@ -882,6 +882,44 @@ before and
         return openDatabase(path, factory, CREATE_IF_NECESSARY);
     }
 
+    public static SQLCipherDatabase openOrCreateDatabase(String path, int mode, CursorFactory factory) {
+    	// TODO implement setting the permissions mode of the database file
+    	Log.w(TAG, "implement setting the permissions mode of the database file!");
+        return openDatabase(path, factory, CREATE_IF_NECESSARY);
+    }
+    
+    // from android.app.ContextImpl
+    /*
+    public SQLCipherDatabase openOrCreateDatabase(String name, int mode, CursorFactory factory) {
+        File f = validateFilePath(name, true);
+        SQLCipherDatabase db = SQLCipherDatabase.openOrCreateDatabase(f, factory);
+        setFilePermissionsFromMode(f.getPath(), mode, 0);
+        return db;
+    }
+    */
+    
+    // from android.app.ContextImpl
+    /*
+    private static void setFilePermissionsFromMode(String name, int mode,
+            int extraPermissions) {
+        int perms = FileUtils.S_IRUSR|FileUtils.S_IWUSR
+            |FileUtils.S_IRGRP|FileUtils.S_IWGRP
+            |extraPermissions;
+        if ((mode&MODE_WORLD_READABLE) != 0) {
+            perms |= FileUtils.S_IROTH;
+        }
+        if ((mode&MODE_WORLD_WRITEABLE) != 0) {
+            perms |= FileUtils.S_IWOTH;
+        }
+        if (DEBUG) {
+            Log.i(TAG, "File " + name + ": mode=0x" + Integer.toHexString(mode)
+                  + ", perms=0x" + Integer.toHexString(perms));
+        }
+        FileUtils.setPermissions(name, perms, -1, -1);
+    }
+    */
+
+    
     /**
      * Create a memory backed SQLite database.  Its contents will be destroyed
      * when the database is closed.
@@ -1242,8 +1280,6 @@ before and
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      * @see Cursor
      */
-    // we are not currently using a CursorFactory to create cursors
-    /*
     public Cursor queryWithFactory(CursorFactory cursorFactory,
             boolean distinct, String table, String[] columns,
             String selection, String[] selectionArgs, String groupBy,
@@ -1257,7 +1293,7 @@ before and
         return rawQueryWithFactory(
                 cursorFactory, sql, selectionArgs, findEditTable(table));
     }
-    */
+
 
     /**
      * Query the given table, returning a {@link Cursor} over the result set.
@@ -1357,7 +1393,7 @@ before and
         try { // from SQLiteDirectCursorDriver.java
             // TODO port this SQLiteDirectCursorDriver code to SQLCipher
         	// compile the query
-            SQLiteQuery query = new SQLiteQuery(mDatabase, mSql, 0, selectionArgs);
+            SQLCipherQuery query = new SQLCipherQuery(this, mSql, 0, selectionArgs);
 
             try {
                 // Arg binding
@@ -1624,7 +1660,6 @@ before and
         lock();
         SQLCipherStatement statement = null;
         try {
-        	// TODO replace with non-compiled SQL query
             statement = compileStatement(sql.toString());
 
             // Bind the values
@@ -1855,7 +1890,6 @@ before and
         }
         SQLCipherStatement statement = null;
         try {
-        	// TODO replace with non-compiled SQL query
             statement = compileStatement(sql);
             if (bindArgs != null) {
                 int numArgs = bindArgs.length;

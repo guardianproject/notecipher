@@ -96,7 +96,8 @@ public abstract class SQLCipherOpenHelper {
                 db = SQLCipherDatabase.create(null);
             } else {
             	// TODO create a database file named mName
-                //db = mContext.openOrCreateDatabase(mName, 0, mFactory);
+//                db = mContext.openOrCreateDatabase(mName, 0, mFactory);
+                db = SQLCipherDatabase.openOrCreateDatabase(mName, 0, null);
             }
 
             int version = db.getVersion();

@@ -24,8 +24,8 @@ import android.util.Log;
  * A SQLite program that represents a query that reads the resulting rows into a CursorWindow.
  * This class is used by SQLiteCursor and isn't useful itself.
  *
- * SQLiteQuery is not internally synchronized so code using a SQLiteQuery from multiple
- * threads should perform its own synchronization when using the SQLiteQuery.
+ * SQLCipherQuery is not internally synchronized so code using a SQLCipherQuery from multiple
+ * threads should perform its own synchronization when using the SQLCipherQuery.
  */
 public class SQLCipherQuery extends SQLCipherProgram {
     private static final String TAG = "Cursor";
