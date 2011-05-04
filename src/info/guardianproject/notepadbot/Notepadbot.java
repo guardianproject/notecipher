@@ -16,20 +16,24 @@
 
 package info.guardianproject.notepadbot;
 
-import com.android.demo.notepad3.R;
-
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.TextView;
+import android.widget.Toast;
+
 
 public class Notepadbot extends ListActivity {
     private static final int ACTIVITY_CREATE=0;
@@ -40,15 +44,69 @@ public class Notepadbot extends ListActivity {
 
     private NotesDbAdapter mDbHelper;
     
+    private String password;
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notes_list);
-        mDbHelper = new NotesDbAdapter(this);
-        mDbHelper.open();
-        fillData();
+
         registerForContextMenu(getListView());
+    }
+    
+    
+    
+    @Override
+	protected void onResume() {
+		super.onResume();
+		
+		if (mDbHelper == null)
+		showPassword();
+	}
+
+
+
+	private void showPassword ()
+    {
+    	 // This example shows how to add a custom layout to an AlertDialog
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
+        new AlertDialog.Builder(this)
+            .setTitle("notepadbot secured")
+            .setView(textEntryView)
+            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                	password = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit)).getText().toString();
+                	
+                	unlockDatabase(password);
+                }
+            })
+            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    /* User clicked cancel so do some stuff */
+                }
+            })
+            .create().show();
+    }
+    
+    private void unlockDatabase (String password)
+    {
+    	if (mDbHelper == null)
+    		mDbHelper = new NotesDbAdapter(this);
+
+    	try
+    	{
+    	
+    		mDbHelper.open(password);
+    		fillData();
+    	}
+    	catch (Exception e)
+    	{
+    		Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+    	}
     }
     
     private void fillData() {
@@ -106,6 +164,11 @@ public class Notepadbot extends ListActivity {
 	
     private void createNote() {
         Intent i = new Intent(this, NoteEdit.class);
+        
+        i.putExtra("pwd", password);
+        
+       // mDbHelper.close();
+        
         startActivityForResult(i, ACTIVITY_CREATE);
     }
     
@@ -113,6 +176,7 @@ public class Notepadbot extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         Intent i = new Intent(this, NoteEdit.class);
+        i.putExtra("pwd", password);
         i.putExtra(NotesDbAdapter.KEY_ROWID, id);
         startActivityForResult(i, ACTIVITY_EDIT);
     }
@@ -121,6 +185,7 @@ public class Notepadbot extends ListActivity {
     protected void onActivityResult(int requestCode, int resultCode, 
                                     Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
+      //  mDbHelper.open(password);
         fillData();
     }
 }

@@ -16,12 +16,12 @@
 
 package info.guardianproject.notepadbot;
 
+import info.guardianproject.database.sqlcipher.SQLiteDatabase;
+import info.guardianproject.database.sqlcipher.SQLiteOpenHelper;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLCipherDatabase;
-import android.database.sqlite.SQLCipherOpenHelper;
 import android.util.Log;
 
 /**
@@ -42,7 +42,7 @@ public class NotesDbAdapter {
 
     private static final String TAG = "NotesDbAdapter";
     private DatabaseHelper mDbHelper;
-    private SQLCipherDatabase mDb;
+    private SQLiteDatabase mDb;
     
     /**
      * Database creation sql statement
@@ -57,20 +57,22 @@ public class NotesDbAdapter {
 
     private final Context mCtx;
 
-    private static class DatabaseHelper extends SQLCipherOpenHelper {
+   
+    private static class DatabaseHelper extends SQLiteOpenHelper {
 
+    	
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
+            
         }
 
         @Override
-        public void onCreate(SQLCipherDatabase db) {
-
+        public void onCreate(SQLiteDatabase db) {
             db.execSQL(DATABASE_CREATE);
         }
 
         @Override
-        public void onUpgrade(SQLCipherDatabase db, int oldVersion, int newVersion) {
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
             db.execSQL("DROP TABLE IF EXISTS notes");
@@ -97,9 +99,10 @@ public class NotesDbAdapter {
      *         initialization call)
      * @throws SQLException if the database could be neither opened or created
      */
-    public NotesDbAdapter open() throws SQLException {
+    public NotesDbAdapter open(String password) throws SQLException {
         mDbHelper = new DatabaseHelper(mCtx);
-        mDb = mDbHelper.getWritableDatabase();
+        mDb = mDbHelper.getWritableDatabase(password);
+        mDb.execSQL("PRAGMA key = '" + password + "'");
         return this;
     }
     

@@ -16,11 +16,10 @@
 
 package info.guardianproject.notepadbot;
 
-import com.android.demo.notepad3.R;
-
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,7 +35,10 @@ public class NoteEdit extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDbHelper = new NotesDbAdapter(this);
-        mDbHelper.open();
+        
+        String password = this.getIntent().getStringExtra("pwd");
+        
+        mDbHelper.open(password);
         setContentView(R.layout.note_edit);
         
        
@@ -51,6 +53,9 @@ public class NoteEdit extends Activity {
 			Bundle extras = getIntent().getExtras();            
 			mRowId = extras != null ? extras.getLong(NotesDbAdapter.KEY_ROWID) 
 									: null;
+			
+			if (mRowId == 0)
+				mRowId = null;
 		}
 
 		populateFields();
@@ -58,6 +63,8 @@ public class NoteEdit extends Activity {
         confirmButton.setOnClickListener(new View.OnClickListener() {
 
         	public void onClick(View view) {
+        	
+        		
         	    setResult(RESULT_OK);
         	    finish();
         	}
@@ -66,14 +73,22 @@ public class NoteEdit extends Activity {
     }
     
     private void populateFields() {
+    	try
+    	{
         if (mRowId != null) {
             Cursor note = mDbHelper.fetchNote(mRowId);
             startManagingCursor(note);
+            
             mTitleText.setText(note.getString(
     	            note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
             mBodyText.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
         }
+    	}
+    	catch (Exception e)
+    	{
+    		Log.e("notepadbot", "error populating",e);
+    	}
     }
     
     @Override
@@ -106,6 +121,8 @@ public class NoteEdit extends Activity {
         } else {
             mDbHelper.updateNote(mRowId, title, body);
         }
+        
+        mDbHelper.close();
     }
     
 }
