@@ -106,6 +106,7 @@ public class Notepadbot extends ListActivity {
     	catch (Exception e)
     	{
     		Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+    		showPassword();
     	}
     }
     
