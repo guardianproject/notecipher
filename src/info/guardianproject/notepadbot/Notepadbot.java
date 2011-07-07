@@ -16,6 +16,7 @@
 
 package info.guardianproject.notepadbot;
 
+import info.guardianproject.database.sqlcipher.SQLiteDatabase;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -50,6 +51,9 @@ public class Notepadbot extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        SQLiteDatabase.loadLibs(this);
+        
         setContentView(R.layout.notes_list);
 
         registerForContextMenu(getListView());
