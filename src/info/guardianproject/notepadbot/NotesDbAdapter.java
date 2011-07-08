@@ -102,8 +102,13 @@ public class NotesDbAdapter {
     public NotesDbAdapter open(String password) throws SQLException {
         mDbHelper = new DatabaseHelper(mCtx);
         mDb = mDbHelper.getWritableDatabase(password);
-        mDb.execSQL("PRAGMA key = '" + password + "'");
+        //mDb.execSQL("PRAGMA key = '" + password + "'");
         return this;
+    }
+    
+    public void rekey (String password)
+    {
+    	mDb.execSQL("PRAGMA rekey = '" + password + "'");
     }
     
     public void close() {

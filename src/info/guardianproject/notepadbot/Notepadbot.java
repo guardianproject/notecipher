@@ -28,11 +28,12 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -42,6 +43,7 @@ public class Notepadbot extends ListActivity {
     
     private static final int INSERT_ID = Menu.FIRST;
     private static final int DELETE_ID = Menu.FIRST + 1;
+    private static final int REKEY_ID = Menu.FIRST + 2;
 
     private NotesDbAdapter mDbHelper;
     
@@ -57,6 +59,9 @@ public class Notepadbot extends ListActivity {
         setContentView(R.layout.notes_list);
 
         registerForContextMenu(getListView());
+        
+       
+        
     }
     
     
@@ -66,7 +71,31 @@ public class Notepadbot extends ListActivity {
 		super.onResume();
 		
 		if (mDbHelper == null)
-		showPassword();
+			showPassword();
+		
+	
+	}
+
+
+
+
+
+	@Override
+	public void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		
+		 findViewById(R.id.listlayout).setOnTouchListener(new OnTouchListener ()
+	        {
+
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					createNote();
+					return false;
+				}
+	        	
+	        }
+	        		
+	        );
 	}
 
 
@@ -77,7 +106,7 @@ public class Notepadbot extends ListActivity {
         LayoutInflater factory = LayoutInflater.from(this);
         final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
         new AlertDialog.Builder(this)
-            .setTitle("notepadbot secured")
+            .setTitle(getString(R.string.app_name))
             .setView(textEntryView)
             .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
@@ -85,6 +114,31 @@ public class Notepadbot extends ListActivity {
                 	password = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit)).getText().toString();
                 	
                 	unlockDatabase(password);
+                }
+            })
+            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    /* User clicked cancel so do some stuff */
+                }
+            })
+            .create().show();
+    }
+	
+	private void showRekeyDialog ()
+    {
+    	 // This example shows how to add a custom layout to an AlertDialog
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
+        new AlertDialog.Builder(this)
+            .setTitle(getString(R.string.app_name))
+            .setView(textEntryView)
+            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                	password = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit)).getText().toString();
+                	
+                	rekeyDatabase(password);
                 }
             })
             .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -114,6 +168,21 @@ public class Notepadbot extends ListActivity {
     	}
     }
     
+    private void rekeyDatabase (String password)
+    {
+
+    	try
+    	{
+    	    	mDbHelper.rekey(password);    		
+
+    	}
+    	catch (Exception e)
+    	{
+    		Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+
+    	}
+    }
+    
     private void fillData() {
         Cursor notesCursor = mDbHelper.fetchAllNotes();
         startManagingCursor(notesCursor);
@@ -134,6 +203,7 @@ public class Notepadbot extends ListActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         menu.add(0, INSERT_ID, 0, R.string.menu_insert);
+        menu.add(0, REKEY_ID, 0, R.string.menu_rekey);
         return true;
     }
 
@@ -143,6 +213,9 @@ public class Notepadbot extends ListActivity {
         case INSERT_ID:
             createNote();
             return true;
+        case REKEY_ID:
+            showRekeyDialog();
+            return true;            
         }
        
         return super.onMenuItemSelected(featureId, item);
