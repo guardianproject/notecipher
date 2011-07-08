@@ -2,7 +2,8 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
+	android:layout_height="fill_parent"
+	android:background="#aaaaaa">
 	
 	<LinearLayout android:orientation="horizontal"
 		android:layout_width="fill_parent"
@@ -10,20 +11,32 @@
 
 		<TextView android:layout_width="wrap_content"
 			android:layout_height="wrap_content" 
-			android:text="@string/title" />
+			android:text="@string/title"
+			  style="@style/padtext"
+			  android:padding="3px"
+			 />
 		<EditText android:id="@+id/title" 
 		  android:layout_width="wrap_content"
 			android:layout_height="wrap_content" 
-			android:layout_weight="1"/>
+			android:layout_weight="1"
+			style="@style/padtext"
+			/>
 	</LinearLayout>
 
 	<TextView android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
-		android:text="@string/body" />
+		android:text="@string/body" 
+		  style="@style/padtext"
+		  android:padding="3px"
+		/>
 	<EditText android:id="@+id/body" android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
-		android:scrollbars="vertical" />
+		style="@style/padtext"
+		android:scrollbars="vertical"
+		android:gravity="top"
+        android:singleLine="false"
+		 />
 	
 	<Button android:id="@+id/confirm" 
 	  android:text="@string/confirm"
