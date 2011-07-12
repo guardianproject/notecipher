@@ -96,7 +96,7 @@ public class NoteEdit extends Activity {
             {
             	// Load up the image's dimensions not the image itself
 				BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
-				bmpFactoryOptions.inSampleSize = 2;
+				bmpFactoryOptions.inSampleSize = 3;
 			
             	Bitmap blobb = BitmapFactory.decodeByteArray(blob, 0, blob.length, bmpFactoryOptions);
 

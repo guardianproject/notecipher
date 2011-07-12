@@ -37,24 +37,26 @@ public class ImageStore extends Activity
 			}
 			
 			if (stream != null)
-				loadInputStream(stream);
+				loadInputStream();
 		}
 	}
 	
-	private void loadInputStream(Uri pathToStream)
+	private void loadInputStream()
 	{
 		try {
-			InputStream is = getContentResolver().openInputStream(pathToStream);
+			InputStream is = getContentResolver().openInputStream(stream);
 			
 			byte[] data = null;
 			
 			
 			data = readBytesAndClose (is);
 			
-			String title = pathToStream.getLastPathSegment();
-			String body = pathToStream.getPath();
+			String title = stream.getLastPathSegment();
+			String body = stream.getPath();
 			
 			mDbHelper.createNote(title, body, data);
+			
+			data = null;
 			
 			Toast.makeText(this, "Imported new file: " + title, Toast.LENGTH_LONG).show();
 			
