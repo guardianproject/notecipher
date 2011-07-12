@@ -32,9 +32,9 @@ android:layout_height="fill_parent">
 		  style="@style/padtext"
 		  android:padding="3px"
 		/>
-	<EditText android:id="@+id/body" android:layout_width="fill_parent"
+	<EditText android:id="@+id/body" 
+	android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_weight="1"
 		style="@style/padtext"
 		android:scrollbars="vertical"
 		android:gravity="top"
