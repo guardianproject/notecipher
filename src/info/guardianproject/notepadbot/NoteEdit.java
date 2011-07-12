@@ -18,16 +18,20 @@ package info.guardianproject.notepadbot;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 public class NoteEdit extends Activity {
 
 	private EditText mTitleText;
     private EditText mBodyText;
+    private ImageView mImageView;
     private Long mRowId;
     private NotesDbAdapter mDbHelper;
 
@@ -44,8 +48,9 @@ public class NoteEdit extends Activity {
        
         mTitleText = (EditText) findViewById(R.id.title);
         mBodyText = (EditText) findViewById(R.id.body);
-      
-        Button confirmButton = (Button) findViewById(R.id.confirm);
+        mImageView = (ImageView) findViewById(R.id.odata);
+        
+      //  Button confirmButton = (Button) findViewById(R.id.confirm);
        
         mRowId = savedInstanceState != null ? savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID) 
                 							: null;
@@ -60,6 +65,7 @@ public class NoteEdit extends Activity {
 
 		populateFields();
 		
+		/*
         confirmButton.setOnClickListener(new View.OnClickListener() {
 
         	public void onClick(View view) {
@@ -69,7 +75,7 @@ public class NoteEdit extends Activity {
         	    finish();
         	}
           
-        });
+        });*/
     }
     
     private void populateFields() {
@@ -83,7 +89,20 @@ public class NoteEdit extends Activity {
     	            note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
             mBodyText.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
-        }
+            
+            byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
+            
+            if (blob != null)
+            {
+            	// Load up the image's dimensions not the image itself
+				BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
+				bmpFactoryOptions.inSampleSize = 2;
+			
+            	Bitmap blobb = BitmapFactory.decodeByteArray(blob, 0, blob.length, bmpFactoryOptions);
+
+            	mImageView.setImageBitmap(blobb);
+            }
+        }   
     	}
     	catch (Exception e)
     	{
@@ -94,7 +113,10 @@ public class NoteEdit extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(NotesDbAdapter.KEY_ROWID, mRowId);
+        
+       if (mRowId != null)
+    		   outState.putLong(NotesDbAdapter.KEY_ROWID, mRowId);
+       
     }
     
     @Override
@@ -113,13 +135,16 @@ public class NoteEdit extends Activity {
         String title = mTitleText.getText().toString();
         String body = mBodyText.getText().toString();
 
-        if (mRowId == null) {
-            long id = mDbHelper.createNote(title, body);
-            if (id > 0) {
-                mRowId = id;
-            }
-        } else {
-            mDbHelper.updateNote(mRowId, title, body);
+        if (title != null && title.length() > 0)
+        {
+	        if (mRowId == null) {
+	            long id = mDbHelper.createNote(title, body, null);
+	            if (id > 0) {
+	                mRowId = id;
+	            }
+	        } else {
+	            mDbHelper.updateNote(mRowId, title, body, null);
+	        }
         }
         
         mDbHelper.close();
