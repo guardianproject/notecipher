@@ -38,6 +38,7 @@ public class NotesDbAdapter {
 
     public static final String KEY_TITLE = "title";
     public static final String KEY_BODY = "body";
+    public static final String KEY_DATA = "odata";
     public static final String KEY_ROWID = "_id";
 
     private static final String TAG = "NotesDbAdapter";
@@ -49,11 +50,11 @@ public class NotesDbAdapter {
      */
     private static final String DATABASE_CREATE =
             "create table notes (_id integer primary key autoincrement, "
-                    + "title text not null, body text not null);";
+                    + KEY_TITLE + " text not null, " + KEY_BODY + " text not null, " + KEY_DATA + " blob);";
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "notes";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private final Context mCtx;
 
@@ -75,8 +76,10 @@ public class NotesDbAdapter {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
-            db.execSQL("DROP TABLE IF EXISTS notes");
-            onCreate(db);
+          
+            //need to migrate old notes here
+            //  db.execSQL("DROP TABLE IF EXISTS notes");
+            //onCreate(db);
         }
     }
 
@@ -125,10 +128,13 @@ public class NotesDbAdapter {
      * @param body the body of the note
      * @return rowId or -1 if failed
      */
-    public long createNote(String title, String body) {
+    public long createNote(String title, String body, byte[] data) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_TITLE, title);
         initialValues.put(KEY_BODY, body);
+        
+        if (data != null)
+        	initialValues.put(KEY_DATA, data);
 
         return mDb.insert(DATABASE_TABLE, null, initialValues);
     }
@@ -151,8 +157,7 @@ public class NotesDbAdapter {
      */
     public Cursor fetchAllNotes() {
 
-        return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID, KEY_TITLE,
-                KEY_BODY}, null, null, null, null, null);
+        return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID, KEY_TITLE}, null, null, null, null, null);
     }
 
     /**
@@ -167,7 +172,7 @@ public class NotesDbAdapter {
         Cursor mCursor =
 
                 mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,
-                        KEY_TITLE, KEY_BODY}, KEY_ROWID + "=" + rowId, null,
+                        KEY_TITLE, KEY_BODY, KEY_DATA}, KEY_ROWID + "=" + rowId, null,
                         null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
@@ -186,11 +191,14 @@ public class NotesDbAdapter {
      * @param body value to set note body to
      * @return true if the note was successfully updated, false otherwise
      */
-    public boolean updateNote(long rowId, String title, String body) {
+    public boolean updateNote(long rowId, String title, String body, byte[] data) {
         ContentValues args = new ContentValues();
         args.put(KEY_TITLE, title);
         args.put(KEY_BODY, body);
-
+        
+        if (data != null)
+        	args.put(KEY_DATA, data);
+        
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
 }
