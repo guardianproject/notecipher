@@ -3,10 +3,14 @@
     <string name="app_name">NoteCipher</string>
     <string name="no_notes">No Notes Yet</string>
     <string name="menu_insert">Add Note</string>
-    <string name="menu_delete">Delete Note</string>
+    <string name="menu_delete">Delete Item</string>
     <string name="menu_rekey">Change PIN</string>
+    <string name="menu_share">Share to App</string>
+    <string name="menu_view">Export to Gallery</string>
     <string name="title">Summary</string>
     <string name="body">Note Text</string>
     <string name="confirm">Save Note</string>
     <string name="edit_note">Edit Note</string>
+    <string name="confirm_delete">Do you want to delete the original, unencrypted file?</string>
+    
 </resources>
