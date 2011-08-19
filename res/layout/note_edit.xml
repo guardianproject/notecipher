@@ -41,16 +41,6 @@ android:layout_height="fill_parent">
         android:singleLine="false"
 		 />
 		 
-	<!-- 
-	<Button android:id="@+id/confirm" 
-	  android:text="@string/confirm"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
-		 -->
-		
-		<ImageView android:id="@+id/odata"
-		 android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
 
 </LinearLayout>
 </ScrollView>

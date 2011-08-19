@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="#aaaaaa">
+	
+	<EditText android:id="@+id/title" 
+		  android:layout_width="wrap_content"
+			android:layout_height="wrap_content" 
+			android:layout_weight="1"
+			style="@style/padtext"
+        android:background="#000000cc"
+        android:layout_x="10px"
+        android:layout_y="10px"
+			/>
+<EditText android:id="@+id/body" 
+	android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		style="@style/padtext"
+		android:scrollbars="vertical"
+		android:gravity="top"
+        android:singleLine="false"
+        android:background="#000000cc"
+          android:layout_x="10px"
+        android:layout_y="40px"
+		 />
+		 
+		 
+		<ImageView android:id="@+id/odata"
+		 android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_x="0px"
+			android:layout_y="0px"
+			
+			 />
+
+</AbsoluteLayout>
