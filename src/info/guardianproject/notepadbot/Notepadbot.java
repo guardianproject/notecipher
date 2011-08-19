@@ -78,7 +78,6 @@ public class Notepadbot extends ListActivity {
         if (getIntent() != null)
 		{
 			
-		
 			if(getIntent().hasExtra(Intent.EXTRA_STREAM)) {
 				dataStream = (Uri) getIntent().getExtras().get(Intent.EXTRA_STREAM);
 			}
@@ -238,6 +237,11 @@ public class Notepadbot extends ListActivity {
         SimpleCursorAdapter notes = 
         	    new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
         setListAdapter(notes);
+        
+        if (notes.isEmpty())
+        {
+        	createNote();
+        }
     }
     
     @Override
@@ -395,18 +399,32 @@ public class Notepadbot extends ListActivity {
     
     
 
-
 	@Override
 	protected void onStop() {
 		super.onStop();
 		
+		
 		//delete temp share file
-		  File file = new File(getExternalFilesDir(null), "nctemp.jpg");
+		  File file = new File(getExternalFilesDirEclair(null), "nctemp.jpg");
 		  if (file.exists())
 			  file.delete();
 		
 	}
 
+
+	public File getExternalFilesDirEclair(Object object) {
+		
+		
+		String packageName = getPackageName();
+		File externalPath = Environment.getExternalStorageDirectory();
+		File appFiles = new File(externalPath.getAbsolutePath() +
+	                         "/Android/data/" + packageName + "/files");
+		
+		if (!appFiles.exists())
+			appFiles.mkdirs();
+		
+		return appFiles;
+	}
 
 	private boolean saveTmpImage(byte[] outdata) {
 		
@@ -415,7 +433,7 @@ public class Notepadbot extends ListActivity {
         // what you place here, since the user often manages these files.  For
         // pictures and other media owned by the application, consider
         // Context.getExternalMediaDir().
-        File path = this.getExternalFilesDir(null);
+        File path = getExternalFilesDirEclair(null);
         File file = new File(path, "nctemp.jpg");
 
         try {
@@ -456,8 +474,8 @@ public class Notepadbot extends ListActivity {
         // what you place here, since the user often manages these files.  For
         // pictures and other media owned by the application, consider
         // Context.getExternalMediaDir().
-	    File path = getExternalFilesDir("NoteCipher");
-        File file = new File(path, title + ".jpg");
+	    File path = getExternalFilesDirEclair("NoteCipher");
+        File file = new File(path, title);
 
         try {
             // Make sure the Pictures directory exists.
@@ -475,6 +493,8 @@ public class Notepadbot extends ListActivity {
             os.write(data);
             is.close();
             os.close();
+            
+            /*
 
 	    	  // Tell the media scanner about the new file so that it is
 	        // immediately available to the user.
@@ -501,7 +521,7 @@ public class Notepadbot extends ListActivity {
 	               
 	            }
 	        });
-	        
+	        */
 	    	
 	    	return true;
 

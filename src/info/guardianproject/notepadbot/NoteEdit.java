@@ -43,17 +43,10 @@ public class NoteEdit extends Activity {
         String password = this.getIntent().getStringExtra("pwd");
         
         mDbHelper.open(password);
-        setContentView(R.layout.note_edit);
-        
-       
-        mTitleText = (EditText) findViewById(R.id.title);
-        mBodyText = (EditText) findViewById(R.id.body);
-        mImageView = (ImageView) findViewById(R.id.odata);
-        
-      //  Button confirmButton = (Button) findViewById(R.id.confirm);
-       
+      
         mRowId = savedInstanceState != null ? savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID) 
                 							: null;
+        
 		if (mRowId == null) {
 			Bundle extras = getIntent().getExtras();            
 			mRowId = extras != null ? extras.getLong(NotesDbAdapter.KEY_ROWID) 
@@ -65,44 +58,56 @@ public class NoteEdit extends Activity {
 
 		populateFields();
 		
-		/*
-        confirmButton.setOnClickListener(new View.OnClickListener() {
-
-        	public void onClick(View view) {
-        	
-        		
-        	    setResult(RESULT_OK);
-        	    finish();
-        	}
+    }
+    
+    private void setupView (boolean hasImage)
+    {
+    	if (hasImage)
+      	  setContentView(R.layout.note_edit_image);
+    	else
+    	  setContentView(R.layout.note_edit);
           
-        });*/
+          
+          mTitleText = (EditText) findViewById(R.id.title);
+          mBodyText = (EditText) findViewById(R.id.body);
+          mImageView = (ImageView) findViewById(R.id.odata);
     }
     
     private void populateFields() {
     	try
     	{
-        if (mRowId != null) {
-            Cursor note = mDbHelper.fetchNote(mRowId);
-            startManagingCursor(note);
-            
-            mTitleText.setText(note.getString(
-    	            note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
-            mBodyText.setText(note.getString(
-                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
-            
-            byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
-            
-            if (blob != null)
-            {
-            	// Load up the image's dimensions not the image itself
-				BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
-				bmpFactoryOptions.inSampleSize = 3;
-			
-            	Bitmap blobb = BitmapFactory.decodeByteArray(blob, 0, blob.length, bmpFactoryOptions);
-
-            	mImageView.setImageBitmap(blobb);
-            }
-        }   
+    		
+	        if (mRowId != null) {
+	            Cursor note = mDbHelper.fetchNote(mRowId);
+	            startManagingCursor(note);
+	
+	            byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
+	
+	            setupView(blob != null);
+	            
+	            if (blob != null)
+	            {
+	            	
+	            	
+	            	// Load up the image's dimensions not the image itself
+					BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
+					bmpFactoryOptions.inSampleSize = 3;
+				
+	            	Bitmap blobb = BitmapFactory.decodeByteArray(blob, 0, blob.length, bmpFactoryOptions);
+	
+	            	mImageView.setImageBitmap(blobb);
+	            }
+	            
+	            mTitleText.setText(note.getString(
+	    	            note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
+	            mBodyText.setText(note.getString(
+	                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
+	            
+	            
+	           
+	        }   
+	        else
+	        	 setupView(false);
     	}
     	catch (Exception e)
     	{
@@ -132,22 +137,26 @@ public class NoteEdit extends Activity {
     }
     
     private void saveState() {
-        String title = mTitleText.getText().toString();
-        String body = mBodyText.getText().toString();
-
-        if (title != null && title.length() > 0)
-        {
-	        if (mRowId == null) {
-	            long id = mDbHelper.createNote(title, body, null);
-	            if (id > 0) {
-	                mRowId = id;
-	            }
-	        } else {
-	            mDbHelper.updateNote(mRowId, title, body, null);
+    	
+    	if (mTitleText != null && mTitleText.getText() != null)
+    	{
+	        String title = mTitleText.getText().toString();
+	        String body = mBodyText.getText().toString();
+	
+	        if (title != null && title.length() > 0)
+	        {
+		        if (mRowId == null) {
+		            long id = mDbHelper.createNote(title, body, null, null);
+		            if (id > 0) {
+		                mRowId = id;
+		            }
+		        } else {
+		            mDbHelper.updateNote(mRowId, title, body, null, null);
+		        }
 	        }
-        }
-        
-        mDbHelper.close();
+	        
+	        mDbHelper.close();
+    	}
     }
     
 }

@@ -34,6 +34,7 @@ public class ImageStore extends Activity
 		
 			if(stream == null && getIntent().hasExtra(Intent.EXTRA_STREAM)) {
 				stream = (Uri) getIntent().getExtras().get(Intent.EXTRA_STREAM);
+				
 			}
 			
 			if (stream != null)
@@ -46,15 +47,14 @@ public class ImageStore extends Activity
 		try {
 			InputStream is = getContentResolver().openInputStream(stream);
 			
-			byte[] data = null;
+			String mimeType = getContentResolver().getType(stream);
 			
-			
-			data = readBytesAndClose (is);
+			byte[] data = readBytesAndClose (is);
 			
 			String title = stream.getLastPathSegment();
 			String body = stream.getPath();
 			
-			mDbHelper.createNote(title, body, data);
+			mDbHelper.createNote(title, body, data, mimeType);
 			
 			data = null;
 			

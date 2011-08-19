@@ -39,6 +39,7 @@ public class NotesDbAdapter {
     public static final String KEY_TITLE = "title";
     public static final String KEY_BODY = "body";
     public static final String KEY_DATA = "odata";
+    public static final String KEY_TYPE = "otype";
     public static final String KEY_ROWID = "_id";
 
     private static final String TAG = "NotesDbAdapter";
@@ -50,7 +51,7 @@ public class NotesDbAdapter {
      */
     private static final String DATABASE_CREATE =
             "create table notes (_id integer primary key autoincrement, "
-                    + KEY_TITLE + " text not null, " + KEY_BODY + " text not null, " + KEY_DATA + " blob);";
+                    + KEY_TITLE + " text not null, " + KEY_BODY + " text not null, " + KEY_DATA + " blob," + KEY_TYPE + " text);";
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "notes";
@@ -128,13 +129,17 @@ public class NotesDbAdapter {
      * @param body the body of the note
      * @return rowId or -1 if failed
      */
-    public long createNote(String title, String body, byte[] data) {
+    public long createNote(String title, String body, byte[] data, String dataType) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_TITLE, title);
         initialValues.put(KEY_BODY, body);
         
         if (data != null)
+        {
         	initialValues.put(KEY_DATA, data);
+        	initialValues.put(KEY_TYPE, dataType);
+        	
+        }
 
         return mDb.insert(DATABASE_TABLE, null, initialValues);
     }
@@ -172,7 +177,7 @@ public class NotesDbAdapter {
         Cursor mCursor =
 
                 mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,
-                        KEY_TITLE, KEY_BODY, KEY_DATA}, KEY_ROWID + "=" + rowId, null,
+                        KEY_TITLE, KEY_BODY, KEY_DATA, KEY_TYPE}, KEY_ROWID + "=" + rowId, null,
                         null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
@@ -191,13 +196,17 @@ public class NotesDbAdapter {
      * @param body value to set note body to
      * @return true if the note was successfully updated, false otherwise
      */
-    public boolean updateNote(long rowId, String title, String body, byte[] data) {
+    public boolean updateNote(long rowId, String title, String body, byte[] data, String dataType) {
         ContentValues args = new ContentValues();
         args.put(KEY_TITLE, title);
         args.put(KEY_BODY, body);
         
         if (data != null)
+        {
         	args.put(KEY_DATA, data);
+        	args.put(KEY_DATA, dataType);
+        }
+        
         
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
