@@ -33,12 +33,11 @@ public class NoteEdit extends Activity {
     private EditText mBodyText;
     private ImageView mImageView;
     private long mRowId = -1;
-    private NotesDbAdapter mDbHelper;
-
+   
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDbHelper = NotesDbAdapter.getInstance(this);
+        
         
         if (savedInstanceState != null)
         	mRowId = savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID);
@@ -64,7 +63,7 @@ public class NoteEdit extends Activity {
     	try
     	{
     		
-	            Cursor note = mDbHelper.fetchNote(mRowId);
+	            Cursor note = NotesDbAdapter.getInstance(this).fetchNote(mRowId);
 	            startManagingCursor(note);
 	
 	            byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
@@ -154,12 +153,12 @@ public class NoteEdit extends Activity {
 	        if (title != null && title.length() > 0)
 	        {
 		        if (mRowId == -1) {
-		            long id = mDbHelper.createNote(title, body, null, null);
+		            long id = NotesDbAdapter.getInstance(this).createNote(title, body, null, null);
 		            if (id > 0) {
 		                mRowId = id;
 		            }
 		        } else {
-		            mDbHelper.updateNote(mRowId, title, body, null, null);
+		        	NotesDbAdapter.getInstance(this).updateNote(mRowId, title, body, null, null);
 		        }
 	        }
 	        

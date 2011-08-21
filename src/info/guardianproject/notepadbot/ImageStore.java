@@ -16,15 +16,11 @@ import android.widget.Toast;
 public class ImageStore extends Activity
 {
 
-	private NotesDbAdapter mDbHelper;
-	
 	private Uri stream;
 	
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		
-		openDB(getIntent());
 		
 		// If originalImageUri is null, we are likely coming from another app via "share"
 		
@@ -54,13 +50,12 @@ public class ImageStore extends Activity
 			String title = stream.getLastPathSegment();
 			String body = stream.getPath();
 			
-			mDbHelper.createNote(title, body, data, mimeType);
+			NotesDbAdapter.getInstance(this).createNote(title, body, data, mimeType);
 			
 			data = null;
 			
 			Toast.makeText(this, "Imported new file: " + title, Toast.LENGTH_LONG).show();
 			
-			mDbHelper.close();
 
 			handleDelete();
 			
@@ -111,12 +106,6 @@ public class ImageStore extends Activity
 		b.show();
 	}
 	
-	
-	private void openDB (Intent intent)
-	{
-		mDbHelper = NotesDbAdapter.getInstance(this);
-        
-	}
 	
 	private static byte[] readBytesAndClose(InputStream in) throws IOException {
 	    try {
