@@ -43,6 +43,9 @@ public class NotesDbAdapter {
     public static final String KEY_ROWID = "_id";
 
     private static final String TAG = "NotesDbAdapter";
+    
+    private static NotesDbAdapter instance;
+    
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
     
@@ -57,7 +60,7 @@ public class NotesDbAdapter {
     private static final String DATABASE_TABLE = "notes";
     private static final int DATABASE_VERSION = 3;
 
-    private final Context mCtx;
+    private Context mCtx;
 
    
     private static class DatabaseHelper extends SQLiteOpenHelper {
@@ -90,8 +93,22 @@ public class NotesDbAdapter {
      * 
      * @param ctx the Context within which to work
      */
-    public NotesDbAdapter(Context ctx) {
+    private NotesDbAdapter(Context ctx)
+    {
+
         this.mCtx = ctx;
+    	
+    }
+    
+    
+    public static synchronized NotesDbAdapter getInstance (Context ctx) {
+    	
+    	if (instance == null)
+    	{
+    		instance = new NotesDbAdapter(ctx);
+    	}
+    	
+    	return instance;
     }
 
     /**
@@ -106,13 +123,14 @@ public class NotesDbAdapter {
     public NotesDbAdapter open(String password) throws SQLException {
         mDbHelper = new DatabaseHelper(mCtx);
         mDb = mDbHelper.getWritableDatabase(password);
-        //mDb.execSQL("PRAGMA key = '" + password + "'");
+        System.gc();
         return this;
     }
     
     public void rekey (String password)
     {
     	mDb.execSQL("PRAGMA rekey = '" + password + "'");
+    	System.gc();
     }
     
     public void close() {

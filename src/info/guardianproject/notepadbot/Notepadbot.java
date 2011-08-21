@@ -62,11 +62,8 @@ public class Notepadbot extends ListActivity {
     private static final int SHARE_ID = Menu.FIRST + 3;
     private static final int VIEW_ID = Menu.FIRST + 4;
     
-    
-
     private NotesDbAdapter mDbHelper;
     
-    private String password;
     private Uri dataStream;
     private Uri tmpImageUri;
     
@@ -101,7 +98,6 @@ public class Notepadbot extends ListActivity {
     	
     	Intent passingIntent = new Intent(this,ImageStore.class);
 
-		passingIntent.putExtra("pwd", password);
 		passingIntent.setData(dataStream);
 		startActivityForResult(passingIntent, 1);
     }
@@ -148,12 +144,15 @@ public class Notepadbot extends ListActivity {
             .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
-                	password = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit)).getText().toString();
+                	String password = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit)).getText().toString();
                 	
                 	unlockDatabase(password);
                 	
                 	if (dataStream != null)
         				loadData();
+                	
+                	System.gc();
+                	
                 }
             })
             .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -176,9 +175,12 @@ public class Notepadbot extends ListActivity {
             .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
-                	password = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit)).getText().toString();
+                	String newPassword = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit)).getText().toString();
                 	
-                	rekeyDatabase(password);
+                	rekeyDatabase(newPassword);
+                	
+                	System.gc();
+                	
                 }
             })
             .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -193,7 +195,7 @@ public class Notepadbot extends ListActivity {
     private void unlockDatabase (String password)
     {
     	if (mDbHelper == null)
-    		mDbHelper = new NotesDbAdapter(this);
+    		mDbHelper = NotesDbAdapter.getInstance(this);
 
     	try
     	{
@@ -203,7 +205,7 @@ public class Notepadbot extends ListActivity {
     	}
     	catch (Exception e)
     	{
-    		Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+    		Toast.makeText(this, "Unable to unlock your notes. Are you sure you entered the right PIN?", Toast.LENGTH_LONG).show();
     		showPassword();
     	}
     }
@@ -240,7 +242,7 @@ public class Notepadbot extends ListActivity {
         
         if (notes.isEmpty())
         {
-        	createNote();
+        	Toast.makeText(this, "Tap anywhere to create a new note", Toast.LENGTH_LONG).show();
         }
     }
     
@@ -345,11 +347,6 @@ public class Notepadbot extends ListActivity {
     
     private void createNote() {
         Intent i = new Intent(this, NoteEdit.class);
-        
-        i.putExtra("pwd", password);
-        
-       // mDbHelper.close();
-        
         startActivityForResult(i, ACTIVITY_CREATE);
     }
     
@@ -357,7 +354,6 @@ public class Notepadbot extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
         Intent i = new Intent(this, NoteEdit.class);
-        i.putExtra("pwd", password);
         i.putExtra(NotesDbAdapter.KEY_ROWID, id);
         startActivityForResult(i, ACTIVITY_EDIT);
     }
@@ -366,7 +362,6 @@ public class Notepadbot extends ListActivity {
     protected void onActivityResult(int requestCode, int resultCode, 
                                     Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-      //  mDbHelper.open(password);
         fillData();
     }
     

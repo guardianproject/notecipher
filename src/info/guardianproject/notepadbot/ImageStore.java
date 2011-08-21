@@ -114,11 +114,8 @@ public class ImageStore extends Activity
 	
 	private void openDB (Intent intent)
 	{
-		mDbHelper = new NotesDbAdapter(this);
+		mDbHelper = NotesDbAdapter.getInstance(this);
         
-        String password = intent.getStringExtra("pwd");
-        
-        mDbHelper.open(password);
 	}
 	
 	private static byte[] readBytesAndClose(InputStream in) throws IOException {

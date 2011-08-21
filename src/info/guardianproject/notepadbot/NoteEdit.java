@@ -32,32 +32,19 @@ public class NoteEdit extends Activity {
 	private EditText mTitleText;
     private EditText mBodyText;
     private ImageView mImageView;
-    private Long mRowId;
+    private long mRowId = -1;
     private NotesDbAdapter mDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDbHelper = new NotesDbAdapter(this);
+        mDbHelper = NotesDbAdapter.getInstance(this);
         
-        String password = this.getIntent().getStringExtra("pwd");
-        
-        mDbHelper.open(password);
-      
-        mRowId = savedInstanceState != null ? savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID) 
-                							: null;
-        
-		if (mRowId == null) {
-			Bundle extras = getIntent().getExtras();            
-			mRowId = extras != null ? extras.getLong(NotesDbAdapter.KEY_ROWID) 
-									: null;
+        if (savedInstanceState != null)
+        	mRowId = savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID);
+       
 			
-			if (mRowId == 0)
-				mRowId = null;
-		}
-
-		populateFields();
-		
+   	 
     }
     
     private void setupView (boolean hasImage)
@@ -77,7 +64,6 @@ public class NoteEdit extends Activity {
     	try
     	{
     		
-	        if (mRowId != null) {
 	            Cursor note = mDbHelper.fetchNote(mRowId);
 	            startManagingCursor(note);
 	
@@ -97,17 +83,17 @@ public class NoteEdit extends Activity {
 	
 	            	mImageView.setImageBitmap(blobb);
 	            }
+	            else
+	            {
+	            	 mBodyText.setText(note.getString(
+	 	                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
+	 	           
+	            }
 	            
 	            mTitleText.setText(note.getString(
 	    	            note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
-	            mBodyText.setText(note.getString(
-	                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
 	            
-	            
-	           
-	        }   
-	        else
-	        	 setupView(false);
+	        
     	}
     	catch (Exception e)
     	{
@@ -119,7 +105,7 @@ public class NoteEdit extends Activity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         
-       if (mRowId != null)
+       if (mRowId != -1)
     		   outState.putLong(NotesDbAdapter.KEY_ROWID, mRowId);
        
     }
@@ -133,6 +119,25 @@ public class NoteEdit extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        
+        Bundle extras = getIntent().getExtras();   
+	
+        if (mRowId != -1)
+        {
+        	populateFields();
+        }
+        else if (extras != null)
+		{
+			mRowId =  extras.getLong(NotesDbAdapter.KEY_ROWID);
+			populateFields();
+		}
+		else
+		{
+	   	 	setupView(false);
+		}
+   
+
+		
         populateFields();
     }
     
@@ -141,11 +146,14 @@ public class NoteEdit extends Activity {
     	if (mTitleText != null && mTitleText.getText() != null)
     	{
 	        String title = mTitleText.getText().toString();
-	        String body = mBodyText.getText().toString();
+	        String body = "";
+	        
+	        if (mBodyText != null)
+	        	body = mBodyText.getText().toString();
 	
 	        if (title != null && title.length() > 0)
 	        {
-		        if (mRowId == null) {
+		        if (mRowId == -1) {
 		            long id = mDbHelper.createNote(title, body, null, null);
 		            if (id > 0) {
 		                mRowId = id;
@@ -155,7 +163,6 @@ public class NoteEdit extends Activity {
 		        }
 	        }
 	        
-	        mDbHelper.close();
     	}
     }
     
