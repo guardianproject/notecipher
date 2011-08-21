@@ -6,14 +6,12 @@
     	>    
     <ListView android:id="@+id/android:list"
           android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"
-        	    	android:background="#ffffff"/>
+        	android:layout_height="wrap_content"/>
         	    	
   	<TextView android:id="@+id/emptytext"
           android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:text="No notes yet"
 			style="@style/padtext"
-        	android:background="#aaaaaa"
         	/>
 </LinearLayout>
