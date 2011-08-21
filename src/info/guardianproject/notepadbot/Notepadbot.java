@@ -47,6 +47,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -144,13 +145,15 @@ public class Notepadbot extends ListActivity {
             .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
-                	String password = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit)).getText().toString();
+                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
+                	String password = eText.getText().toString();
                 	
                 	unlockDatabase(password);
                 	
                 	if (dataStream != null)
         				loadData();
                 	
+                	eText.setText("");
                 	System.gc();
                 	
                 }
@@ -175,10 +178,13 @@ public class Notepadbot extends ListActivity {
             .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
-                	String newPassword = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit)).getText().toString();
+                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
+
+                	String newPassword = eText.getText().toString();
                 	
                 	rekeyDatabase(newPassword);
                 	
+                	eText.setText("");
                 	System.gc();
                 	
                 }
