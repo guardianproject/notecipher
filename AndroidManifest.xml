@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
- package="info.guardianproject.notepadbot" android:versionName="0.0.4" android:versionCode="4">
+ package="info.guardianproject.notepadbot" android:versionName="0.0.4.1" android:versionCode="6">
  
      <supports-screens android:smallScreens="true"
                       android:normalScreens="true"
