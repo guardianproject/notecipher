@@ -7,6 +7,7 @@
     <string name="menu_rekey">Change PIN</string>
     <string name="menu_share">Share to App</string>
     <string name="menu_view">Export to Gallery</string>
+    <string name="menu_save">Save Note</string>
     <string name="title">Summary</string>
     <string name="body">Note Text</string>
     <string name="confirm">Save Note</string>
