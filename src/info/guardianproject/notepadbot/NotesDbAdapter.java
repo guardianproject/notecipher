@@ -127,6 +127,14 @@ public class NotesDbAdapter {
         return this;
     }
     
+    public boolean isOpen ()
+    {
+    	if (mDb !=null)
+    		return mDb.isOpen();
+    	else
+    		return false;
+    }
+    
     public void rekey (String password)
     {
     	mDb.execSQL("PRAGMA rekey = '" + password + "'");

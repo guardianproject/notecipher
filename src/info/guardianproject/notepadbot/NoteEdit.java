@@ -17,21 +17,27 @@
 package info.guardianproject.notepadbot;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class NoteEdit extends Activity {
 
 	private EditText mTitleText;
     private EditText mBodyText;
     private ImageView mImageView;
+    private byte[] blob;
+    
     private long mRowId = -1;
    
     @Override
@@ -45,6 +51,33 @@ public class NoteEdit extends Activity {
 			
    	 
     }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+    //    menu.add(0, INSERT_ID, 0, R.string.menu_insert);
+     //   menu.add(0, REKEY_ID, 0, R.string.menu_rekey);
+        
+        
+        return true;
+    }
+    
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        switch(item.getItemId()) {
+        /*
+        case INSERT_ID:
+            createNote();
+            return true;
+        case REKEY_ID:
+            showRekeyDialog();
+            return true;           
+            */ 
+        }
+       
+        return super.onMenuItemSelected(featureId, item);
+    }
+	
     
     private void setupView (boolean hasImage)
     {
@@ -66,7 +99,7 @@ public class NoteEdit extends Activity {
 	            Cursor note = NotesDbAdapter.getInstance(this).fetchNote(mRowId);
 	            startManagingCursor(note);
 	
-	            byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
+	            blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
 	
 	            setupView(blob != null);
 	            
@@ -164,5 +197,44 @@ public class NoteEdit extends Activity {
 	        
     	}
     }
+    
+    private void shareEntry()
+    {
+         if (blob != null)
+         {
+        	 try
+        	 {
+        		 NoteUtils.shareImage(this, blob);
+        	 }
+        	 catch (Exception e)
+        	 {
+        		 Toast.makeText(this, "Error exporting image: " + e.getMessage(), Toast.LENGTH_LONG).show();
+
+        	 }
+         }
+         else
+         {
+        	 String body = mBodyText.getText().toString();
+        	 NoteUtils.shareText(this, body);
+         }
+         
+        
+    }
+    
+    private void viewEntry(long id)
+    {
+    	 
+         if (blob != null)
+         {
+        	 String title = mTitleText.getText().toString();
+        	 NoteUtils.savePublicImage(this, title, blob);
+        	 
+         }
+         
+        
+    }
+    
+    
+       
     
 }
