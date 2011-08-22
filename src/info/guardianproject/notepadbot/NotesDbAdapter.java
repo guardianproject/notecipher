@@ -58,7 +58,7 @@ public class NotesDbAdapter {
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "notes";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     private Context mCtx;
 
@@ -81,6 +81,18 @@ public class NotesDbAdapter {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
           
+           
+            if (oldVersion == 2)
+            {
+            	db.execSQL("ALTER TABLE notes ADD " + KEY_DATA + " blog");
+            	db.execSQL("ALTER TABLE notes ADD " + KEY_TYPE + " text");
+
+            }
+            
+            if (newVersion == 3)
+            {
+            	db.execSQL("ALTER TABLE notes ADD " + KEY_TYPE + " text");
+            }
             //need to migrate old notes here
             //  db.execSQL("DROP TABLE IF EXISTS notes");
             //onCreate(db);

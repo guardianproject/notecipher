@@ -63,6 +63,7 @@ public class Notepadbot extends ListActivity {
     private static final int REKEY_ID = Menu.FIRST + 2;
     private static final int SHARE_ID = Menu.FIRST + 3;
     private static final int VIEW_ID = Menu.FIRST + 4;
+    private static final int LOCK_ID = Menu.FIRST + 5;
     
     private NotesDbAdapter mDbHelper;
     
@@ -97,7 +98,7 @@ public class Notepadbot extends ListActivity {
     }
     
     
-    private void loadData ()
+    private void importDataStream ()
     {
     	
     	Intent passingIntent = new Intent(this,ImageStore.class);
@@ -122,7 +123,7 @@ public class Notepadbot extends ListActivity {
     	
 
     	if (dataStream != null)
-			loadData();
+    		importDataStream();
 	
 	}
 
@@ -209,6 +210,15 @@ public class Notepadbot extends ListActivity {
             .create().show();
     }
     
+	private void lockDatabase ()
+	{
+		mDbHelper.close();
+		mDbHelper = null;
+		
+		finish();
+		
+	}
+	
     private void unlockDatabase (String password)
     {
 
@@ -255,6 +265,7 @@ public class Notepadbot extends ListActivity {
         	    new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
         setListAdapter(notes);
         
+        
         if (notes.isEmpty())
         {
         	Toast.makeText(this, "Tap anywhere to create a new note", Toast.LENGTH_LONG).show();
@@ -266,6 +277,7 @@ public class Notepadbot extends ListActivity {
         super.onCreateOptionsMenu(menu);
         menu.add(0, INSERT_ID, 0, R.string.menu_insert);
         menu.add(0, REKEY_ID, 0, R.string.menu_rekey);
+        menu.add(0, LOCK_ID, 0, R.string.menu_lock);
         
         
         return true;
@@ -279,7 +291,10 @@ public class Notepadbot extends ListActivity {
             return true;
         case REKEY_ID:
             showRekeyDialog();
-            return true;            
+            return true;  
+        case LOCK_ID:
+            lockDatabase();
+            return true;
         }
        
         return super.onMenuItemSelected(featureId, item);
