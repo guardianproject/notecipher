@@ -67,7 +67,6 @@ public class Notepadbot extends ListActivity {
     private NotesDbAdapter mDbHelper;
     
     private Uri dataStream;
-    private Uri tmpImageUri;
     
     /** Called when the activity is first created. */
     @Override
@@ -116,6 +115,8 @@ public class Notepadbot extends ListActivity {
     	
     	if (!mDbHelper.isOpen())
 			showPassword();
+    	else
+    		fillData();
 	
 	}
 
@@ -378,6 +379,9 @@ public class Notepadbot extends ListActivity {
     protected void onActivityResult(int requestCode, int resultCode, 
                                     Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
+        
+    	mDbHelper = NotesDbAdapter.getInstance(this);
+
         fillData();
     }
     
@@ -410,8 +414,8 @@ public class Notepadbot extends ListActivity {
 		
 		NoteUtils.cleanupTmp(this);
 		
-		if (mDbHelper != null)
-			mDbHelper.close();
+	//	if (mDbHelper != null)
+		//	mDbHelper.close();
 	}
 
 

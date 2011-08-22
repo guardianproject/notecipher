@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class NoteEdit extends Activity {
 
@@ -39,6 +40,11 @@ public class NoteEdit extends Activity {
     private byte[] blob;
     
     private long mRowId = -1;
+    
+    private static final int SAVE_ID = Menu.FIRST;
+    private static final int SHARE_ID = Menu.FIRST + 1;
+    private static final int VIEW_ID = Menu.FIRST + 2;
+    
    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +61,10 @@ public class NoteEdit extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-    //    menu.add(0, INSERT_ID, 0, R.string.menu_insert);
-     //   menu.add(0, REKEY_ID, 0, R.string.menu_rekey);
+        
+        menu.add(0, SAVE_ID, 0, R.string.menu_save);
+    	menu.add(0, VIEW_ID, 0, R.string.menu_view);
+		menu.add(0, SHARE_ID, 0, R.string.menu_share);
         
         
         return true;
@@ -64,16 +72,17 @@ public class NoteEdit extends Activity {
     
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        switch(item.getItemId()) {
-        /*
-        case INSERT_ID:
-            createNote();
-            return true;
-        case REKEY_ID:
-            showRekeyDialog();
-            return true;           
-            */ 
-        }
+    	switch(item.getItemId()) {
+    	case SAVE_ID:
+    		saveState();
+	        return true;
+    	case SHARE_ID:
+    		shareEntry();
+	        return true;
+    	case VIEW_ID:
+    		viewEntry();
+	        return true;
+		}
        
         return super.onMenuItemSelected(featureId, item);
     }
@@ -221,7 +230,7 @@ public class NoteEdit extends Activity {
         
     }
     
-    private void viewEntry(long id)
+    private void viewEntry()
     {
     	 
          if (blob != null)
