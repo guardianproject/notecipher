@@ -104,6 +104,8 @@ public class Notepadbot extends ListActivity {
 
 		passingIntent.setData(dataStream);
 		startActivityForResult(passingIntent, 1);
+		
+		dataStream = null;
     }
     
     @Override
@@ -117,6 +119,10 @@ public class Notepadbot extends ListActivity {
 			showPassword();
     	else
     		fillData();
+    	
+
+    	if (dataStream != null)
+			loadData();
 	
 	}
 
@@ -157,8 +163,6 @@ public class Notepadbot extends ListActivity {
                 	
                 	unlockDatabase(password);
                 	
-                	if (dataStream != null)
-        				loadData();
                 	
                 	eText.setText("");
                 	System.gc();
@@ -391,7 +395,6 @@ public class Notepadbot extends ListActivity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-		
 		
 		  
 	}
