@@ -134,7 +134,9 @@ public class NotesDbAdapter {
      */
     public NotesDbAdapter open(String password) throws SQLException {
         mDbHelper = new DatabaseHelper(mCtx);
+       
         mDb = mDbHelper.getWritableDatabase(password);
+        
         System.gc();
         return this;
     }
@@ -178,7 +180,7 @@ public class NotesDbAdapter {
         	initialValues.put(KEY_TYPE, dataType);
         	
         }
-
+        
         return mDb.insert(DATABASE_TABLE, null, initialValues);
     }
 

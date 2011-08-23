@@ -27,10 +27,13 @@ import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -137,13 +140,31 @@ public class Notepadbot extends ListActivity {
 
 	private void showPassword ()
     {
+		String dialogMessage;
+		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		
+		boolean firstTime = prefs.getBoolean("first_time",true);
+		
+		if (firstTime)
+		{
+			dialogMessage = getString(R.string.new_pin);
+			Editor pEdit = prefs.edit();
+			pEdit.putBoolean("first_time",false);
+			pEdit.commit();
+		}
+		else
+			dialogMessage = getString(R.string.enter_pin);
+
+		
     	 // This example shows how to add a custom layout to an AlertDialog
         LayoutInflater factory = LayoutInflater.from(this);
         final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
         new AlertDialog.Builder(this)
             .setTitle(getString(R.string.app_name))
             .setView(textEntryView)
-            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+            .setMessage(dialogMessage)
+            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
                 	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
@@ -157,7 +178,7 @@ public class Notepadbot extends ListActivity {
                 	
                 }
             })
-            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
                     /* User clicked cancel so do some stuff */
@@ -174,7 +195,8 @@ public class Notepadbot extends ListActivity {
         new AlertDialog.Builder(this)
             .setTitle(getString(R.string.app_name))
             .setView(textEntryView)
-            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+            .setMessage(getString(R.string.rekey_message))
+            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
                 	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
@@ -188,7 +210,7 @@ public class Notepadbot extends ListActivity {
                 	
                 }
             })
-            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
                     /* User clicked cancel so do some stuff */
@@ -221,7 +243,7 @@ public class Notepadbot extends ListActivity {
     	}
     	catch (Exception e)
     	{
-    		Toast.makeText(this, "Unable to unlock your notes. Are you sure you entered the right PIN?", Toast.LENGTH_LONG).show();
+    		Toast.makeText(this, getString(R.string.err_pin), Toast.LENGTH_LONG).show();
     		showPassword();
     	}
     }
@@ -231,6 +253,8 @@ public class Notepadbot extends ListActivity {
 
     	try
     	{
+    		Toast.makeText(this, getString(R.string.do_rekey), Toast.LENGTH_LONG).show();
+
     	    	mDbHelper.rekey(password);    		
 
     	}
@@ -259,7 +283,7 @@ public class Notepadbot extends ListActivity {
         
         if (notes.isEmpty())
         {
-        	Toast.makeText(this, "Tap anywhere to create a new note", Toast.LENGTH_LONG).show();
+        	Toast.makeText(this, getString(R.string.on_start), Toast.LENGTH_LONG).show();
         }
     }
     
@@ -340,7 +364,7 @@ public class Notepadbot extends ListActivity {
         	 }
         	 catch (IOException e)
         	 {
-        		 Toast.makeText(this, "Error exporting image: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        		 Toast.makeText(this, getString(R.string.err_export) + e.getMessage(), Toast.LENGTH_LONG).show();
         	 }
          }
          else
@@ -444,14 +468,17 @@ public class Notepadbot extends ListActivity {
 			
 			NotesDbAdapter.getInstance(this).createNote(title, body, data, mimeType);
 			
-			data = null;
-			
-			Toast.makeText(this, "Imported new file: " + title, Toast.LENGTH_LONG).show();
-			
+			Toast.makeText(this, getString(R.string.on_import) + ": " + title, Toast.LENGTH_LONG).show();
 
 			handleDelete();
-			
 
+			data = null;
+			dataStream = null;
+			title = null;
+			body = null;
+			
+			System.gc();
+			
 			fillData();
 			
 		} catch (FileNotFoundException e) {
@@ -464,7 +491,7 @@ public class Notepadbot extends ListActivity {
 		} 
 		catch (OutOfMemoryError e)
 		{
-			Toast.makeText(this, "Imported file size is too large", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, getString(R.string.err_size), Toast.LENGTH_LONG).show();
 		
 		}
 		finally

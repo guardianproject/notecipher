@@ -45,6 +45,7 @@ public class NoteEdit extends Activity {
     private static final int SHARE_ID = Menu.FIRST + 1;
     private static final int VIEW_ID = Menu.FIRST + 2;
     
+    private final static String ZERO_TEXT = "*******************";
    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,7 +118,11 @@ public class NoteEdit extends Activity {
 	            	
 	            	// Load up the image's dimensions not the image itself
 					BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
-					bmpFactoryOptions.inSampleSize = 4;
+					
+					if (blob.length > 100000)
+						bmpFactoryOptions.inSampleSize = 4;
+					else
+						bmpFactoryOptions.inSampleSize = 2;
 					
 	            	Bitmap blobb = BitmapFactory.decodeByteArray(blob, 0, blob.length, bmpFactoryOptions);
 	
@@ -148,7 +153,9 @@ public class NoteEdit extends Activity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         
-       if (mRowId != -1)
+        saveState();
+        
+        if (mRowId != -1)
     		   outState.putLong(NotesDbAdapter.KEY_ROWID, mRowId);
        
     }
@@ -157,6 +164,15 @@ public class NoteEdit extends Activity {
     protected void onPause() {
         super.onPause();
         saveState();
+        
+        if (mTitleText != null)
+        	mTitleText.setText(ZERO_TEXT);
+        
+        if (mBodyText != null)
+        	mBodyText.setText(ZERO_TEXT);
+        
+        if (mImageView != null)
+        	mImageView.setImageBitmap(null);
     }
     
     @Override
