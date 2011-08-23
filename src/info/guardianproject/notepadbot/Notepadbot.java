@@ -16,28 +16,21 @@
 
 package info.guardianproject.notepadbot;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
+import info.guardianproject.database.sqlcipher.SQLiteDatabase;
+
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
-import info.guardianproject.database.sqlcipher.SQLiteDatabase;
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -64,6 +57,8 @@ public class Notepadbot extends ListActivity {
     private static final int SHARE_ID = Menu.FIRST + 3;
     private static final int VIEW_ID = Menu.FIRST + 4;
     private static final int LOCK_ID = Menu.FIRST + 5;
+    
+    public static final String TAG = "notecipher";
     
     private NotesDbAdapter mDbHelper;
     
@@ -98,16 +93,6 @@ public class Notepadbot extends ListActivity {
     }
     
     
-    private void importDataStream ()
-    {
-    	
-    	Intent passingIntent = new Intent(this,ImageStore.class);
-
-		passingIntent.setData(dataStream);
-		startActivityForResult(passingIntent, 1);
-		
-		dataStream = null;
-    }
     
     @Override
 	protected void onResume() {
@@ -118,12 +103,11 @@ public class Notepadbot extends ListActivity {
     	
     	if (!mDbHelper.isOpen())
 			showPassword();
+    	else if (dataStream != null)
+    		importDataStream();
     	else
     		fillData();
     	
-
-    	if (dataStream != null)
-    		importDataStream();
 	
 	}
 
@@ -137,7 +121,10 @@ public class Notepadbot extends ListActivity {
 
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
-					createNote();
+					
+					if (mDbHelper != null && mDbHelper.isOpen())
+						createNote();
+					
 					return false;
 				}
 	        	
@@ -226,7 +213,11 @@ public class Notepadbot extends ListActivity {
     	{
     	
     		mDbHelper.open(password);
-    		fillData();
+    		
+    		if (dataStream != null)
+        		importDataStream();
+    		else
+    			fillData();
     	}
     	catch (Exception e)
     	{
@@ -394,6 +385,11 @@ public class Notepadbot extends ListActivity {
         startActivityForResult(i, ACTIVITY_EDIT);
     }
 
+    /*
+     * Called after the return from creating a new note
+     * (non-Javadoc)
+     * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, 
                                     Intent intent) {
@@ -432,10 +428,82 @@ public class Notepadbot extends ListActivity {
 		
 		NoteUtils.cleanupTmp(this);
 		
-	//	if (mDbHelper != null)
-		//	mDbHelper.close();
 	}
 
+	private void importDataStream()
+	{
+		try {
+			InputStream is = getContentResolver().openInputStream(dataStream);
+			
+			String mimeType = getContentResolver().getType(dataStream);
+			
+			byte[] data = NoteUtils.readBytesAndClose (is);
+			
+			String title = dataStream.getLastPathSegment();
+			String body = dataStream.getPath();
+			
+			NotesDbAdapter.getInstance(this).createNote(title, body, data, mimeType);
+			
+			data = null;
+			
+			Toast.makeText(this, "Imported new file: " + title, Toast.LENGTH_LONG).show();
+			
+
+			handleDelete();
+			
+
+			fillData();
+			
+		} catch (FileNotFoundException e) {
+			Log.e(TAG, e.getMessage(), e);
+			
+		} catch (IOException e) {
+			Log.e(TAG, e.getMessage(), e);
+
+	
+		} 
+		catch (OutOfMemoryError e)
+		{
+			Toast.makeText(this, "Imported file size is too large", Toast.LENGTH_LONG).show();
+		
+		}
+		finally
+		{
+			//finish();
+			
+		}
+	}
+	
+	/*
+	 * Call this to delete the original image, will ask the user
+	 */
+	private void handleDelete() 
+	{
+		final AlertDialog.Builder b = new AlertDialog.Builder(this);
+		b.setIcon(android.R.drawable.ic_dialog_alert);
+		b.setTitle(getString(R.string.app_name));
+		b.setMessage(getString(R.string.confirm_delete));
+		b.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+                // User clicked OK so go ahead and delete
+				getContentResolver().delete(dataStream, null, null);
+				
+				
+            }
+        });
+		b.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+              
+            }	
+		});
+		b.show();
+	}
+	
+	
+	
+	
 
    
 }

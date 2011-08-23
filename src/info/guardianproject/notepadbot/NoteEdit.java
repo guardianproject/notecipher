@@ -115,14 +115,15 @@ public class NoteEdit extends Activity {
 	            if (blob != null)
 	            {
 	            	
-	            	
 	            	// Load up the image's dimensions not the image itself
 					BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
-					bmpFactoryOptions.inSampleSize = 3;
-				
+					bmpFactoryOptions.inSampleSize = 4;
+					
 	            	Bitmap blobb = BitmapFactory.decodeByteArray(blob, 0, blob.length, bmpFactoryOptions);
 	
 	            	mImageView.setImageBitmap(blobb);
+	            	
+	            	System.gc();
 	            }
 	            else
 	            {
@@ -139,6 +140,7 @@ public class NoteEdit extends Activity {
     	catch (Exception e)
     	{
     		Log.e("notepadbot", "error populating",e);
+    		Toast.makeText(this, "Something went wrong when loading your note: " + e.getMessage(), Toast.LENGTH_LONG).show();
     	}
     }
     
@@ -178,8 +180,6 @@ public class NoteEdit extends Activity {
 		}
    
 
-		
-        populateFields();
     }
     
     private void saveState() {
