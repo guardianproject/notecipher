@@ -67,6 +67,9 @@ public class Notepadbot extends ListActivity {
     
     private Uri dataStream;
     
+
+	private final static int MIN_PASS_LENGTH = 6;
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -148,44 +151,131 @@ public class Notepadbot extends ListActivity {
 		
 		if (firstTime)
 		{
-			dialogMessage = getString(R.string.new_pin);
-			Editor pEdit = prefs.edit();
-			pEdit.putBoolean("first_time",false);
-			pEdit.commit();
+			dialogMessage = getString(R.string.new_pass);
+			
+			
+			 // This example shows how to add a custom layout to an AlertDialog
+	        LayoutInflater factory = LayoutInflater.from(this);
+	        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
+	        new AlertDialog.Builder(this)
+	            .setTitle(getString(R.string.app_name))
+	            .setView(textEntryView)
+	            .setMessage(dialogMessage)
+	            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int whichButton) {
+	
+	                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
+	                	String passphrase = eText.getText().toString();
+	                	
+	                	if (goodPassphrase (passphrase))
+	                	{
+	                		unlockDatabase(passphrase);                	
+	                		eText.setText("");
+	                		System.gc();
+	                		
+	                		//we're good so we can flag this is not first_time anymore
+	                		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Notepadbot.this);
+	                		Editor pEdit = prefs.edit();
+	            			pEdit.putBoolean("first_time",false);
+	            			pEdit.commit();
+	                	}
+	                	else
+	                	{	                		
+	                		//pass pass show again
+	                		showPassword();
+	                	}
+	                	
+	                }
+	            })
+	            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int whichButton) {
+	
+	                    /* User clicked cancel so do some stuff */
+	                }
+	            })
+	            .create().show();
+			
 		}
 		else
-			dialogMessage = getString(R.string.enter_pin);
+		{
+			dialogMessage = getString(R.string.enter_pass);
 
-		
-    	 // This example shows how to add a custom layout to an AlertDialog
-        LayoutInflater factory = LayoutInflater.from(this);
-        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
-        new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.app_name))
-            .setView(textEntryView)
-            .setMessage(dialogMessage)
-            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
-                	String password = eText.getText().toString();
-                	
-                	unlockDatabase(password);
-                	
-                	
-                	eText.setText("");
-                	System.gc();
-                	
-                }
-            })
-            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                    /* User clicked cancel so do some stuff */
-                }
-            })
-            .create().show();
+	    	 // This example shows how to add a custom layout to an AlertDialog
+	        LayoutInflater factory = LayoutInflater.from(this);
+	        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
+	        new AlertDialog.Builder(this)
+	            .setTitle(getString(R.string.app_name))
+	            .setView(textEntryView)
+	            .setMessage(dialogMessage)
+	            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int whichButton) {
+	
+	                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
+	                	String passphrase = eText.getText().toString();
+	                	
+	                	unlockDatabase(passphrase);                	
+	                	eText.setText("");
+	                	System.gc();                	
+	                	
+	                }
+	            })
+	            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
+	                public void onClick(DialogInterface dialog, int whichButton) {
+	
+	                    /* User clicked cancel so do some stuff */
+	                }
+	            })
+	            .create().show();
+		}
     }
+	
+	private boolean goodPassphrase (String pass)
+	{
+		
+		 boolean upper = false;
+		    boolean lower = false;
+		    boolean number = false;
+		    for (char c : pass.toCharArray()) {
+		      if (Character.isUpperCase(c)) {
+		        upper = true;
+		      } else if (Character.isLowerCase(c)) {
+		        lower = true;
+		      } else if (Character.isDigit(c)) {
+		        number = true;
+		      }
+		    }
+		
+		if (pass.length() < MIN_PASS_LENGTH)
+		{
+			//should we support some user string message here?
+			showPassError(getString(R.string.pass_err_length));
+			return false;
+		}
+		else if (!upper)
+		{
+			showPassError(getString(R.string.pass_err_upper));
+			return false;
+		}
+		else if (!lower)
+		{
+			showPassError(getString(R.string.pass_err_lower));
+			return false;
+		}
+		else if (!number)
+		{
+			showPassError(getString(R.string.pass_err_num));
+			return false;
+		}
+		
+		
+		 //if it got here, then must be okay
+		return true;
+	}
+	
+	private void showPassError (String msg)
+	{
+		Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+	}
 	
 	private void showRekeyDialog ()
     {
@@ -203,10 +293,15 @@ public class Notepadbot extends ListActivity {
 
                 	String newPassword = eText.getText().toString();
                 	
-                	rekeyDatabase(newPassword);
+                	if (goodPassphrase(newPassword))
+                	{
+                		rekeyDatabase(newPassword);
                 	
-                	eText.setText("");
-                	System.gc();
+                		eText.setText("");
+                		System.gc();
+                	}
+                	else
+                		showRekeyDialog();
                 	
                 }
             })
@@ -243,7 +338,7 @@ public class Notepadbot extends ListActivity {
     	}
     	catch (Exception e)
     	{
-    		Toast.makeText(this, getString(R.string.err_pin), Toast.LENGTH_LONG).show();
+    		Toast.makeText(this, getString(R.string.err_pass), Toast.LENGTH_LONG).show();
     		showPassword();
     	}
     }
