@@ -32,7 +32,6 @@
         android:capitalize="none"
         android:gravity="fill_horizontal"
         android:password="true"
-        android:numeric="integer"
         android:key="password"
         android:textAppearance="?android:attr/textAppearanceMedium" />
         
