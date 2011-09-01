@@ -156,6 +156,8 @@ public class NotesDbAdapter {
     }
     
     public void close() {
+    	
+    	
         mDbHelper.close();
     }
 

@@ -18,13 +18,13 @@ package info.guardianproject.notepadbot;
 
 import info.guardianproject.database.sqlcipher.SQLiteDatabase;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -514,8 +514,14 @@ public class Notepadbot extends ListActivity {
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 // User clicked OK so go ahead and delete
-				getContentResolver().delete(dataStream, null, null);
+				ContentResolver cr = getContentResolver();
 				
+				if (cr != null)
+					cr.delete(dataStream, null, null);
+				else
+				{
+					Toast.makeText(Notepadbot.this, "Unable to delete originaL", Toast.LENGTH_SHORT).show();
+				}
 				
             }
         });

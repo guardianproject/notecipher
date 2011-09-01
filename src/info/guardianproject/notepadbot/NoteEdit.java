@@ -17,7 +17,6 @@
 package info.guardianproject.notepadbot;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,12 +24,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class NoteEdit extends Activity {
 
@@ -91,15 +87,24 @@ public class NoteEdit extends Activity {
     
     private void setupView (boolean hasImage)
     {
+
+        
     	if (hasImage)
+    	{
       	  setContentView(R.layout.note_edit_image);
-    	else
-    	  setContentView(R.layout.note_edit);
-          
-          
-          mTitleText = (EditText) findViewById(R.id.title);
-          mBodyText = (EditText) findViewById(R.id.body);
+
           mImageView = (ImageView) findViewById(R.id.odata);
+    	}
+    	else
+    	{
+    	  setContentView(R.layout.note_edit);
+
+          mBodyText = (EditText) findViewById(R.id.body);
+    	} 
+    	
+
+        mTitleText = (EditText) findViewById(R.id.title);
+          
     }
     
     private void populateFields() {
@@ -128,7 +133,6 @@ public class NoteEdit extends Activity {
 	
 	            	mImageView.setImageBitmap(blobb);
 	            	
-	            	System.gc();
 	            }
 	            else
 	            {
@@ -178,6 +182,7 @@ public class NoteEdit extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        
         
         Bundle extras = getIntent().getExtras();   
 	
