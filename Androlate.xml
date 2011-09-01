@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Androlate>
+    <operation>
+        <filename>/home/n8fr8/dev/Guardian/repo/github/notepadbot/res/values/strings.xml</filename>
+        <translate>
+            <string>
+                <name>no_notes</name>
+                <value>No Notes Yet</value>
+            </string>
+            <string>
+                <name>menu_insert</name>
+                <value>Add Note</value>
+            </string>
+            <string>
+                <name>menu_delete</name>
+                <value>Delete Item</value>
+            </string>
+            <string>
+                <name>menu_rekey</name>
+                <value>Change PIN</value>
+            </string>
+            <string>
+                <name>menu_share</name>
+                <value>Share...</value>
+            </string>
+            <string>
+                <name>menu_view</name>
+                <value>Export Image</value>
+            </string>
+            <string>
+                <name>menu_save</name>
+                <value>Save Note</value>
+            </string>
+            <string>
+                <name>menu_lock</name>
+                <value>Lock Notes</value>
+            </string>
+            <string>
+                <name>title</name>
+                <value>Summary</value>
+            </string>
+            <string>
+                <name>body</name>
+                <value>Note Text</value>
+            </string>
+            <string>
+                <name>confirm</name>
+                <value>Save Note</value>
+            </string>
+            <string>
+                <name>edit_note</name>
+                <value>Edit Note</value>
+            </string>
+            <string>
+                <name>confirm_delete</name>
+                <value>Do you want to delete the original, unencrypted file?</value>
+            </string>
+            <string>
+                <name>on_import</name>
+                <value>Imported new file</value>
+            </string>
+            <string>
+                <name>err_size</name>
+                <value>Imported file size is too large</value>
+            </string>
+            <string>
+                <name>err_export</name>
+                <value>Error exporting image</value>
+            </string>
+            <string>
+                <name>on_start</name>
+                <value>Tap anywhere to create a new note</value>
+            </string>
+            <string>
+                <name>err_pin</name>
+                <value>Unable to unlock your notes. Are you sure you entered the right PIN?</value>
+            </string>
+            <string>
+                <name>button_ok</name>
+                <value>Okay</value>
+            </string>
+            <string>
+                <name>button_cancel</name>
+                <value>Cancel</value>
+            </string>
+            <string>
+                <name>rekey_message</name>
+                <value>Enter a *new* PIN (this will re-encrypt all existing notes to this PIN)</value>
+            </string>
+            <string>
+                <name>do_rekey</name>
+                <value>Updating your notes with the new PIN (patience...)</value>
+            </string>
+            <string>
+                <name>enter_pin</name>
+                <value>Enter your PIN:</value>
+            </string>
+            <string>
+                <name>new_pin</name>
+                <value>Welcome! Enter a numerical PIN to secure your notes</value>
+            </string>
+        </translate>
+        <ignore/>
+        <allstrings>
+            <string>
+                <name>app_name</name>
+                <value>NoteCipher</value>
+            </string>
+            <string>
+                <name>no_notes</name>
+                <value>No Notes Yet</value>
+            </string>
+            <string>
+                <name>menu_insert</name>
+                <value>Add Note</value>
+            </string>
+            <string>
+                <name>menu_delete</name>
+                <value>Delete Item</value>
+            </string>
+            <string>
+                <name>menu_rekey</name>
+                <value>Change PIN</value>
+            </string>
+            <string>
+                <name>menu_share</name>
+                <value>Share...</value>
+            </string>
+            <string>
+                <name>menu_view</name>
+                <value>Export Image</value>
+            </string>
+            <string>
+                <name>menu_save</name>
+                <value>Save Note</value>
+            </string>
+            <string>
+                <name>menu_lock</name>
+                <value>Lock Notes</value>
+            </string>
+            <string>
+                <name>title</name>
+                <value>Summary</value>
+            </string>
+            <string>
+                <name>body</name>
+                <value>Note Text</value>
+            </string>
+            <string>
+                <name>confirm</name>
+                <value>Save Note</value>
+            </string>
+            <string>
+                <name>edit_note</name>
+                <value>Edit Note</value>
+            </string>
+            <string>
+                <name>confirm_delete</name>
+                <value>Do you want to delete the original, unencrypted file?</value>
+            </string>
+            <string>
+                <name>on_import</name>
+                <value>Imported new file</value>
+            </string>
+            <string>
+                <name>err_size</name>
+                <value>Imported file size is too large</value>
+            </string>
+            <string>
+                <name>err_export</name>
+                <value>Error exporting image</value>
+            </string>
+            <string>
+                <name>on_start</name>
+                <value>Tap anywhere to create a new note</value>
+            </string>
+            <string>
+                <name>err_pin</name>
+                <value>Unable to unlock your notes. Are you sure you entered the right PIN?</value>
+            </string>
+            <string>
+                <name>button_ok</name>
+                <value>Okay</value>
+            </string>
+            <string>
+                <name>button_cancel</name>
+                <value>Cancel</value>
+            </string>
+            <string>
+                <name>rekey_message</name>
+                <value>Enter a *new* PIN (this will re-encrypt all existing notes to this PIN)</value>
+            </string>
+            <string>
+                <name>do_rekey</name>
+                <value>Updating your notes with the new PIN (patience...)</value>
+            </string>
+            <string>
+                <name>enter_pin</name>
+                <value>Enter your PIN:</value>
+            </string>
+            <string>
+                <name>new_pin</name>
+                <value>Welcome! Enter a numerical PIN to secure your notes</value>
+            </string>
+        </allstrings>
+    </operation>
+    <target_language>
+        <display>ARABIC</display>
+        <iso639_1>ar</iso639_1>
+        <directory>ar</directory>
+    </target_language>
+</Androlate>
