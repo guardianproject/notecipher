@@ -167,8 +167,9 @@ public class NoteEdit extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        saveState();
         
+	    saveState();
+	        
         if (mTitleText != null)
         	mTitleText.setText(ZERO_TEXT);
         
@@ -177,6 +178,7 @@ public class NoteEdit extends Activity {
         
         if (mImageView != null)
         	mImageView.setImageBitmap(null);
+        
     }
     
     @Override
@@ -205,7 +207,9 @@ public class NoteEdit extends Activity {
     
     private void saveState() {
     	
-    	if (mTitleText != null && mTitleText.getText() != null)
+    	if ((mTitleText != null && mTitleText.getText() != null && mTitleText.getText().length() > 0)
+    			|| (mBodyText != null && mBodyText.getText() != null && mBodyText.getText().length() > 0)
+    			)
     	{
 	        String title = mTitleText.getText().toString();
 	        String body = "";

@@ -67,8 +67,11 @@ public class Notepadbot extends ListActivity {
     
     private Uri dataStream;
     
-
+    //strong passphrase config variables
 	private final static int MIN_PASS_LENGTH = 6;
+	private final static int MAX_PASS_ATTEMPTS = 3;
+	private final static int PASS_RETRY_WAIT_TIMEOUT = 30000;
+    private int currentPassAttempts = 0;
     
     /** Called when the activity is first created. */
     @Override
@@ -148,6 +151,14 @@ public class Notepadbot extends ListActivity {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		
 		boolean firstTime = prefs.getBoolean("first_time",true);
+		
+		if (currentPassAttempts >= MAX_PASS_ATTEMPTS)
+		{					
+			try { Thread.sleep(PASS_RETRY_WAIT_TIMEOUT); }
+			catch (Exception e){};
+			currentPassAttempts = 0;
+		}
+		
 		
 		if (firstTime)
 		{
@@ -335,11 +346,17 @@ public class Notepadbot extends ListActivity {
         		importDataStream();
     		else
     			fillData();
+    		
+    		//reset the pass attempts
+    		currentPassAttempts = 0;
     	}
     	catch (Exception e)
     	{
+    		currentPassAttempts++;
+    		
     		Toast.makeText(this, getString(R.string.err_pass), Toast.LENGTH_LONG).show();
     		showPassword();
+    		
     	}
     }
     
