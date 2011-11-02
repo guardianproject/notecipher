@@ -20,16 +20,16 @@ public class NoteUtils {
 		 * When the user selects the Share menu item
 		 * Uses saveTmpImage (overwriting what is already there) and uses the standard Android Share Intent
 		 */
-	    public static void shareImage(Context ctx, byte[] outdata) throws IOException
+	    public static void shareData(Context ctx, String mimeType, byte[] outdata) throws IOException
 	    {
 	    	
-	    	Uri tmpImageUri = saveTmpImage(ctx, outdata);
+	    	Uri tmpImageUri = saveTmpFile(ctx, mimeType, outdata);
 	    	
 	    	if (tmpImageUri != null) {
 	        	Intent share = new Intent(Intent.ACTION_SEND);
-	        	share.setType("image/jpeg");
+	        	share.setType(mimeType);
 	        	share.putExtra(Intent.EXTRA_STREAM, tmpImageUri);
-	        	ctx.startActivity(Intent.createChooser(share, "Share Image"));    	
+	        	ctx.startActivity(Intent.createChooser(share, "Share File"));    	
 	    	} else {
 	    		Toast t = Toast.makeText(ctx,"Saving Temporary File Failed!", Toast.LENGTH_SHORT); 
 	    		t.show();
@@ -75,7 +75,7 @@ public class NoteUtils {
 			  return false;
 	}
 	
-	public static Uri saveTmpImage(Context ctx, byte[] outdata) throws IOException
+	public static Uri saveTmpFile(Context ctx, String mimeType, byte[] outdata) throws IOException
 	{
 		
         // Create a path where we will place our picture in the user's
@@ -110,7 +110,7 @@ public class NoteUtils {
     }
 	
 	
-	public static boolean savePublicImage(Context ctx, String title, byte[] outdata) {
+	public static boolean savePublicFile(Context ctx, String title, String mimeType, byte[] outdata) {
 		
         // Create a path where we will place our picture in the user's
         // public pictures directory.  Note that you should be careful about

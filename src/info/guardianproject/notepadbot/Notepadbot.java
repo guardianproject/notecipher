@@ -467,12 +467,13 @@ public class Notepadbot extends ListActivity {
     	 startManagingCursor(note);
     	 
     	 byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
+         String mimeType = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
          
          if (blob != null)
          {
         	 try
         	 {
-        		 NoteUtils.shareImage(this, blob);
+        		 NoteUtils.shareData(this, mimeType, blob);
         	 }
         	 catch (IOException e)
         	 {
@@ -495,13 +496,14 @@ public class Notepadbot extends ListActivity {
     	 startManagingCursor(note);
     	 
     	 byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
-         
+         String mimeType = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
+
          if (blob != null)
          {
         	 String title = note.getString(
                      note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
         	 
-        	 NoteUtils.savePublicImage(this, title, blob);
+        	 NoteUtils.savePublicFile(this, title, mimeType, blob);
         	 
          }
          
@@ -569,9 +571,10 @@ public class Notepadbot extends ListActivity {
 	private void importDataStream()
 	{
 		try {
-			InputStream is = getContentResolver().openInputStream(dataStream);
+			ContentResolver cr = getContentResolver(); 
+			InputStream is = cr.openInputStream(dataStream);
 			
-			String mimeType = getContentResolver().getType(dataStream);
+			String mimeType = cr.getType(dataStream);
 			
 			byte[] data = NoteUtils.readBytesAndClose (is);
 			
@@ -582,7 +585,7 @@ public class Notepadbot extends ListActivity {
 			
 			Toast.makeText(this, getString(R.string.on_import) + ": " + title, Toast.LENGTH_LONG).show();
 
-			handleDelete();
+			//handleDelete();
 
 			data = null;
 			dataStream = null;

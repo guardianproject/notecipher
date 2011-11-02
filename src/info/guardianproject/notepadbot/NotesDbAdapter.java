@@ -183,6 +183,7 @@ public class NotesDbAdapter {
         	
         }
         
+        
         if (mDb != null)
         	return mDb.insert(DATABASE_TABLE, null, initialValues);
         else

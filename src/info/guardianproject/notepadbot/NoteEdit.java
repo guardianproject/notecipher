@@ -33,7 +33,8 @@ public class NoteEdit extends Activity {
 	private EditText mTitleText;
     private EditText mBodyText;
     private ImageView mImageView;
-    private byte[] blob;
+    private byte[] mBlob;
+    private String mMimeType;
     
     private long mRowId = -1;
     
@@ -114,22 +115,28 @@ public class NoteEdit extends Activity {
 	            Cursor note = NotesDbAdapter.getInstance(this).fetchNote(mRowId);
 	            startManagingCursor(note);
 	
-	            blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
+	            mBlob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
 	
-	            setupView(blob != null);
+	            mMimeType = note.getString(
+ 	                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
 	            
-	            if (blob != null)
+	            boolean isImage = mMimeType.startsWith("image");
+	            
+
+            	setupView(isImage);
+            	
+	            if (isImage)
 	            {
-	            	
+		            	
 	            	// Load up the image's dimensions not the image itself
 					BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
 					
-					if (blob.length > 100000)
+					if (mBlob.length > 100000)
 						bmpFactoryOptions.inSampleSize = 4;
 					else
 						bmpFactoryOptions.inSampleSize = 2;
 					
-	            	Bitmap blobb = BitmapFactory.decodeByteArray(blob, 0, blob.length, bmpFactoryOptions);
+	            	Bitmap blobb = BitmapFactory.decodeByteArray(mBlob, 0, mBlob.length, bmpFactoryOptions);
 	
 	            	mImageView.setImageBitmap(blobb);
 	            	
@@ -234,11 +241,11 @@ public class NoteEdit extends Activity {
     
     private void shareEntry()
     {
-         if (blob != null)
+         if (mBlob != null)
          {
         	 try
         	 {
-        		 NoteUtils.shareImage(this, blob);
+        		 NoteUtils.shareData(this, mMimeType, mBlob);
         	 }
         	 catch (Exception e)
         	 {
@@ -258,10 +265,10 @@ public class NoteEdit extends Activity {
     private void viewEntry()
     {
     	 
-         if (blob != null)
+         if (mBlob != null)
          {
         	 String title = mTitleText.getText().toString();
-        	 NoteUtils.savePublicImage(this, title, blob);
+        	 NoteUtils.savePublicFile(this, title, mMimeType, mBlob);
         	 
          }
          
