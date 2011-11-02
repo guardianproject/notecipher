@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
- package="info.guardianproject.notepadbot" android:versionName="0.0.4.2" android:versionCode="7">
+ package="info.guardianproject.notepadbot" android:versionName="0.0.5" android:versionCode="8">
  
      <supports-screens android:smallScreens="true"
                       android:normalScreens="true"
@@ -22,7 +22,7 @@
                  <category android:name="android.intent.category.ALTERNATIVE" /> 
                  <category android:name="android.intent.category.SELECTED_ALTERNATIVE" /> 
                  
-                 <data android:mimeType="image/*" />
+                 <data android:mimeType="*/*" />
              </intent-filter> 
            
         </activity>
