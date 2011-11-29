@@ -50,7 +50,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 
-public class Notepadbot extends ListActivity {
+public class NoteCipher extends ListActivity {
     private static final int ACTIVITY_CREATE=0;
     private static final int ACTIVITY_EDIT=1;
     
@@ -66,6 +66,8 @@ public class Notepadbot extends ListActivity {
     private NotesDbAdapter mDbHelper;
     
     private Uri dataStream;
+    
+    private final static int MAX_SIZE = 1000000;
     
     //strong passphrase config variables
 	private final static int MIN_PASS_LENGTH = 6;
@@ -185,7 +187,7 @@ public class Notepadbot extends ListActivity {
 	                		System.gc();
 	                		
 	                		//we're good so we can flag this is not first_time anymore
-	                		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Notepadbot.this);
+	                		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(NoteCipher.this);
 	                		Editor pEdit = prefs.edit();
 	            			pEdit.putBoolean("first_time",false);
 	            			pEdit.commit();
@@ -467,13 +469,17 @@ public class Notepadbot extends ListActivity {
     	 startManagingCursor(note);
     	 
     	 byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
+    	 String title = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
          String mimeType = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
+         
+         if (mimeType == null)
+        	 mimeType = "text/plain";
          
          if (blob != null)
          {
         	 try
         	 {
-        		 NoteUtils.shareData(this, mimeType, blob);
+        		 NoteUtils.shareData(this, title, mimeType, blob);
         	 }
         	 catch (IOException e)
         	 {
@@ -498,6 +504,10 @@ public class Notepadbot extends ListActivity {
     	 byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
          String mimeType = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
 
+         if (mimeType == null)
+        	 mimeType = "text/plain";
+         
+         
          if (blob != null)
          {
         	 String title = note.getString(
@@ -578,23 +588,31 @@ public class Notepadbot extends ListActivity {
 			
 			byte[] data = NoteUtils.readBytesAndClose (is);
 			
-			String title = dataStream.getLastPathSegment();
-			String body = dataStream.getPath();
-			
-			NotesDbAdapter.getInstance(this).createNote(title, body, data, mimeType);
-			
-			Toast.makeText(this, getString(R.string.on_import) + ": " + title, Toast.LENGTH_LONG).show();
+			if (data.length > MAX_SIZE)
+			{
+				Toast.makeText(this, getString(R.string.err_size), Toast.LENGTH_LONG).show();
 
-			//handleDelete();
-
-			data = null;
-			dataStream = null;
-			title = null;
-			body = null;
-			
-			System.gc();
-			
-			fillData();
+			}
+			else
+			{
+				String title = dataStream.getLastPathSegment();
+				String body = dataStream.getPath();
+				
+				NotesDbAdapter.getInstance(this).createNote(title, body, data, mimeType);
+				
+				Toast.makeText(this, getString(R.string.on_import) + ": " + title, Toast.LENGTH_LONG).show();
+	
+				//handleDelete();
+	
+				data = null;
+				dataStream = null;
+				title = null;
+				body = null;
+				
+				System.gc();
+				
+				fillData();
+			}
 			
 		} catch (FileNotFoundException e) {
 			Log.e(TAG, e.getMessage(), e);
@@ -611,7 +629,7 @@ public class Notepadbot extends ListActivity {
 		}
 		finally
 		{
-			//finish();
+			dataStream = null;
 			
 		}
 	}
@@ -635,7 +653,7 @@ public class Notepadbot extends ListActivity {
 					cr.delete(dataStream, null, null);
 				else
 				{
-					Toast.makeText(Notepadbot.this, "Unable to delete originaL", Toast.LENGTH_SHORT).show();
+					Toast.makeText(NoteCipher.this, "Unable to delete originaL", Toast.LENGTH_SHORT).show();
 				}
 				
             }

@@ -41,6 +41,9 @@ public class NoteEdit extends Activity {
     private static final int SAVE_ID = Menu.FIRST;
     private static final int SHARE_ID = Menu.FIRST + 1;
     private static final int VIEW_ID = Menu.FIRST + 2;
+    private static final int BIGGER_ID = Menu.FIRST + 3;
+    private static final int SMALLER_ID = Menu.FIRST + 4;
+    
     
     private final static String ZERO_TEXT = "*******************";
    
@@ -61,9 +64,13 @@ public class NoteEdit extends Activity {
         super.onCreateOptionsMenu(menu);
         
         menu.add(0, SAVE_ID, 0, R.string.menu_save);
-    	menu.add(0, VIEW_ID, 0, R.string.menu_view);
-		menu.add(0, SHARE_ID, 0, R.string.menu_share);
         
+        if (mBlob != null)
+        	menu.add(0, VIEW_ID, 0, R.string.menu_view);
+        
+		menu.add(0, SHARE_ID, 0, R.string.menu_share);
+		menu.add(0, SMALLER_ID, 0, R.string.menu_smaller);
+		menu.add(0, BIGGER_ID, 0, R.string.menu_bigger);
         
         return true;
     }
@@ -80,11 +87,24 @@ public class NoteEdit extends Activity {
     	case VIEW_ID:
     		viewEntry();
 	        return true;
+    	case BIGGER_ID:
+    		changeTextSize(1.1f);
+	        return true;
+    	case SMALLER_ID:
+    		changeTextSize(.9f);
+	        return true;
 		}
        
         return super.onMenuItemSelected(featureId, item);
     }
 	
+    private void changeTextSize (float factor)
+    {
+    	float pxSize = mBodyText.getTextSize();
+    	pxSize *= factor;
+    	
+    	mBodyText.setTextSize(pxSize);
+    }
     
     private void setupView (boolean hasImage)
     {
@@ -119,6 +139,9 @@ public class NoteEdit extends Activity {
 	
 	            mMimeType = note.getString(
  	                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
+	            
+	            if (mMimeType == null)
+	            	mMimeType = "text/plain";
 	            
 	            boolean isImage = mMimeType.startsWith("image");
 	            
@@ -245,7 +268,7 @@ public class NoteEdit extends Activity {
          {
         	 try
         	 {
-        		 NoteUtils.shareData(this, mMimeType, mBlob);
+        		 NoteUtils.shareData(this, mTitleText.getText().toString(), mMimeType, mBlob);
         	 }
         	 catch (Exception e)
         	 {

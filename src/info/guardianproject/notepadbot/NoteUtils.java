@@ -20,10 +20,10 @@ public class NoteUtils {
 		 * When the user selects the Share menu item
 		 * Uses saveTmpImage (overwriting what is already there) and uses the standard Android Share Intent
 		 */
-	    public static void shareData(Context ctx, String mimeType, byte[] outdata) throws IOException
+	    public static void shareData(Context ctx, String filename, String mimeType, byte[] outdata) throws IOException
 	    {
 	    	
-	    	Uri tmpImageUri = saveTmpFile(ctx, mimeType, outdata);
+	    	Uri tmpImageUri = saveTmpFile(ctx, filename, mimeType, outdata);
 	    	
 	    	if (tmpImageUri != null) {
 	        	Intent share = new Intent(Intent.ACTION_SEND);
@@ -75,7 +75,7 @@ public class NoteUtils {
 			  return false;
 	}
 	
-	public static Uri saveTmpFile(Context ctx, String mimeType, byte[] outdata) throws IOException
+	public static Uri saveTmpFile(Context ctx, String filename, String mimeType, byte[] outdata) throws IOException
 	{
 		
         // Create a path where we will place our picture in the user's
@@ -84,7 +84,7 @@ public class NoteUtils {
         // pictures and other media owned by the application, consider
         // Context.getExternalMediaDir().
         File path = getExternalFilesDirEclair(ctx, null);
-        File file = new File(path, "nctemp.jpg");
+        File file = new File(path, filename);
 
         // Make sure the Pictures directory exists.
         path.mkdirs();
