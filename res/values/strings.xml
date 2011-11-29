@@ -6,9 +6,12 @@
     <string name="menu_delete">Delete Item</string>
     <string name="menu_rekey">Change Passphrase</string>
     <string name="menu_share">Share...</string>
-    <string name="menu_view">Export Data</string>
+    <string name="menu_view">Export...</string>
     <string name="menu_save">Save Note</string>
     <string name="menu_lock">Lock Notes</string>
+    <string name="menu_bigger">Bigger</string>
+    <string name="menu_smaller">Smaller</string>
+    
     <string name="title">Summary</string>
     <string name="body">Note Text</string>
     <string name="confirm">Save Note</string>
