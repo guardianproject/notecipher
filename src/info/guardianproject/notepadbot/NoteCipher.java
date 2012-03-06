@@ -16,41 +16,38 @@
 
 package info.guardianproject.notepadbot;
 
-import info.guardianproject.database.sqlcipher.SQLiteDatabase;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.sqlcipher.auth.SQLCipherOwner;
+import net.sqlcipher.auth.SQLCipherStateManager;
+import net.sqlcipher.database.SQLiteDatabase;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 
-public class NoteCipher extends ListActivity {
+public class NoteCipher extends ListActivity implements SQLCipherOwner
+{
     private static final int ACTIVITY_CREATE=0;
     private static final int ACTIVITY_EDIT=1;
     
@@ -67,13 +64,9 @@ public class NoteCipher extends ListActivity {
     
     private Uri dataStream;
     
-    private final static int MAX_SIZE = 1000000;
+    private final static int MAX_SIZE = 900000;
     
-    //strong passphrase config variables
-	private final static int MIN_PASS_LENGTH = 6;
-	private final static int MAX_PASS_ATTEMPTS = 3;
-	private final static int PASS_RETRY_WAIT_TIMEOUT = 30000;
-    private int currentPassAttempts = 0;
+    private SQLCipherStateManager mScsManager = new SQLCipherStateManager(this);
     
     /** Called when the activity is first created. */
     @Override
@@ -113,7 +106,7 @@ public class NoteCipher extends ListActivity {
     	mDbHelper = NotesDbAdapter.getInstance(this);
     	
     	if (!mDbHelper.isOpen())
-			showPassword();
+    		mScsManager.showPassword();
     	else if (dataStream != null)
     		importDataStream();
     	else
@@ -146,187 +139,10 @@ public class NoteCipher extends ListActivity {
 
 
 
-	private void showPassword ()
-    {
-		String dialogMessage;
-		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		
-		boolean firstTime = prefs.getBoolean("first_time",true);
-		
-		if (currentPassAttempts >= MAX_PASS_ATTEMPTS)
-		{					
-			try { Thread.sleep(PASS_RETRY_WAIT_TIMEOUT); }
-			catch (Exception e){};
-			currentPassAttempts = 0;
-		}
-		
-		
-		if (firstTime)
-		{
-			dialogMessage = getString(R.string.new_pass);
-			
-			
-			 // This example shows how to add a custom layout to an AlertDialog
-	        LayoutInflater factory = LayoutInflater.from(this);
-	        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
-	        new AlertDialog.Builder(this)
-	            .setTitle(getString(R.string.app_name))
-	            .setView(textEntryView)
-	            .setMessage(dialogMessage)
-	            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
-	                public void onClick(DialogInterface dialog, int whichButton) {
 	
-	                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
-	                	String passphrase = eText.getText().toString();
-	                	
-	                	if (goodPassphrase (passphrase))
-	                	{
-	                		unlockDatabase(passphrase);                	
-	                		eText.setText("");
-	                		System.gc();
-	                		
-	                		//we're good so we can flag this is not first_time anymore
-	                		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(NoteCipher.this);
-	                		Editor pEdit = prefs.edit();
-	            			pEdit.putBoolean("first_time",false);
-	            			pEdit.commit();
-	                	}
-	                	else
-	                	{	                		
-	                		//pass pass show again
-	                		showPassword();
-	                	}
-	                	
-	                }
-	            })
-	            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
-	                public void onClick(DialogInterface dialog, int whichButton) {
 	
-	                    /* User clicked cancel so do some stuff */
-	                }
-	            })
-	            .create().show();
-			
-		}
-		else
-		{
-			dialogMessage = getString(R.string.enter_pass);
-
-	    	 // This example shows how to add a custom layout to an AlertDialog
-	        LayoutInflater factory = LayoutInflater.from(this);
-	        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
-	        new AlertDialog.Builder(this)
-	            .setTitle(getString(R.string.app_name))
-	            .setView(textEntryView)
-	            .setMessage(dialogMessage)
-	            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
-	                public void onClick(DialogInterface dialog, int whichButton) {
 	
-	                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
-	                	String passphrase = eText.getText().toString();
-	                	
-	                	unlockDatabase(passphrase);                	
-	                	eText.setText("");
-	                	System.gc();                	
-	                	
-	                }
-	            })
-	            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
-	                public void onClick(DialogInterface dialog, int whichButton) {
 	
-	                    /* User clicked cancel so do some stuff */
-	                }
-	            })
-	            .create().show();
-		}
-    }
-	
-	private boolean goodPassphrase (String pass)
-	{
-		
-		 boolean upper = false;
-		    boolean lower = false;
-		    boolean number = false;
-		    for (char c : pass.toCharArray()) {
-		      if (Character.isUpperCase(c)) {
-		        upper = true;
-		      } else if (Character.isLowerCase(c)) {
-		        lower = true;
-		      } else if (Character.isDigit(c)) {
-		        number = true;
-		      }
-		    }
-		
-		if (pass.length() < MIN_PASS_LENGTH)
-		{
-			//should we support some user string message here?
-			showPassError(getString(R.string.pass_err_length));
-			return false;
-		}
-		else if (!upper)
-		{
-			showPassError(getString(R.string.pass_err_upper));
-			return false;
-		}
-		else if (!lower)
-		{
-			showPassError(getString(R.string.pass_err_lower));
-			return false;
-		}
-		else if (!number)
-		{
-			showPassError(getString(R.string.pass_err_num));
-			return false;
-		}
-		
-		
-		 //if it got here, then must be okay
-		return true;
-	}
-	
-	private void showPassError (String msg)
-	{
-		Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-	}
-	
-	private void showRekeyDialog ()
-    {
-    	 // This example shows how to add a custom layout to an AlertDialog
-        LayoutInflater factory = LayoutInflater.from(this);
-        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
-        new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.app_name))
-            .setView(textEntryView)
-            .setMessage(getString(R.string.rekey_message))
-            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
-
-                	String newPassword = eText.getText().toString();
-                	
-                	if (goodPassphrase(newPassword))
-                	{
-                		rekeyDatabase(newPassword);
-                	
-                		eText.setText("");
-                		System.gc();
-                	}
-                	else
-                		showRekeyDialog();
-                	
-                }
-            })
-            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                    /* User clicked cancel so do some stuff */
-                }
-            })
-            .create().show();
-    }
-    
 	private void lockDatabase ()
 	{
 		mDbHelper.close();
@@ -336,47 +152,25 @@ public class NoteCipher extends ListActivity {
 		
 	}
 	
-    private void unlockDatabase (String password)
+    public void unlockDatabase (String password) throws Exception
     {
-
-    	try
-    	{
-    	
-    		mDbHelper.open(password);
+    	mDbHelper.open(password);
     		
-    		if (dataStream != null)
-        		importDataStream();
-    		else
-    			fillData();
-    		
-    		//reset the pass attempts
-    		currentPassAttempts = 0;
-    	}
-    	catch (Exception e)
-    	{
-    		currentPassAttempts++;
-    		
-    		Toast.makeText(this, getString(R.string.err_pass), Toast.LENGTH_LONG).show();
-    		showPassword();
-    		
-    	}
+		if (dataStream != null)
+    		importDataStream();
+		else
+			fillData();
+		
     }
     
-    private void rekeyDatabase (String password)
+    public void rekeyDatabase (String password) throws Exception
     {
 
-    	try
-    	{
-    		Toast.makeText(this, getString(R.string.do_rekey), Toast.LENGTH_LONG).show();
+		Toast.makeText(this, getString(R.string.do_rekey), Toast.LENGTH_LONG).show();
 
-    	    	mDbHelper.rekey(password);    		
+	    mDbHelper.rekey(password);    		
 
-    	}
-    	catch (Exception e)
-    	{
-    		Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-
-    	}
+	
     }
     
     private void fillData() {
@@ -419,7 +213,7 @@ public class NoteCipher extends ListActivity {
             createNote();
             return true;
         case REKEY_ID:
-            showRekeyDialog();
+        	mScsManager.showRekeyDialog();
             return true;  
         case LOCK_ID:
             lockDatabase();
