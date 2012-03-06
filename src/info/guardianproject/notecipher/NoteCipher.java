@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package info.guardianproject.notepadbot;
+package info.guardianproject.notecipher;
+
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

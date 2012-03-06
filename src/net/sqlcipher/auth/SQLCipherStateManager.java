@@ -1,6 +1,6 @@
 package net.sqlcipher.auth;
 
-import info.guardianproject.notepadbot.R;
+import info.guardianproject.notecipher.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;

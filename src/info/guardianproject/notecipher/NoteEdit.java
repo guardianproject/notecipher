@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package info.guardianproject.notepadbot;
+package info.guardianproject.notecipher;
 
 import android.app.Activity;
 import android.database.Cursor;

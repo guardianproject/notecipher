@@ -14,7 +14,7 @@
  * the License.
  */
 
-package info.guardianproject.notepadbot;
+package info.guardianproject.notecipher;
 
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteOpenHelper;

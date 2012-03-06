@@ -1,4 +1,4 @@
-package info.guardianproject.notepadbot;
+package info.guardianproject.notecipher;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
