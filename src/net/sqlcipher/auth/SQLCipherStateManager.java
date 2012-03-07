@@ -26,9 +26,10 @@ public class SQLCipherStateManager
     
     private Context _context;
     
-    public SQLCipherStateManager (Context context)
+    public SQLCipherStateManager (Context context, SQLCipherOwner sqOwner)
     {
     	_context = context;
+    	_sqOwner = sqOwner;
     }
     
     public void showPassword ()
@@ -53,7 +54,7 @@ public class SQLCipherStateManager
 			
 			 // This example shows how to add a custom layout to an AlertDialog
 	        LayoutInflater factory = LayoutInflater.from(_context);
-	        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
+	        final View textEntryView = factory.inflate(R.layout.sqlcipher_password_dialog, null);
 	        new AlertDialog.Builder(_context)
 	            .setTitle(_context.getString(R.string.app_name))
 	            .setView(textEntryView)
@@ -70,7 +71,6 @@ public class SQLCipherStateManager
 								_sqOwner.unlockDatabase(passphrase);
 							} catch (Exception e) {
 								showPassError(e.getMessage());
-
 							}                	
 	                		eText.setText("");
 	                		System.gc();
@@ -93,6 +93,7 @@ public class SQLCipherStateManager
 	                public void onClick(DialogInterface dialog, int whichButton) {
 	
 	                    /* User clicked cancel so do some stuff */
+	                	
 	                }
 	            })
 	            .create().show();
@@ -104,7 +105,7 @@ public class SQLCipherStateManager
 
 	    	 // This example shows how to add a custom layout to an AlertDialog
 	        LayoutInflater factory = LayoutInflater.from(_context);
-	        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
+	        final View textEntryView = factory.inflate(R.layout.sqlcipher_password_dialog, null);
 	        new AlertDialog.Builder(_context)
 	            .setTitle(_context.getString(R.string.app_name))
 	            .setView(textEntryView)
@@ -132,6 +133,7 @@ public class SQLCipherStateManager
 	                public void onClick(DialogInterface dialog, int whichButton) {
 	
 	                    /* User clicked cancel so do some stuff */
+	                	_sqOwner.cancel();
 	                }
 	            })
 	            .create().show();
@@ -186,7 +188,7 @@ public class SQLCipherStateManager
     {
     	 // This example shows how to add a custom layout to an AlertDialog
         LayoutInflater factory = LayoutInflater.from(_context);
-        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
+        final View textEntryView = factory.inflate(R.layout.sqlcipher_password_dialog, null);
         new AlertDialog.Builder(_context)
             .setTitle(_context.getString(R.string.app_name))
             .setView(textEntryView)

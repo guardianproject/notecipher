@@ -1,13 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2007 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+  
+          http://www.apache.org/licenses/LICENSE-2.0
+  
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
 <resources>
     <string name="app_name">NoteCipher</string>
+    <string name="live_folder_name">NoteCipher: LiveNotes</string>
+
+    <string name="title_edit_title">Note title:</string>
+    <string name="title_create">New note</string>
+    <string name="title_edit">Edit: %1$s</string>
+    <string name="title_notes_list">NoteCipher: Notes</string>
+
+    <string name="menu_add">New note</string>
+    <string name="menu_save">Save</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_open">Open</string>
+    <string name="menu_revert">Revert changes</string>
+    <string name="menu_copy">Copy</string>
+    <string name="menu_paste">Paste</string>
+
+    <string name="button_ok">OK</string>
+    <string name="text_title">Title:</string>
+
+    <string name="resolve_edit">Edit note</string>
+    <string name="resolve_title">Edit title</string>
+
+    <string name="error_title">Error</string>
+    <string name="error_message">Error loading note</string>
+    <string name="nothing_to_save">There is nothing to save</string>
+    
+
     <string name="no_notes">No Notes Yet</string>
     <string name="menu_insert">Add Note</string>
-    <string name="menu_delete">Delete Item</string>
     <string name="menu_rekey">Change Passphrase</string>
-    <string name="menu_share">Share...</string>
-    <string name="menu_view">Export...</string>
-    <string name="menu_save">Save Note</string>
+    <string name="menu_share">Share&#8230;</string>
+    <string name="menu_view">Export&#8230;</string>
     <string name="menu_lock">Lock Notes</string>
     <string name="menu_bigger">Bigger</string>
     <string name="menu_smaller">Smaller</string>
@@ -22,10 +61,9 @@
     <string name="err_export">Error exporting image</string>
     <string name="on_start">Tap anywhere to create a new note</string>
     <string name="err_pass">Unable to unlock your notes. Are you sure you entered the right passphrase?</string>
-    <string name="button_ok">Okay</string>
     <string name="button_cancel">Cancel</string>
     <string name="rekey_message">Enter a *new* passphrase. It must contain at least one uppercase, one lowercase and one number, and be longer than six characters.</string>
-    <string name="do_rekey">Encrypting your existing notes with the new passphrase (patience...)</string>
+    <string name="do_rekey">Encrypting your existing notes with the new passphrase</string>
     <string name="enter_pass">Enter your passphrase:</string>
     <string name="new_pass">Welcome! Enter a strong passphrase to secure your notes. It must contain at least one uppercase, one lowercase and one number, and be longer than six characters.</string>
     <string name="pass_err_length">Your passphrase was not long enough</string>
