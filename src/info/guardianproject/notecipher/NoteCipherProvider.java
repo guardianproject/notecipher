@@ -252,7 +252,7 @@ public class NoteCipherProvider extends ContentProvider
    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
            String sortOrder) {
 
-       // Constructs a new query builder and sets its table name
+       // Constructs a new query builder and sets its table name111
        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
        qb.setTables(NoteCipher.Notes.TABLE_NAME);
 

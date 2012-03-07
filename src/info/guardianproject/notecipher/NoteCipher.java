@@ -16,6 +16,8 @@
 
 package info.guardianproject.notecipher;
 
+import android.app.Application;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -25,13 +27,31 @@ import android.provider.BaseColumns;
  * is a public, non-extendable (final) class that contains constants defining column names and
  * URIs. A well-written client depends only on the constants in the contract.
  */
-public final class NoteCipher {
+public final class NoteCipher extends Application
+{
     public static final String AUTHORITY = "info.guardianproject.provider.NoteCipher";
 
-    // This class cannot be instantiated
-    private NoteCipher() {
+
+    @Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
+
+	@Override
+    public void onCreate() {
+        super.onCreate();
     }
 
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+    }
+    
     /**
      * Notes table contract
      */

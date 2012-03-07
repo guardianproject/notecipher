@@ -66,6 +66,9 @@ public class NotesList extends ListActivity implements SQLCipherOwner
     /** The index of the title column */
     private static final int COLUMN_INDEX_TITLE = 1;
 
+    /** cursor for the list**/
+    private Cursor listCursor;
+    
     /**
      * onCreate is called when Android starts this Activity from scratch.
      */
@@ -127,14 +130,14 @@ public class NotesList extends ListActivity implements SQLCipherOwner
          *
          * Please see the introductory note about performing provider operations on the UI thread.
          */
-        Cursor cursor = managedQuery(
+        listCursor = managedQuery(
             getIntent().getData(),            // Use the default content URI for the provider.
             PROJECTION,                       // Return the note ID and title for each note.
             null,                             // No where clause, return all records.
             null,                             // No where clause, therefore no where column values.
             NoteCipher.Notes.DEFAULT_SORT_ORDER  // Use the default sort order.
         );
-
+        
         /*
          * The following two arrays create a "map" between columns in the cursor and view IDs
          * for items in the ListView. Each element in the dataColumns array represents
@@ -155,7 +158,7 @@ public class NotesList extends ListActivity implements SQLCipherOwner
             = new SimpleCursorAdapter(
                       this,                             // The Context for the ListView
                       R.layout.noteslist_item,          // Points to the XML for a list item
-                      cursor,                           // The cursor to get items from
+                      listCursor,                           // The cursor to get items from
                       dataColumns,
                       viewIDs
               );
@@ -517,8 +520,12 @@ public class NotesList extends ListActivity implements SQLCipherOwner
 	
 	private void lockNotes ()
 	{
+		
+		listCursor.close();
+		
 		NoteCipherProvider.cachePasscode = null;
-		finish();
+		
+		finish();		
 		
 	}
 }
