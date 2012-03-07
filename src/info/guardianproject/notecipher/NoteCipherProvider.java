@@ -102,7 +102,7 @@ public class NoteCipherProvider extends ContentProvider
     private static final UriMatcher sUriMatcher;
 
     // Handle to a new DatabaseHelper.
-    private DatabaseHelper mOpenHelper;
+    //private DatabaseHelper mOpenHelper;
 
     /**
      * A block that instantiates and sets static objects
@@ -233,8 +233,7 @@ public class NoteCipherProvider extends ContentProvider
 
        // Creates a new helper object. Note that the database itself isn't opened until
        // something tries to access it, and it's only created if it doesn't already exist.
-       mOpenHelper = new DatabaseHelper(getContext());
-
+      
        // Assumes that any failures will be reported by a thrown exception.
        return true;
    }
@@ -297,6 +296,8 @@ public class NoteCipherProvider extends ContentProvider
            // otherwise, uses the incoming sort order
            orderBy = sortOrder;
        }
+
+       DatabaseHelper mOpenHelper = new DatabaseHelper(getContext());
 
        // Opens the database object in "read" mode, since no writes need to be done.
        SQLiteDatabase db = mOpenHelper.getReadableDatabase(cachePasscode);
@@ -543,6 +544,7 @@ public class NoteCipherProvider extends ContentProvider
         }
 
         // Opens the database object in "write" mode.
+        DatabaseHelper mOpenHelper = new DatabaseHelper(getContext());        
         SQLiteDatabase db = mOpenHelper.getWritableDatabase(cachePasscode);
 
         // Performs the insert and returns the ID of the new note.
@@ -585,6 +587,7 @@ public class NoteCipherProvider extends ContentProvider
     public int delete(Uri uri, String where, String[] whereArgs) {
 
         // Opens the database object in "write" mode.
+    	DatabaseHelper mOpenHelper = new DatabaseHelper(getContext());
         SQLiteDatabase db = mOpenHelper.getWritableDatabase(cachePasscode);
         String finalWhere;
 
@@ -671,6 +674,7 @@ public class NoteCipherProvider extends ContentProvider
     public int update(Uri uri, ContentValues values, String where, String[] whereArgs) {
 
         // Opens the database object in "write" mode.
+    	DatabaseHelper mOpenHelper = new DatabaseHelper(getContext());
         SQLiteDatabase db = mOpenHelper.getWritableDatabase(cachePasscode);
         int count;
         String finalWhere;
@@ -749,6 +753,7 @@ public class NoteCipherProvider extends ContentProvider
      * @return a handle to the database helper object for the provider's data.
      */
     DatabaseHelper getOpenHelperForTest() {
+    	DatabaseHelper mOpenHelper = new DatabaseHelper(getContext());
         return mOpenHelper;
     }
 }
