@@ -70,5 +70,8 @@
     <string name="pass_err_upper">Your passphrase did not contain any uppercase letters</string>
     <string name="pass_err_lower">Your passphrase did not contain any lowercase letters</string>
     <string name="pass_err_num">Your passphrase did not contain any numbers</string>
+    <string name="wrong_password_">Wrong password.</string>
+    <string name="passphrase_accepted_database_created_">Passphrase accepted. Database created.</string>
+    <string name="accepted_password_database_unlocked_">Accepted Password. Database unlocked.</string>
     
 </resources>

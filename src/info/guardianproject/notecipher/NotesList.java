@@ -110,10 +110,20 @@ public class NotesList extends ListActivity implements SQLCipherOwner
         if (NoteCipherProvider.cachePasscode == null)
         {
         	SQLCipherStateManager csm = new SQLCipherStateManager(this, this);
+        	
         	csm.showPassword();
+        	
         }
-        else
-        	loadList ();
+        else {
+        	try {
+        		loadList();
+        	} catch (Exception e) {
+        		Log.e(TAG, " got exception in onResume , trying loadList()\n"+e.getMessage());
+        		e.printStackTrace();
+        		NoteCipherProvider.cachePasscode = null;
+        		finish();
+        	}
+        }
 	}
 
 	@Override
@@ -122,7 +132,7 @@ public class NotesList extends ListActivity implements SQLCipherOwner
 		lockNotes ();
 	}
 
-	private void loadList ()
+	private void loadList () throws Exception
     {
 
         /* Performs a managed query. The Activity handles closing and requerying the cursor
