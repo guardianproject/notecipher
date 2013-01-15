@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
- package="info.guardianproject.notepadbot" android:versionName="0.0.6" android:versionCode="9">
+ package="info.guardianproject.notepadbot" android:versionName="0.0.7" android:versionCode="10">
  
+    
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="17"/>
+    
      <supports-screens android:smallScreens="true"
                       android:normalScreens="true"
                       android:largeScreens="true"
@@ -32,5 +35,4 @@
         
     </application>
     
-    <uses-sdk android:minSdkVersion="7"/>
 </manifest> 
