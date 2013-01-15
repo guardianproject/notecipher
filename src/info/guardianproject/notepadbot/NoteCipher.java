@@ -432,7 +432,7 @@ public class NoteCipher extends ListActivity {
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
-		menu.add(0, VIEW_ID, 0, R.string.menu_view);
+	//	menu.add(0, VIEW_ID, 0, R.string.menu_view);
 		menu.add(0, SHARE_ID, 0, R.string.menu_share);
 		menu.add(0, DELETE_ID, 0, R.string.menu_delete);
         

@@ -129,6 +129,8 @@ public class NoteEdit extends Activity {
     }
     
     private void populateFields() {
+        
+        
     	try
     	{
     		
@@ -174,6 +176,7 @@ public class NoteEdit extends Activity {
 	            mTitleText.setText(note.getString(
 	    	            note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
 	            
+	            note.close();
 	        
     	}
     	catch (Exception e)
