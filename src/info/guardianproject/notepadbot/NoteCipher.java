@@ -16,12 +16,11 @@
 
 package info.guardianproject.notepadbot;
 
-import info.guardianproject.database.sqlcipher.SQLiteDatabase;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.sqlcipher.database.SQLiteDatabase;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentResolver;

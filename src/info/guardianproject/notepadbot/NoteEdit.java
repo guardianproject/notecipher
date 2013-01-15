@@ -200,6 +200,13 @@ public class NoteEdit extends Activity {
         
 	    saveState();
 	        
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onPause();
+        
+     
         if (mTitleText != null)
         	mTitleText.setText(ZERO_TEXT);
         

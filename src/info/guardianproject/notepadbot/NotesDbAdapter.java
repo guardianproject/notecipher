@@ -16,8 +16,8 @@
 
 package info.guardianproject.notepadbot;
 
-import info.guardianproject.database.sqlcipher.SQLiteDatabase;
-import info.guardianproject.database.sqlcipher.SQLiteOpenHelper;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteOpenHelper;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
