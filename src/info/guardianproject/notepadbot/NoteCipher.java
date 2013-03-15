@@ -145,111 +145,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 	}
 
 
-
-	private void showPassword ()
-    {
-		String dialogMessage;
-
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-		boolean firstTime = prefs.getBoolean("first_time",true);
-
-		if (currentPassAttempts >= MAX_PASS_ATTEMPTS)
-		{
-			try { Thread.sleep(PASS_RETRY_WAIT_TIMEOUT); }
-			catch (Exception e){};
-			currentPassAttempts = 0;
-		}
-
-
-		if (firstTime)
-		{
-			dialogMessage = getString(R.string.new_pass);
-
-
-			 // This example shows how to add a custom layout to an AlertDialog
-	        LayoutInflater factory = LayoutInflater.from(this);
-	        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
-	        new AlertDialog.Builder(this)
-	            .setTitle(getString(R.string.app_name))
-	            .setView(textEntryView)
-	            .setMessage(dialogMessage)
-	            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
-	                public void onClick(DialogInterface dialog, int whichButton) {
-
-	                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
-	                	String passphrase = eText.getText().toString();
-
-	                	if (goodPassphrase (passphrase))
-	                	{
-	                		try {
-                                mCacheWord.setPassphrase(passphrase.toCharArray());
-                                eText.setText("");
-                                System.gc();
-
-                                //we're good so we can flag this is not first_time anymore
-                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(NoteCipher.this);
-                                Editor pEdit = prefs.edit();
-                                pEdit.putBoolean("first_time",false);
-                                pEdit.commit();
-                            } catch (GeneralSecurityException e) {
-                                // initialization failed
-                                Log.e(TAG, "CacheWord initialization failed: " + e.getMessage());
-                            }
-	                	}
-	                	else
-	                	{
-	                		//pass pass show again
-	                		showPassword();
-	                	}
-
-	                }
-	            })
-	            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
-	                public void onClick(DialogInterface dialog, int whichButton) {
-
-	                    /* User clicked cancel so do some stuff */
-	                }
-	            })
-	            .create().show();
-
-		}
-		else
-		{
-			dialogMessage = getString(R.string.enter_pass);
-
-	    	 // This example shows how to add a custom layout to an AlertDialog
-	        LayoutInflater factory = LayoutInflater.from(this);
-	        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
-	        new AlertDialog.Builder(this)
-	            .setTitle(getString(R.string.app_name))
-	            .setView(textEntryView)
-	            .setMessage(dialogMessage)
-	            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
-	                public void onClick(DialogInterface dialog, int whichButton) {
-
-	                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
-	                	String passphrase = eText.getText().toString();
-
-	                	try {
-                            mCacheWord.setPassphrase(passphrase.toCharArray());
-                        } catch (GeneralSecurityException e) {
-                            Log.e(TAG, "Cacheword pass verification failed: " + e.getMessage());
-                        }
-	                	eText.setText("");
-	                	System.gc();
-	                }
-	            })
-	            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
-	                public void onClick(DialogInterface dialog, int whichButton) {
-
-	                    /* User clicked cancel so do some stuff */
-	                }
-	            })
-	            .create().show();
-		}
-    }
-
 	private boolean goodPassphrase (String pass)
 	{
 	    return true;
@@ -298,43 +193,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 		Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 	}
 
-	private void showRekeyDialog ()
-    {
-    	 // This example shows how to add a custom layout to an AlertDialog
-        LayoutInflater factory = LayoutInflater.from(this);
-        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
-        new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.app_name))
-            .setView(textEntryView)
-            .setMessage(getString(R.string.rekey_message))
-            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
-
-                	String newPassword = eText.getText().toString();
-
-                	if (goodPassphrase(newPassword))
-                	{
-                		rekeyDatabase(newPassword);
-
-                		eText.setText("");
-                		System.gc();
-                	}
-                	else
-                		showRekeyDialog();
-
-                }
-            })
-            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                    /* User clicked cancel so do some stuff */
-                }
-            })
-            .create().show();
-    }
-
 	private void lockDatabase ()
 	{
 	    if( mDbHelper != null ) {
@@ -364,7 +222,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     		currentPassAttempts++;
 
     		Toast.makeText(this, getString(R.string.err_pass), Toast.LENGTH_LONG).show();
-    		showPassword();
 
     	}
     }
@@ -412,7 +269,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         menu.add(0, INSERT_ID, 0, R.string.menu_insert);
-        menu.add(0, REKEY_ID, 0, R.string.menu_rekey);
+//        menu.add(0, REKEY_ID, 0, R.string.menu_rekey);
         menu.add(0, LOCK_ID, 0, R.string.menu_lock);
 
 
@@ -426,7 +283,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
             createNote();
             return true;
         case REKEY_ID:
-            showRekeyDialog();
             return true;
         case LOCK_ID:
             lockDatabase();
