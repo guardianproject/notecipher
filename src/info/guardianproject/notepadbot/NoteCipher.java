@@ -19,8 +19,12 @@ package info.guardianproject.notepadbot;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 
 import net.sqlcipher.database.SQLiteDatabase;
+
+import org.apache.commons.codec.binary.Hex;
+
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentResolver;
@@ -48,98 +52,95 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import info.guardianproject.cacheword.CacheWordHandler;
+import info.guardianproject.cacheword.ICacheWordSubscriber;
 
-public class NoteCipher extends ListActivity {
+public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     private static final int ACTIVITY_CREATE=0;
     private static final int ACTIVITY_EDIT=1;
-    
+
     private static final int INSERT_ID = Menu.FIRST;
     private static final int DELETE_ID = Menu.FIRST + 1;
     private static final int REKEY_ID = Menu.FIRST + 2;
     private static final int SHARE_ID = Menu.FIRST + 3;
     private static final int VIEW_ID = Menu.FIRST + 4;
     private static final int LOCK_ID = Menu.FIRST + 5;
-    
+
     public static final String TAG = "notecipher";
-    
+
     private NotesDbAdapter mDbHelper;
-    
+
     private Uri dataStream;
-    
+
     private final static int MAX_SIZE = 1000000;
-    
+
     //strong passphrase config variables
 	private final static int MIN_PASS_LENGTH = 6;
 	private final static int MAX_PASS_ATTEMPTS = 3;
 	private final static int PASS_RETRY_WAIT_TIMEOUT = 30000;
     private int currentPassAttempts = 0;
-    
+
+    private CacheWordHandler mCacheWord;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         if (getIntent() != null)
 		{
-			
+
 			if(getIntent().hasExtra(Intent.EXTRA_STREAM)) {
 				dataStream = (Uri) getIntent().getExtras().get(Intent.EXTRA_STREAM);
 			}
 			else
 				dataStream = getIntent().getData();
-			
+
 		}
-        
+
         SQLiteDatabase.loadLibs(this);
-        
+
         setContentView(R.layout.notes_list);
 
         registerForContextMenu(getListView());
 
-		if (savedInstanceState != null)
-		{
-			
-		}
+        mCacheWord = new CacheWordHandler(this);
     }
-    
-    
-    
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mCacheWord.onPause();
+    }
+
+
     @Override
 	protected void onResume() {
 		super.onResume();
-		
+		mDbHelper = NotesDbAdapter.getInstance(this);
 
-    	mDbHelper = NotesDbAdapter.getInstance(this);
-    	
-    	if (!mDbHelper.isOpen())
-			showPassword();
-    	else if (dataStream != null)
-    		importDataStream();
-    	else
-    		fillData();
-    	
-	
+		mCacheWord.onResume();
 	}
 
 
 	@Override
 	public void onAttachedToWindow() {
 		super.onAttachedToWindow();
-		
+
 		 findViewById(R.id.listlayout).setOnTouchListener(new OnTouchListener ()
 	        {
 
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
-					
+
 					if (mDbHelper != null && mDbHelper.isOpen())
 						createNote();
-					
+
 					return false;
 				}
-	        	
+
 	        }
-	        		
+
 	        );
 	}
 
@@ -148,24 +149,24 @@ public class NoteCipher extends ListActivity {
 	private void showPassword ()
     {
 		String dialogMessage;
-		
+
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		
+
 		boolean firstTime = prefs.getBoolean("first_time",true);
-		
+
 		if (currentPassAttempts >= MAX_PASS_ATTEMPTS)
-		{					
+		{
 			try { Thread.sleep(PASS_RETRY_WAIT_TIMEOUT); }
 			catch (Exception e){};
 			currentPassAttempts = 0;
 		}
-		
-		
+
+
 		if (firstTime)
 		{
 			dialogMessage = getString(R.string.new_pass);
-			
-			
+
+
 			 // This example shows how to add a custom layout to an AlertDialog
 	        LayoutInflater factory = LayoutInflater.from(this);
 	        final View textEntryView = factory.inflate(R.layout.alert_dialog_text_entry, null);
@@ -175,38 +176,43 @@ public class NoteCipher extends ListActivity {
 	            .setMessage(dialogMessage)
 	            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
 	                public void onClick(DialogInterface dialog, int whichButton) {
-	
+
 	                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
 	                	String passphrase = eText.getText().toString();
-	                	
+
 	                	if (goodPassphrase (passphrase))
 	                	{
-	                		unlockDatabase(passphrase);                	
-	                		eText.setText("");
-	                		System.gc();
-	                		
-	                		//we're good so we can flag this is not first_time anymore
-	                		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(NoteCipher.this);
-	                		Editor pEdit = prefs.edit();
-	            			pEdit.putBoolean("first_time",false);
-	            			pEdit.commit();
+	                		try {
+                                mCacheWord.setPassphrase(passphrase.toCharArray());
+                                eText.setText("");
+                                System.gc();
+
+                                //we're good so we can flag this is not first_time anymore
+                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(NoteCipher.this);
+                                Editor pEdit = prefs.edit();
+                                pEdit.putBoolean("first_time",false);
+                                pEdit.commit();
+                            } catch (GeneralSecurityException e) {
+                                // initialization failed
+                                Log.e(TAG, "CacheWord initialization failed: " + e.getMessage());
+                            }
 	                	}
 	                	else
-	                	{	                		
+	                	{
 	                		//pass pass show again
 	                		showPassword();
 	                	}
-	                	
+
 	                }
 	            })
 	            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
 	                public void onClick(DialogInterface dialog, int whichButton) {
-	
+
 	                    /* User clicked cancel so do some stuff */
 	                }
 	            })
 	            .create().show();
-			
+
 		}
 		else
 		{
@@ -221,30 +227,33 @@ public class NoteCipher extends ListActivity {
 	            .setMessage(dialogMessage)
 	            .setPositiveButton(getString(R.string.button_ok), new DialogInterface.OnClickListener() {
 	                public void onClick(DialogInterface dialog, int whichButton) {
-	
+
 	                	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
 	                	String passphrase = eText.getText().toString();
-	                	
-	                	unlockDatabase(passphrase);                	
+
+	                	try {
+                            mCacheWord.setPassphrase(passphrase.toCharArray());
+                        } catch (GeneralSecurityException e) {
+                            Log.e(TAG, "Cacheword pass verification failed: " + e.getMessage());
+                        }
 	                	eText.setText("");
-	                	System.gc();                	
-	                	
+	                	System.gc();
 	                }
 	            })
 	            .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
 	                public void onClick(DialogInterface dialog, int whichButton) {
-	
+
 	                    /* User clicked cancel so do some stuff */
 	                }
 	            })
 	            .create().show();
 		}
     }
-	
+
 	private boolean goodPassphrase (String pass)
 	{
-		
-		 boolean upper = false;
+	    return true;
+		 /*boolean upper = false;
 		    boolean lower = false;
 		    boolean number = false;
 		    for (char c : pass.toCharArray()) {
@@ -256,7 +265,7 @@ public class NoteCipher extends ListActivity {
 		        number = true;
 		      }
 		    }
-		
+
 		if (pass.length() < MIN_PASS_LENGTH)
 		{
 			//should we support some user string message here?
@@ -277,18 +286,18 @@ public class NoteCipher extends ListActivity {
 		{
 			showPassError(getString(R.string.pass_err_num));
 			return false;
-		}
-		
-		
+		}*/
+
+
 		 //if it got here, then must be okay
-		return true;
+//		return true;
 	}
-	
+
 	private void showPassError (String msg)
 	{
 		Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 	}
-	
+
 	private void showRekeyDialog ()
     {
     	 // This example shows how to add a custom layout to an AlertDialog
@@ -304,17 +313,17 @@ public class NoteCipher extends ListActivity {
                 	EditText eText = ((android.widget.EditText)textEntryView.findViewById(R.id.password_edit));
 
                 	String newPassword = eText.getText().toString();
-                	
+
                 	if (goodPassphrase(newPassword))
                 	{
                 		rekeyDatabase(newPassword);
-                	
+
                 		eText.setText("");
                 		System.gc();
                 	}
                 	else
                 		showRekeyDialog();
-                	
+
                 }
             })
             .setNegativeButton(getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
@@ -325,42 +334,39 @@ public class NoteCipher extends ListActivity {
             })
             .create().show();
     }
-    
+
 	private void lockDatabase ()
 	{
 		mDbHelper.close();
 		mDbHelper = null;
-		
-		finish();
-		
 	}
-	
+
     private void unlockDatabase (String password)
     {
 
     	try
     	{
-    	
+
     		mDbHelper.open(password);
-    		
+
     		if (dataStream != null)
         		importDataStream();
     		else
     			fillData();
-    		
+
     		//reset the pass attempts
     		currentPassAttempts = 0;
     	}
     	catch (Exception e)
     	{
     		currentPassAttempts++;
-    		
+
     		Toast.makeText(this, getString(R.string.err_pass), Toast.LENGTH_LONG).show();
     		showPassword();
-    		
+
     	}
     }
-    
+
     private void rekeyDatabase (String password)
     {
 
@@ -368,7 +374,7 @@ public class NoteCipher extends ListActivity {
     	{
     		Toast.makeText(this, getString(R.string.do_rekey), Toast.LENGTH_LONG).show();
 
-    	    	mDbHelper.rekey(password);    		
+    	    	mDbHelper.rekey(password);
 
     	}
     	catch (Exception e)
@@ -377,37 +383,37 @@ public class NoteCipher extends ListActivity {
 
     	}
     }
-    
+
     private void fillData() {
         Cursor notesCursor = mDbHelper.fetchAllNotes();
         startManagingCursor(notesCursor);
-        
+
         // Create an array to specify the fields we want to display in the list (only TITLE)
         String[] from = new String[]{NotesDbAdapter.KEY_TITLE};
-        
+
         // and an array of the fields we want to bind those fields to (in this case just text1)
         int[] to = new int[]{R.id.text1};
-        
+
         // Now create a simple cursor adapter and set it to display
-        SimpleCursorAdapter notes = 
+        SimpleCursorAdapter notes =
         	    new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
         setListAdapter(notes);
-        
-        
+
+
         if (notes.isEmpty())
         {
         	Toast.makeText(this, getString(R.string.on_start), Toast.LENGTH_LONG).show();
         }
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         menu.add(0, INSERT_ID, 0, R.string.menu_insert);
         menu.add(0, REKEY_ID, 0, R.string.menu_rekey);
         menu.add(0, LOCK_ID, 0, R.string.menu_lock);
-        
-        
+
+
         return true;
     }
 
@@ -419,15 +425,15 @@ public class NoteCipher extends ListActivity {
             return true;
         case REKEY_ID:
             showRekeyDialog();
-            return true;  
+            return true;
         case LOCK_ID:
             lockDatabase();
             return true;
         }
-       
+
         return super.onMenuItemSelected(featureId, item);
     }
-	
+
     @Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
@@ -435,13 +441,13 @@ public class NoteCipher extends ListActivity {
 	//	menu.add(0, VIEW_ID, 0, R.string.menu_view);
 		menu.add(0, SHARE_ID, 0, R.string.menu_share);
 		menu.add(0, DELETE_ID, 0, R.string.menu_delete);
-        
+
 	}
 
     @Override
 	public boolean onContextItemSelected(MenuItem item) {
     	AdapterContextMenuInfo info;
-    	
+
 		switch(item.getItemId()) {
     	case DELETE_ID:
     		info = (AdapterContextMenuInfo) item.getMenuInfo();
@@ -451,29 +457,29 @@ public class NoteCipher extends ListActivity {
     	case SHARE_ID:
     		info = (AdapterContextMenuInfo) item.getMenuInfo();
     		shareEntry(info.id);
-	     
+
 	        return true;
     	case VIEW_ID:
     		info = (AdapterContextMenuInfo) item.getMenuInfo();
     		viewEntry(info.id);
-	     
+
 	        return true;
 		}
 		return super.onContextItemSelected(item);
 	}
-	
+
     private void shareEntry(long id)
     {
     	Cursor note = mDbHelper.fetchNote(id);
     	 startManagingCursor(note);
-    	 
+
     	 byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
     	 String title = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
          String mimeType = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
-         
+
          if (mimeType == null)
         	 mimeType = "text/plain";
-         
+
          if (blob != null)
          {
         	 try
@@ -491,39 +497,39 @@ public class NoteCipher extends ListActivity {
                      note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY));
         	 NoteUtils.shareText(this, body);
          }
-         
+
          note.close();
     }
-    
+
     private void viewEntry(long id)
     {
     	Cursor note = mDbHelper.fetchNote(id);
     	 startManagingCursor(note);
-    	 
+
     	 byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
          String mimeType = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
 
          if (mimeType == null)
         	 mimeType = "text/plain";
-         
-         
+
+
          if (blob != null)
          {
         	 String title = note.getString(
                      note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
-        	 
+
         	 NoteUtils.savePublicFile(this, title, mimeType, blob);
-        	 
+
          }
-         
+
          note.close();
     }
-    
+
     private void createNote() {
         Intent i = new Intent(this, NoteEdit.class);
         startActivityForResult(i, ACTIVITY_CREATE);
     }
-    
+
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -538,25 +544,25 @@ public class NoteCipher extends ListActivity {
      * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, 
+    protected void onActivityResult(int requestCode, int resultCode,
                                     Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        
+
     	mDbHelper = NotesDbAdapter.getInstance(this);
 
         fillData();
     }
-    
-    
-   
+
+
+
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		
-		  
+
+
 	}
-	
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
@@ -565,28 +571,28 @@ public class NoteCipher extends ListActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		
+
 	}
 
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		
+
 		NoteUtils.cleanupTmp(this);
-		
+
 	}
 
 	private void importDataStream()
 	{
 		try {
-			ContentResolver cr = getContentResolver(); 
+			ContentResolver cr = getContentResolver();
 			InputStream is = cr.openInputStream(dataStream);
-			
+
 			String mimeType = cr.getType(dataStream);
-			
+
 			byte[] data = NoteUtils.readBytesAndClose (is);
-			
+
 			if (data.length > MAX_SIZE)
 			{
 				Toast.makeText(this, getString(R.string.err_size), Toast.LENGTH_LONG).show();
@@ -596,47 +602,47 @@ public class NoteCipher extends ListActivity {
 			{
 				String title = dataStream.getLastPathSegment();
 				String body = dataStream.getPath();
-				
+
 				NotesDbAdapter.getInstance(this).createNote(title, body, data, mimeType);
-				
+
 				Toast.makeText(this, getString(R.string.on_import) + ": " + title, Toast.LENGTH_LONG).show();
-	
+
 				//handleDelete();
-	
+
 				data = null;
 				dataStream = null;
 				title = null;
 				body = null;
-				
+
 				System.gc();
-				
+
 				fillData();
 			}
-			
+
 		} catch (FileNotFoundException e) {
 			Log.e(TAG, e.getMessage(), e);
-			
+
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage(), e);
 
-	
-		} 
+
+		}
 		catch (OutOfMemoryError e)
 		{
 			Toast.makeText(this, getString(R.string.err_size), Toast.LENGTH_LONG).show();
-		
+
 		}
 		finally
 		{
 			dataStream = null;
-			
+
 		}
 	}
-	
+
 	/*
 	 * Call this to delete the original image, will ask the user
 	 */
-	private void handleDelete() 
+	private void handleDelete()
 	{
 		final AlertDialog.Builder b = new AlertDialog.Builder(this);
 		b.setIcon(android.R.drawable.ic_dialog_alert);
@@ -647,28 +653,50 @@ public class NoteCipher extends ListActivity {
 
                 // User clicked OK so go ahead and delete
 				ContentResolver cr = getContentResolver();
-				
+
 				if (cr != null)
 					cr.delete(dataStream, null, null);
 				else
 				{
 					Toast.makeText(NoteCipher.this, "Unable to delete originaL", Toast.LENGTH_SHORT).show();
 				}
-				
+
             }
         });
 		b.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
 
-              
-            }	
+
+            }
 		});
 		b.show();
 	}
-	
-	
-	
-	
 
-   
+    @Override
+    public void onCacheWordUninitializedEvent() {
+        Log.d(TAG, "onCacheWordUninitializedEvent");
+        showPassword();
+
+    }
+
+    @Override
+    public void onCacheWordLockedEvent() {
+        Log.d(TAG, "onCacheWordLockedEvent");
+        lockDatabase();
+        showPassword();
+    }
+
+    @Override
+    public void onCacheWordUnLockedEvent() {
+        Log.d(TAG, "onCacheWordUnLockedEvent");
+        byte[] key = mCacheWord.getEncryptionKey();
+        // ideally we wouldn't have to wrap this in a string.
+        unlockDatabase( new String(Hex.encodeHex(key)) );
+
+        if (mDbHelper.isOpen()) {
+            if (dataStream != null) importDataStream();
+            else                    fillData();
+        }
+    }
+
 }
