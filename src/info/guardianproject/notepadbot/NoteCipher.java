@@ -528,6 +528,8 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     }
 
     private void createNote() {
+        if(mCacheWord.isLocked()) return;
+
         Intent i = new Intent(this, NoteEdit.class);
         startActivityForResult(i, ACTIVITY_CREATE);
     }
@@ -587,6 +589,8 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
 	private void importDataStream()
 	{
+	    if(mCacheWord.isLocked()) return;
+
 		try {
 			ContentResolver cr = getContentResolver();
 			InputStream is = cr.openInputStream(dataStream);
