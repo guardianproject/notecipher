@@ -337,8 +337,10 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
 	private void lockDatabase ()
 	{
-		mDbHelper.close();
-		mDbHelper = null;
+	    if( mDbHelper != null ) {
+	        mDbHelper.close();
+	        mDbHelper = null;
+	    }
 	}
 
     private void unlockDatabase (String password)
