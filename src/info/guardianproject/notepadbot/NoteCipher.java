@@ -678,18 +678,29 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 		b.show();
 	}
 
+	void showLockScreen() {
+	    Intent intent = new Intent(this, LockScreenActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("originalIntent", getIntent());
+        startActivity(intent);
+        finish();
+	}
+
+	void lock() {
+	    lockDatabase();
+	    showLockScreen();
+	}
+
     @Override
     public void onCacheWordUninitializedEvent() {
         Log.d(TAG, "onCacheWordUninitializedEvent");
-        showPassword();
-
+        showLockScreen();
     }
 
     @Override
     public void onCacheWordLockedEvent() {
         Log.d(TAG, "onCacheWordLockedEvent");
-        lockDatabase();
-        showPassword();
+        lock();
     }
 
     @Override

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
  package="info.guardianproject.notepadbot" android:versionName="0.0.7" android:versionCode="10">
- 
-    
+
+
     <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="17"/>
-    
+
      <supports-screens android:smallScreens="true"
                       android:normalScreens="true"
                       android:largeScreens="true"
-                      android:anyDensity="true" 
-                       />  
+                      android:anyDensity="true"
+                       />
        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
-                                           
+
     <application android:icon="@drawable/icon"  android:label="@string/app_name">
         <activity android:name=".NoteCipher" android:label="@string/app_name">
             <intent-filter>
@@ -20,20 +20,25 @@
             </intent-filter>
             <intent-filter>
                  <action android:name="android.intent.action.SEND" />
-                
+
                  <category android:name="android.intent.category.DEFAULT" />
-                 <category android:name="android.intent.category.ALTERNATIVE" /> 
-                 <category android:name="android.intent.category.SELECTED_ALTERNATIVE" /> 
-                 
+                 <category android:name="android.intent.category.ALTERNATIVE" />
+                 <category android:name="android.intent.category.SELECTED_ALTERNATIVE" />
+
                  <data android:mimeType="*/*" />
-             </intent-filter> 
-           
+             </intent-filter>
+
         </activity>
         <activity android:name=".NoteEdit"  android:label="@string/app_name">
         </activity>
+        <activity
+            android:name=".LockScreenActivity"
+            android:label="@string/title_activity_lock_screen"
+            android:configChanges="keyboardHidden|orientation|screenSize" >
+        </activity>
         <service android:name="info.guardianproject.cacheword.CacheWordService" android:enabled="true" android:exported="false" />
-        
-        
+
+
     </application>
-    
-</manifest> 
+
+</manifest>
