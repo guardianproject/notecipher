@@ -68,12 +68,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
     private final static int MAX_SIZE = 1000000;
 
-    //strong passphrase config variables
-	private final static int MIN_PASS_LENGTH = 6;
-	private final static int MAX_PASS_ATTEMPTS = 3;
-	private final static int PASS_RETRY_WAIT_TIMEOUT = 30000;
-    private int currentPassAttempts = 0;
-
     private CacheWordHandler mCacheWord;
 
     /** Called when the activity is first created. */
@@ -138,50 +132,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 	        );
 	}
 
-
-	private boolean goodPassphrase (String pass)
-	{
-	    return true;
-		 /*boolean upper = false;
-		    boolean lower = false;
-		    boolean number = false;
-		    for (char c : pass.toCharArray()) {
-		      if (Character.isUpperCase(c)) {
-		        upper = true;
-		      } else if (Character.isLowerCase(c)) {
-		        lower = true;
-		      } else if (Character.isDigit(c)) {
-		        number = true;
-		      }
-		    }
-
-		if (pass.length() < MIN_PASS_LENGTH)
-		{
-			//should we support some user string message here?
-			showPassError(getString(R.string.pass_err_length));
-			return false;
-		}
-		else if (!upper)
-		{
-			showPassError(getString(R.string.pass_err_upper));
-			return false;
-		}
-		else if (!lower)
-		{
-			showPassError(getString(R.string.pass_err_lower));
-			return false;
-		}
-		else if (!number)
-		{
-			showPassError(getString(R.string.pass_err_num));
-			return false;
-		}*/
-
-
-		 //if it got here, then must be okay
-//		return true;
-	}
-
 	private void showPassError (String msg)
 	{
 		Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
@@ -208,15 +158,10 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     		else
     			fillData();
 
-    		//reset the pass attempts
-    		currentPassAttempts = 0;
     	}
     	catch (Exception e)
     	{
-    		currentPassAttempts++;
-
     		Toast.makeText(this, getString(R.string.err_pass), Toast.LENGTH_LONG).show();
-
     	}
     }
 

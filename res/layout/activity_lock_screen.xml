@@ -41,38 +41,45 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
-
-                <LinearLayout
-                    android:id="@+id/LinearLayout02"
+                
+                <ViewFlipper
+                    android:id="@+id/viewFlipper1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp" >
+                    android:inAnimation="@anim/push_right_in" >
 
-                    <EditText
-                        android:id="@+id/editNewPassphrase"
+                    <LinearLayout
+                        android:id="@+id/flipView1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:hint="@string/lock_screen_passphrase_not_set_enter"
-                        android:inputType="textPassword" />
-                </LinearLayout>
+                        android:layout_margin="5dp" >
 
-                <LinearLayout
-                    android:id="@+id/LinearLayout01"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp" >
+                        <EditText
+                            android:id="@+id/editNewPassphrase"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ems="10"
+                            android:hint="@string/lock_screen_passphrase_not_set_enter"
+                            android:inputType="textPassword" />
+                    </LinearLayout>
 
-                    <EditText
-                        android:id="@+id/editConfirmNewPassphrase"
+                    <LinearLayout
+                        android:id="@+id/flipView2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:hint="@string/lock_screen_passphrase_not_set_confirm"
-                        android:inputType="textPassword" />
-                </LinearLayout>
+                        android:layout_margin="5dp" >
+
+                        <EditText
+                            android:id="@+id/editConfirmNewPassphrase"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ems="10"
+                            android:hint="@string/lock_screen_passphrase_not_set_confirm"
+                            android:inputType="textPassword" />
+                    </LinearLayout>
+                </ViewFlipper>
 
                 <Button
                     android:id="@+id/btnCreate"
