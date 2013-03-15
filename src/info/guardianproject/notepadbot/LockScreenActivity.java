@@ -3,7 +3,6 @@ package info.guardianproject.notepadbot;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
@@ -19,10 +18,10 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-import java.security.GeneralSecurityException;
-
 import info.guardianproject.cacheword.CacheWordHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
+
+import java.security.GeneralSecurityException;
 
 public class LockScreenActivity extends Activity implements ICacheWordSubscriber {
     private static final String TAG = "LockScreenActivity";
