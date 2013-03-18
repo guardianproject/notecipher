@@ -118,15 +118,9 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
 					return false;
 				}
-
 	        }
 
 	        );
-	}
-
-	private void showPassError (String msg)
-	{
-		Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 	}
 
 	private void lockDatabase ()
