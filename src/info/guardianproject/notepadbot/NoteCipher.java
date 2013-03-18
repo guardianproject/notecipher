@@ -212,7 +212,8 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         case REKEY_ID:
             return true;
         case LOCK_ID:
-            lockDatabase();
+            if(!mCacheWord.isLocked())
+                mCacheWord.manuallyLock();
             return true;
         }
 
