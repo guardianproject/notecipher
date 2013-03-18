@@ -121,7 +121,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
                 );
     }
 
-    private void lockDatabase()
+    private void closeDatabase()
     {
         if (mDbHelper != null) {
             mDbHelper.close();
@@ -345,6 +345,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     protected void onDestroy() {
         super.onDestroy();
 
+        closeDatabase();
         NoteUtils.cleanupTmp(this);
 
     }
@@ -446,7 +447,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     }
 
     void lock() {
-        lockDatabase();
+        closeDatabase();
         setListAdapter(null);
         System.gc();
         showLockScreen();

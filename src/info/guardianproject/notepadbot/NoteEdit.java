@@ -40,6 +40,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     private byte[] mBlob;
     private String mMimeType;
     private CacheWordActivityHandler mCacheWord;
+    private NotesDbAdapter mDb;
 
     private long mRowId = -1;
 
@@ -61,6 +62,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         mCacheWord = new CacheWordActivityHandler(this);
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -133,7 +135,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
         try
         {
-            Cursor note = new NotesDbAdapter(mCacheWord, this).fetchNote(mRowId);
+            Cursor note = mDb.fetchNote(mRowId);
             startManagingCursor(note);
 
             mBlob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
@@ -214,6 +216,8 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     protected void onDestroy() {
         super.onDestroy();
 
+        closeDatabase();
+
         if (mTitleText != null)
             mTitleText.setText(ZERO_TEXT);
 
@@ -241,17 +245,15 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
             if (mBodyText != null)
                 body = mBodyText.getText().toString();
 
-            NotesDbAdapter db = new NotesDbAdapter(mCacheWord, this);
-
             if (title != null && title.length() > 0)
             {
                 if (mRowId == -1) {
-                    long id = db.createNote(title, body, null, null);
+                    long id = mDb.createNote(title, body, null, null);
                     if (id > 0) {
                         mRowId = id;
                     }
                 } else {
-                    db.updateNote(mRowId, title, body, null, null);
+                    mDb.updateNote(mRowId, title, body, null, null);
                 }
             }
 
@@ -291,20 +293,31 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
     }
 
+    private void closeDatabase()
+    {
+        if (mDb != null) {
+            mDb.close();
+            mDb = null;
+        }
+    }
+
     @Override
     public void onCacheWordUninitializedEvent() {
         // We should not exist if we're not unlocked
+        closeDatabase();
         finish();
     }
 
     @Override
     public void onCacheWordLockedEvent() {
         // We should not exist if we're not unlocked
+        closeDatabase();
         finish();
     }
 
     @Override
     public void onCacheWordUnLockedEvent() {
+        mDb = new NotesDbAdapter(mCacheWord, this);
         Bundle extras = getIntent().getExtras();
 
         if (mRowId != -1) {
