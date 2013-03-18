@@ -212,7 +212,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
     @Override
     protected void onDestroy() {
-        super.onPause();
+        super.onDestroy();
 
         if (mTitleText != null)
             mTitleText.setText(ZERO_TEXT);
