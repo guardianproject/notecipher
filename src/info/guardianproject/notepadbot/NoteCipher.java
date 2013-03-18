@@ -100,9 +100,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     @Override
 	protected void onResume() {
 		super.onResume();
-		mDbHelper = NotesDbAdapter.getInstance(this);
-
-		mCacheWord.onResume();
+	    mCacheWord.onResume();
 	}
 
 
@@ -112,7 +110,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
 		 findViewById(R.id.listlayout).setOnTouchListener(new OnTouchListener ()
 	        {
-
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
 
@@ -140,13 +137,14 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 	    }
 	}
 
-    private void unlockDatabase (String password)
+    private void unlockDatabase()
     {
-
+        mDbHelper = new NotesDbAdapter(mCacheWord, this);
+        Log.e(TAG, "unlockDatabase mhandler is null: " + (mCacheWord==null));
     	try
     	{
 
-    		mDbHelper.open(password);
+            mDbHelper.open();
 
     		if (dataStream != null)
         		importDataStream();
@@ -156,6 +154,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     	}
     	catch (Exception e)
     	{
+    	    e.printStackTrace();
     		Toast.makeText(this, getString(R.string.err_pass), Toast.LENGTH_LONG).show();
     	}
     }
@@ -342,7 +341,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
                                     Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-    	mDbHelper = NotesDbAdapter.getInstance(this);
+    	mDbHelper = new NotesDbAdapter(mCacheWord, this);
 
         fillData();
     }
@@ -399,7 +398,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 				String title = dataStream.getLastPathSegment();
 				String body = dataStream.getPath();
 
-				NotesDbAdapter.getInstance(this).createNote(title, body, data, mimeType);
+				new NotesDbAdapter(mCacheWord, this).createNote(title, body, data, mimeType);
 
 				Toast.makeText(this, getString(R.string.on_import) + ": " + title, Toast.LENGTH_LONG).show();
 
@@ -496,9 +495,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     @Override
     public void onCacheWordUnLockedEvent() {
         Log.d(TAG, "onCacheWordUnLockedEvent");
-        byte[] key = mCacheWord.getEncryptionKey();
-        // ideally we wouldn't have to wrap this in a string.
-        unlockDatabase( new String(Hex.encodeHex(key)) );
+        unlockDatabase();
 
         if (mDbHelper.isOpen()) {
             if (dataStream != null) importDataStream();

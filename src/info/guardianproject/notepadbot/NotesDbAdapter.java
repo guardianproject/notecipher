@@ -1,12 +1,12 @@
 /*
  * Copyright (C) 2008 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -17,7 +17,11 @@
 package info.guardianproject.notepadbot;
 
 import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SQLiteOpenHelper;
+import net.sqlcipher.database.SQLiteException;
+
+import info.guardianproject.cacheword.SQLCipherOpenHelper;
+import info.guardianproject.cacheword.CacheWordHandler;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -28,7 +32,7 @@ import android.util.Log;
  * Simple notes database access helper class. Defines the basic CRUD operations
  * for the notepad example, and gives the ability to list all notes as well as
  * retrieve or modify a specific note.
- * 
+ *
  * This has been improved from the first version of this tutorial through the
  * addition of better error handling and also using returning a Cursor instead
  * of using a collection of inner classes (which is less scalable and not
@@ -43,12 +47,10 @@ public class NotesDbAdapter {
     public static final String KEY_ROWID = "_id";
 
     private static final String TAG = "NotesDbAdapter";
-    
-    private static NotesDbAdapter instance;
-    
+
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
-    
+
     /**
      * Database creation sql statement
      */
@@ -61,14 +63,15 @@ public class NotesDbAdapter {
     private static final int DATABASE_VERSION = 4;
 
     private Context mCtx;
+    private CacheWordHandler mCacheWord;
 
-   
-    private static class DatabaseHelper extends SQLiteOpenHelper {
 
-    	
-        DatabaseHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-            
+    private static class DatabaseHelper extends SQLCipherOpenHelper {
+
+
+        DatabaseHelper(CacheWordHandler cacheWord, Context context) {
+            super(cacheWord, context, DATABASE_NAME, null, DATABASE_VERSION);
+
         }
 
         @Override
@@ -80,15 +83,15 @@ public class NotesDbAdapter {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
-          
-           
+
+
             if (oldVersion == 2)
             {
             	db.execSQL("ALTER TABLE notes ADD " + KEY_DATA + " blog");
             	db.execSQL("ALTER TABLE notes ADD " + KEY_TYPE + " text");
 
             }
-            
+
             if (newVersion == 3)
             {
             	db.execSQL("ALTER TABLE notes ADD " + KEY_TYPE + " text");
@@ -102,45 +105,34 @@ public class NotesDbAdapter {
     /**
      * Constructor - takes the context to allow the database to be
      * opened/created
-     * 
+     *
      * @param ctx the Context within which to work
      */
-    private NotesDbAdapter(Context ctx)
+    public NotesDbAdapter(CacheWordHandler cacheword, Context ctx)
     {
-
+        this.mCacheWord = cacheword;
         this.mCtx = ctx;
-    	
-    }
-    
-    
-    public static synchronized NotesDbAdapter getInstance (Context ctx) {
-    	
-    	if (instance == null)
-    	{
-    		instance = new NotesDbAdapter(ctx);
-    	}
-    	
-    	return instance;
     }
 
     /**
      * Open the notes database. If it cannot be opened, try to create a new
      * instance of the database. If it cannot be created, throw an exception to
      * signal the failure
-     * 
+     *
      * @return this (self reference, allowing this to be chained in an
      *         initialization call)
      * @throws SQLException if the database could be neither opened or created
      */
-    public NotesDbAdapter open(String password) throws SQLException {
-        mDbHelper = new DatabaseHelper(mCtx);
-       
-        mDb = mDbHelper.getWritableDatabase(password);
-        
+    public NotesDbAdapter open() throws SQLException {
+        Log.e(TAG, "opening with cacheword");
+        mDbHelper = new DatabaseHelper(mCacheWord, mCtx);
+
+        mDb = mDbHelper.getWritableDatabase();
+
         System.gc();
         return this;
     }
-    
+
     public boolean isOpen ()
     {
     	if (mDb !=null)
@@ -148,17 +140,16 @@ public class NotesDbAdapter {
     	else
     		return false;
     }
-    
+
     public void rekey (String password)
     {
     	mDb.execSQL("PRAGMA rekey = '" + password + "'");
     	System.gc();
     }
-    
+
     public void close() {
-    	
-    	
-        mDbHelper.close();
+        if( mDbHelper != null )
+            mDbHelper.close();
     }
 
 
@@ -166,24 +157,25 @@ public class NotesDbAdapter {
      * Create a new note using the title and body provided. If the note is
      * successfully created return the new rowId for that note, otherwise return
      * a -1 to indicate failure.
-     * 
+     *
      * @param title the title of the note
      * @param body the body of the note
      * @return rowId or -1 if failed
      */
     public long createNote(String title, String body, byte[] data, String dataType) {
+        openGuard();
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_TITLE, title);
         initialValues.put(KEY_BODY, body);
-        
+
         if (data != null)
         {
         	initialValues.put(KEY_DATA, data);
         	initialValues.put(KEY_TYPE, dataType);
-        	
+
         }
-        
-        
+
+
         if (mDb != null)
         	return mDb.insert(DATABASE_TABLE, null, initialValues);
         else
@@ -192,34 +184,34 @@ public class NotesDbAdapter {
 
     /**
      * Delete the note with the given rowId
-     * 
+     *
      * @param rowId id of note to delete
      * @return true if deleted, false otherwise
      */
     public boolean deleteNote(long rowId) {
-
+        openGuard();
         return mDb.delete(DATABASE_TABLE, KEY_ROWID + "=" + rowId, null) > 0;
     }
 
     /**
      * Return a Cursor over the list of all notes in the database
-     * 
+     *
      * @return Cursor over all notes
      */
-    public Cursor fetchAllNotes() {
-
+    public Cursor fetchAllNotes() throws SQLException {
+        openGuard();
         return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID, KEY_TITLE}, null, null, null, null, null);
     }
 
     /**
      * Return a Cursor positioned at the note that matches the given rowId
-     * 
+     *
      * @param rowId id of note to retrieve
      * @return Cursor positioned to matching note, if found
      * @throws SQLException if note could not be found/retrieved
      */
     public Cursor fetchNote(long rowId) throws SQLException {
-
+        openGuard();
         Cursor mCursor =
 
                 mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,
@@ -236,24 +228,33 @@ public class NotesDbAdapter {
      * Update the note using the details provided. The note to be updated is
      * specified using the rowId, and it is altered to use the title and body
      * values passed in
-     * 
+     *
      * @param rowId id of note to update
      * @param title value to set note title to
      * @param body value to set note body to
      * @return true if the note was successfully updated, false otherwise
      */
     public boolean updateNote(long rowId, String title, String body, byte[] data, String dataType) {
+        openGuard();
         ContentValues args = new ContentValues();
         args.put(KEY_TITLE, title);
         args.put(KEY_BODY, body);
-        
+
         if (data != null)
         {
         	args.put(KEY_DATA, data);
         	args.put(KEY_DATA, dataType);
         }
-        
-        
+
+
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
+    }
+
+    private void openGuard() throws SQLiteException {
+        if(isOpen()) return;
+        open();
+        if(isOpen()) return;
+        Log.d(TAG, "open guard failed");
+        throw new  SQLiteException("Could not open database");
     }
 }
