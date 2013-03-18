@@ -22,7 +22,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import info.guardianproject.cacheword.CacheWordHandler;
+import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
 
 import java.security.GeneralSecurityException;
@@ -40,7 +40,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
     private View mViewCreatePassphrase;
     private View mViewEnterPassphrase;
     private Button mBtnOpen;
-    private CacheWordHandler mCacheWord;
+    private CacheWordActivityHandler mCacheWord;
     private String mPasswordError;
     private TwoViewSlider mSlider;
 
@@ -49,7 +49,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lock_screen);
-        mCacheWord = new CacheWordHandler(this);
+        mCacheWord = new CacheWordActivityHandler(this);
 
         mViewCreatePassphrase = findViewById(R.id.llCreatePassphrase);
         mViewEnterPassphrase = findViewById(R.id.llEnterPassphrase);

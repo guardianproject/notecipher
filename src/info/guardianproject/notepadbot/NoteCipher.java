@@ -38,12 +38,10 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import info.guardianproject.cacheword.CacheWordHandler;
+import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
 
 import net.sqlcipher.database.SQLiteDatabase;
-
-import org.apache.commons.codec.binary.Hex;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -68,7 +66,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
     private final static int MAX_SIZE = 1000000;
 
-    private CacheWordHandler mCacheWord;
+    private CacheWordActivityHandler mCacheWord;
 
     /** Called when the activity is first created. */
     @Override
@@ -87,12 +85,9 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 		}
 
         SQLiteDatabase.loadLibs(this);
-
         setContentView(R.layout.notes_list);
-
         registerForContextMenu(getListView());
-
-        mCacheWord = new CacheWordHandler(this);
+        mCacheWord = new CacheWordActivityHandler(this);
     }
 
     @Override
