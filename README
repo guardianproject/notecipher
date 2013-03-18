@@ -1,8 +1,19 @@
 NoteCipher
-Showcase app for SQLCipher for Android
+Showcase app for SQLCipher and CacheWord for Android
 
 Notepad Icon originally from:
 http://yaromanzarek.deviantart.com/art/iPhone-style-Notepad-icon-133822563
+
+LICENSE
+
+This project is licensed under the Apache version 2.0 license
+
+Copyright (C) 2013 Abel Luck <abel@guardianproject.info>
+Copyright (C) 2011-2013 Nathan Freitas <nathan@freitas.net>
+Copyright (C) 2011 Hans-Christoph Steiner <hans@eds.org>
+Copyright (C) 2008 The Android Open Source Project
+Copyright (C) 2008 Google Inc.
+
 
 NOTICE 
 
