@@ -132,7 +132,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     private void unlockDatabase()
     {
         mDbHelper = new NotesDbAdapter(mCacheWord, this);
-        Log.e(TAG, "unlockDatabase mhandler is null: " + (mCacheWord == null));
         try
         {
 
@@ -448,6 +447,8 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
     void lock() {
         lockDatabase();
+        setListAdapter(null);
+        System.gc();
         showLockScreen();
     }
 
