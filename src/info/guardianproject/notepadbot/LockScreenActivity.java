@@ -204,6 +204,8 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
         {
             public void onClick(View v)
             {
+                if(mEnterPassphrase.getText().toString().length() == 0)
+                    return;
                 // Check passphrase
                 try {
                     mCacheWord.setPassphrase(mEnterPassphrase.getText().toString().toCharArray());
