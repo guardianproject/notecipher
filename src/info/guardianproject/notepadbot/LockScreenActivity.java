@@ -31,8 +31,8 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
     private static final String TAG = "LockScreenActivity";
 
     private final static int MIN_PASS_LENGTH = 6;
-    private final static int MAX_PASS_ATTEMPTS = 3;
-    private final static int PASS_RETRY_WAIT_TIMEOUT = 30000;
+    // private final static int MAX_PASS_ATTEMPTS = 3;
+    // private final static int PASS_RETRY_WAIT_TIMEOUT = 30000;
 
     private EditText mEnterPassphrase;
     private EditText mNewPassphrase;
@@ -120,8 +120,6 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
         mConfirmNewPassphrase.getEditableText().clear();
     }
 
-
-
     private boolean isPasswordValid() {
         return validatePassword(mNewPassphrase.getText().toString().toCharArray());
     }
@@ -204,7 +202,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
         {
             public void onClick(View v)
             {
-                if(mEnterPassphrase.getText().toString().length() == 0)
+                if (mEnterPassphrase.getText().toString().length() == 0)
                     return;
                 // Check passphrase
                 try {
@@ -297,17 +295,18 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
         private Animation pushLeftIn;
         private Animation pushLeftOut;
 
-        public TwoViewSlider(ViewFlipper flipper, LinearLayout container1, LinearLayout container2, View view1, View view2) {
-            this.flipper    = flipper;
+        public TwoViewSlider(ViewFlipper flipper, LinearLayout container1, LinearLayout container2,
+                View view1, View view2) {
+            this.flipper = flipper;
             this.container1 = container1;
             this.container2 = container2;
-            this.firstView  = view1;
+            this.firstView = view1;
             this.secondView = view2;
 
-            pushRightIn  = AnimationUtils.loadAnimation(LockScreenActivity.this, R.anim.push_right_in);
+            pushRightIn = AnimationUtils.loadAnimation(LockScreenActivity.this, R.anim.push_right_in);
             pushRightOut = AnimationUtils.loadAnimation(LockScreenActivity.this, R.anim.push_right_out);
-            pushLeftIn   = AnimationUtils.loadAnimation(LockScreenActivity.this, R.anim.push_left_in);
-            pushLeftOut  = AnimationUtils.loadAnimation(LockScreenActivity.this, R.anim.push_left_out);
+            pushLeftIn = AnimationUtils.loadAnimation(LockScreenActivity.this, R.anim.push_left_in);
+            pushLeftOut = AnimationUtils.loadAnimation(LockScreenActivity.this, R.anim.push_left_out);
 
         }
 

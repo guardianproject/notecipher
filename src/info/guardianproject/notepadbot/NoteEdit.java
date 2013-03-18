@@ -32,9 +32,9 @@ import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
 
 public class NoteEdit extends Activity implements ICacheWordSubscriber {
-    private final static String TAG = "NoteEdit";
+    // private final static String TAG = "NoteEdit";
 
-	private EditText mTitleText;
+    private EditText mTitleText;
     private EditText mBodyText;
     private ImageView mImageView;
     private byte[] mBlob;
@@ -49,16 +49,14 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     private static final int BIGGER_ID = Menu.FIRST + 3;
     private static final int SMALLER_ID = Menu.FIRST + 4;
 
-
     private final static String ZERO_TEXT = "*******************";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         if (savedInstanceState != null)
-        	mRowId = savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID);
+            mRowId = savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID);
 
         mCacheWord = new CacheWordActivityHandler(this);
 
@@ -71,63 +69,61 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         menu.add(0, SAVE_ID, 0, R.string.menu_save);
 
         if (mBlob != null)
-        	menu.add(0, VIEW_ID, 0, R.string.menu_view);
+            menu.add(0, VIEW_ID, 0, R.string.menu_view);
 
-		menu.add(0, SHARE_ID, 0, R.string.menu_share);
-		menu.add(0, SMALLER_ID, 0, R.string.menu_smaller);
-		menu.add(0, BIGGER_ID, 0, R.string.menu_bigger);
+        menu.add(0, SHARE_ID, 0, R.string.menu_share);
+        menu.add(0, SMALLER_ID, 0, R.string.menu_smaller);
+        menu.add(0, BIGGER_ID, 0, R.string.menu_bigger);
 
         return true;
     }
 
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
-    	switch(item.getItemId()) {
-    	case SAVE_ID:
-    		saveState();
-	        return true;
-    	case SHARE_ID:
-    		shareEntry();
-	        return true;
-    	case VIEW_ID:
-    		viewEntry();
-	        return true;
-    	case BIGGER_ID:
-    		changeTextSize(1.1f);
-	        return true;
-    	case SMALLER_ID:
-    		changeTextSize(.9f);
-	        return true;
-		}
+        switch (item.getItemId()) {
+            case SAVE_ID:
+                saveState();
+                return true;
+            case SHARE_ID:
+                shareEntry();
+                return true;
+            case VIEW_ID:
+                viewEntry();
+                return true;
+            case BIGGER_ID:
+                changeTextSize(1.1f);
+                return true;
+            case SMALLER_ID:
+                changeTextSize(.9f);
+                return true;
+        }
 
         return super.onMenuItemSelected(featureId, item);
     }
 
-    private void changeTextSize (float factor)
+    private void changeTextSize(float factor)
     {
-    	float pxSize = mBodyText.getTextSize();
-    	pxSize *= factor;
+        float pxSize = mBodyText.getTextSize();
+        pxSize *= factor;
 
-    	mBodyText.setTextSize(pxSize);
+        mBodyText.setTextSize(pxSize);
     }
 
-    private void setupView (boolean hasImage)
+    private void setupView(boolean hasImage)
     {
 
+        if (hasImage)
+        {
+            setContentView(R.layout.note_edit_image);
 
-    	if (hasImage)
-    	{
-      	  setContentView(R.layout.note_edit_image);
+            mImageView = (ImageView) findViewById(R.id.odata);
+        }
+        else
+        {
+            setContentView(R.layout.note_edit);
 
-          mImageView = (ImageView) findViewById(R.id.odata);
-    	}
-    	else
-    	{
-    	  setContentView(R.layout.note_edit);
-
-          mBodyText = (EditText) findViewById(R.id.body);
-    	}
-
+            mBodyText = (EditText) findViewById(R.id.body);
+        }
 
         mTitleText = (EditText) findViewById(R.id.title);
 
@@ -135,59 +131,57 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
     private void populateFields() {
 
+        try
+        {
+            Cursor note = new NotesDbAdapter(mCacheWord, this).fetchNote(mRowId);
+            startManagingCursor(note);
 
-    	try
-    	{
-	            Cursor note = new NotesDbAdapter(mCacheWord, this).fetchNote(mRowId);
-	            startManagingCursor(note);
+            mBlob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
 
-	            mBlob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
+            mMimeType = note.getString(
+                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
 
-	            mMimeType = note.getString(
- 	                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
+            if (mMimeType == null)
+                mMimeType = "text/plain";
 
-	            if (mMimeType == null)
-	            	mMimeType = "text/plain";
+            boolean isImage = mMimeType.startsWith("image");
 
-	            boolean isImage = mMimeType.startsWith("image");
+            setupView(isImage);
 
+            if (isImage)
+            {
 
-            	setupView(isImage);
+                // Load up the image's dimensions not the image itself
+                BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
 
-	            if (isImage)
-	            {
+                if (mBlob.length > 100000)
+                    bmpFactoryOptions.inSampleSize = 4;
+                else
+                    bmpFactoryOptions.inSampleSize = 2;
 
-	            	// Load up the image's dimensions not the image itself
-					BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
+                Bitmap blobb = BitmapFactory.decodeByteArray(mBlob, 0, mBlob.length, bmpFactoryOptions);
 
-					if (mBlob.length > 100000)
-						bmpFactoryOptions.inSampleSize = 4;
-					else
-						bmpFactoryOptions.inSampleSize = 2;
+                mImageView.setImageBitmap(blobb);
 
-	            	Bitmap blobb = BitmapFactory.decodeByteArray(mBlob, 0, mBlob.length, bmpFactoryOptions);
+            }
+            else
+            {
+                mBodyText.setText(note.getString(
+                        note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
 
-	            	mImageView.setImageBitmap(blobb);
+            }
 
-	            }
-	            else
-	            {
-	            	 mBodyText.setText(note.getString(
-	 	                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
+            mTitleText.setText(note.getString(
+                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
 
-	            }
+            note.close();
 
-	            mTitleText.setText(note.getString(
-	    	            note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
-
-	            note.close();
-
-    	}
-    	catch (Exception e)
-    	{
-    		Log.e("notepadbot", "error populating",e);
-    		Toast.makeText(this, "Something went wrong when loading your note: " + e.getMessage(), Toast.LENGTH_LONG).show();
-    	}
+        } catch (Exception e)
+        {
+            Log.e("notepadbot", "error populating", e);
+            Toast.makeText(this, "Something went wrong when loading your note: " + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -197,7 +191,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         saveState();
 
         if (mRowId != -1)
-    		   outState.putLong(NotesDbAdapter.KEY_ROWID, mRowId);
+            outState.putLong(NotesDbAdapter.KEY_ROWID, mRowId);
 
     }
 
@@ -208,7 +202,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         // we double check that the database is unlocked
         // and if a timeout or manually locking occured, the
         // db is already locked when we get here.
-        if( !mCacheWord.isLocked() )
+        if (!mCacheWord.isLocked())
             saveState();
 
         // note that we call cacheword's onPause AFTER
@@ -221,13 +215,13 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         super.onPause();
 
         if (mTitleText != null)
-        	mTitleText.setText(ZERO_TEXT);
+            mTitleText.setText(ZERO_TEXT);
 
         if (mBodyText != null)
-        	mBodyText.setText(ZERO_TEXT);
+            mBodyText.setText(ZERO_TEXT);
 
         if (mImageView != null)
-        	mImageView.setImageBitmap(null);
+            mImageView.setImageBitmap(null);
 
     }
 
@@ -238,66 +232,62 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     }
 
     private void saveState() {
-    	if ((mTitleText != null && mTitleText.getText() != null && mTitleText.getText().length() > 0)
-    			|| (mBodyText != null && mBodyText.getText() != null && mBodyText.getText().length() > 0)
-    			)
-    	{
-	        String title = mTitleText.getText().toString();
-	        String body = "";
+        if ((mTitleText != null && mTitleText.getText() != null && mTitleText.getText().length() > 0)
+                || (mBodyText != null && mBodyText.getText() != null && mBodyText.getText().length() > 0))
+        {
+            String title = mTitleText.getText().toString();
+            String body = "";
 
-	        if (mBodyText != null)
-	        	body = mBodyText.getText().toString();
+            if (mBodyText != null)
+                body = mBodyText.getText().toString();
 
-	        NotesDbAdapter db = new NotesDbAdapter(mCacheWord, this);
+            NotesDbAdapter db = new NotesDbAdapter(mCacheWord, this);
 
-	        if (title != null && title.length() > 0)
-	        {
-		        if (mRowId == -1) {
-		            long id = db.createNote(title, body, null, null);
-		            if (id > 0) {
-		                mRowId = id;
-		            }
-		        } else {
-		        	db.updateNote(mRowId, title, body, null, null);
-		        }
-	        }
+            if (title != null && title.length() > 0)
+            {
+                if (mRowId == -1) {
+                    long id = db.createNote(title, body, null, null);
+                    if (id > 0) {
+                        mRowId = id;
+                    }
+                } else {
+                    db.updateNote(mRowId, title, body, null, null);
+                }
+            }
 
-    	}
+        }
     }
 
     private void shareEntry()
     {
-         if (mBlob != null)
-         {
-        	 try
-        	 {
-        		 NoteUtils.shareData(this, mTitleText.getText().toString(), mMimeType, mBlob);
-        	 }
-        	 catch (Exception e)
-        	 {
-        		 Toast.makeText(this, "Error exporting image: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        if (mBlob != null)
+        {
+            try
+            {
+                NoteUtils.shareData(this, mTitleText.getText().toString(), mMimeType, mBlob);
+            } catch (Exception e)
+            {
+                Toast.makeText(this, "Error exporting image: " + e.getMessage(), Toast.LENGTH_LONG).show();
 
-        	 }
-         }
-         else
-         {
-        	 String body = mBodyText.getText().toString();
-        	 NoteUtils.shareText(this, body);
-         }
-
+            }
+        }
+        else
+        {
+            String body = mBodyText.getText().toString();
+            NoteUtils.shareText(this, body);
+        }
 
     }
 
     private void viewEntry()
     {
 
-         if (mBlob != null)
-         {
-        	 String title = mTitleText.getText().toString();
-        	 NoteUtils.savePublicFile(this, title, mMimeType, mBlob);
+        if (mBlob != null)
+        {
+            String title = mTitleText.getText().toString();
+            NoteUtils.savePublicFile(this, title, mMimeType, mBlob);
 
-         }
-
+        }
 
     }
 
@@ -309,7 +299,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
     @Override
     public void onCacheWordLockedEvent() {
-     // We should not exist if we're not unlocked
+        // We should not exist if we're not unlocked
         finish();
     }
 
@@ -320,15 +310,12 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         if (mRowId != -1) {
             populateFields();
         } else if (extras != null) {
-            mRowId =  extras.getLong(NotesDbAdapter.KEY_ROWID);
+            mRowId = extras.getLong(NotesDbAdapter.KEY_ROWID);
             populateFields();
         } else {
             setupView(false);
         }
 
     }
-
-
-
 
 }

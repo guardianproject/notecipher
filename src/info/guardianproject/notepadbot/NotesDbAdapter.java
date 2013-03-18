@@ -16,17 +16,17 @@
 
 package info.guardianproject.notepadbot;
 
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SQLiteException;
-
-import info.guardianproject.cacheword.SQLCipherOpenHelper;
-import info.guardianproject.cacheword.CacheWordHandler;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.util.Log;
+
+import info.guardianproject.cacheword.CacheWordHandler;
+import info.guardianproject.cacheword.SQLCipherOpenHelper;
+
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteException;
 
 /**
  * Simple notes database access helper class. Defines the basic CRUD operations
