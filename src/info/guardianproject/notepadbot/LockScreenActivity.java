@@ -30,7 +30,7 @@ import java.security.GeneralSecurityException;
 public class LockScreenActivity extends Activity implements ICacheWordSubscriber {
     private static final String TAG = "LockScreenActivity";
 
-    private final static int MIN_PASS_LENGTH = 6;
+    private final static int MIN_PASS_LENGTH = 8;
     // private final static int MAX_PASS_ATTEMPTS = 3;
     // private final static int PASS_RETRY_WAIT_TIMEOUT = 30000;
 
@@ -243,42 +243,11 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
 
     private boolean validatePassword(char[] pass)
     {
-        boolean upper = false;
-        boolean lower = false;
-        boolean number = false;
-        for (char c : pass) {
-            if (Character.isUpperCase(c)) {
-                upper = true;
-            } else if (Character.isLowerCase(c)) {
-                lower = true;
-            } else if (Character.isDigit(c)) {
-                number = true;
-            }
-        }
-
-        if (pass.length < MIN_PASS_LENGTH)
-        {
+        if (pass.length < MIN_PASS_LENGTH) {
             // should we support some user string message here?
             mPasswordError = getString(R.string.pass_err_length);
             return false;
         }
-        else if (!upper)
-        {
-            mPasswordError = getString(R.string.pass_err_upper);
-            return false;
-        }
-        else if (!lower)
-        {
-            mPasswordError = getString(R.string.pass_err_lower);
-            return false;
-        }
-        else if (!number)
-        {
-            mPasswordError = getString(R.string.pass_err_num);
-            return false;
-        }
-        // if it got here, then must be okay
-        // hopefully the user can remember it
         return true;
     }
 
