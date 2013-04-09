@@ -78,17 +78,17 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
     }
 
     @Override
-    public void onCacheWordUninitializedEvent() {
+    public void onCacheWordUninitialized() {
         initializePassphrase();
     }
 
     @Override
-    public void onCacheWordLockedEvent() {
+    public void onCacheWordLocked() {
         promptPassphrase();
     }
 
     @Override
-    public void onCacheWordUnLockedEvent() {
+    public void onCacheWordOpened() {
         Intent intent = (Intent) getIntent().getParcelableExtra("originalIntent");
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 

@@ -454,20 +454,20 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     }
 
     @Override
-    public void onCacheWordUninitializedEvent() {
-        Log.d(TAG, "onCacheWordUninitializedEvent");
+    public void onCacheWordUninitialized() {
+        Log.d(TAG, "onCacheWordUninitialized");
         showLockScreen();
     }
 
     @Override
-    public void onCacheWordLockedEvent() {
-        Log.d(TAG, "onCacheWordLockedEvent");
+    public void onCacheWordLocked() {
+        Log.d(TAG, "onCacheWordLocked");
         lock();
     }
 
     @Override
-    public void onCacheWordUnLockedEvent() {
-        Log.d(TAG, "onCacheWordUnLockedEvent");
+    public void onCacheWordOpened() {
+        Log.d(TAG, "onCacheWordOpened");
         unlockDatabase();
 
         if (mDbHelper.isOpen()) {

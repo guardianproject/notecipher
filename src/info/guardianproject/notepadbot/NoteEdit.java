@@ -302,21 +302,21 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     }
 
     @Override
-    public void onCacheWordUninitializedEvent() {
+    public void onCacheWordUninitialized() {
         // We should not exist if we're not unlocked
         closeDatabase();
         finish();
     }
 
     @Override
-    public void onCacheWordLockedEvent() {
+    public void onCacheWordLocked() {
         // We should not exist if we're not unlocked
         closeDatabase();
         finish();
     }
 
     @Override
-    public void onCacheWordUnLockedEvent() {
+    public void onCacheWordOpened() {
         mDb = new NotesDbAdapter(mCacheWord, this);
         Bundle extras = getIntent().getExtras();
 
