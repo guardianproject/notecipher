@@ -17,4 +17,4 @@ gen/
 # Local configuration file (sdk path, etc)
 local.properties
 
-project.properties
+android-support-v4.jar
