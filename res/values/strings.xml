@@ -11,7 +11,8 @@
     <string name="menu_lock">Lock Notes</string>
     <string name="menu_bigger">Bigger</string>
     <string name="menu_smaller">Smaller</string>
-    
+    <string name="menu_timeout">Change Lock Timeout</string>
+
     <string name="title">Summary</string>
     <string name="body">Note Text</string>
     <string name="confirm">Save Note</string>
@@ -40,5 +41,8 @@
 	<string name="lock_screen_passphrase_not_set_enter">Enter new passphrase</string>
 	<string name="lock_screen_passphrase_not_set_confirm">Confirm new passphrase</string>
 	<string name="lock_screen_passphrases_not_matching">Passphrases did not match, please try again</string>
+	
+	<string name="change_timeout_prompt_title">Change Lock Timeout</string>
+	<string name="change_timeout_prompt">After how many minutes of inactivity should NoteCipher lock itself?</string>
     
 </resources>
