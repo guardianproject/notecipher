@@ -87,7 +87,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         SQLiteDatabase.loadLibs(this);
         setContentView(R.layout.notes_list);
         registerForContextMenu(getListView());
-        mCacheWord = new CacheWordActivityHandler(this);
+        mCacheWord = new CacheWordActivityHandler(this, this);
     }
 
     @Override
@@ -454,19 +454,19 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     }
 
     @Override
-    public void onCacheWordUninitializedEvent() {
+    public void onCacheWordUninitialized() {
         Log.d(TAG, "onCacheWordUninitializedEvent");
         showLockScreen();
     }
 
     @Override
-    public void onCacheWordLockedEvent() {
+    public void onCacheWordLocked() {
         Log.d(TAG, "onCacheWordLockedEvent");
         lock();
     }
 
     @Override
-    public void onCacheWordUnLockedEvent() {
+    public void onCacheWordOpened() {
         Log.d(TAG, "onCacheWordUnLockedEvent");
         unlockDatabase();
 
