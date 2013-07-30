@@ -9,10 +9,13 @@ build.xml
 # Java class files
 *.class
 .classpath
+.metadata
 
 # generated files
 bin/
 gen/
+app/lint.xml
+app/proguard-project.txt
 
 # Local configuration file (sdk path, etc)
 local.properties

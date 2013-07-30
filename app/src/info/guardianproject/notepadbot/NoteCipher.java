@@ -89,7 +89,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         SQLiteDatabase.loadLibs(this);
         setContentView(R.layout.notes_list);
         registerForContextMenu(getListView());
-        mCacheWord = new CacheWordActivityHandler(this);
+        mCacheWord = new CacheWordActivityHandler(this, this);
     }
 
     @Override
@@ -423,6 +423,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         b.setTitle(getString(R.string.app_name));
         b.setMessage(getString(R.string.confirm_delete));
         b.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 // User clicked OK so go ahead and delete
@@ -438,6 +439,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
             }
         });
         b.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int whichButton) {
 
             }

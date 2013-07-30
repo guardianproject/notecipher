@@ -1,0 +1,3 @@
+[submodule "external/cacheword"]
+	path = external/cacheword
+	url = https://github.com/guardianproject/cacheword.git

@@ -49,7 +49,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lock_screen);
-        mCacheWord = new CacheWordActivityHandler(this);
+        mCacheWord = new CacheWordActivityHandler(this, this);
 
         mViewCreatePassphrase = findViewById(R.id.llCreatePassphrase);
         mViewEnterPassphrase = findViewById(R.id.llEnterPassphrase);
@@ -170,6 +170,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
         Button btnCreate = (Button) findViewById(R.id.btnCreate);
         btnCreate.setOnClickListener(new OnClickListener()
         {
+            @Override
             public void onClick(View v)
             {
                 // validate
@@ -200,6 +201,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
         mBtnOpen = (Button) findViewById(R.id.btnOpen);
         mBtnOpen.setOnClickListener(new OnClickListener()
         {
+            @Override
             public void onClick(View v)
             {
                 if (mEnterPassphrase.getText().toString().length() == 0)
@@ -218,6 +220,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
 
         mEnterPassphrase.setOnEditorActionListener(new OnEditorActionListener()
         {
+            @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
             {
                 if (actionId == EditorInfo.IME_NULL || actionId == EditorInfo.IME_ACTION_GO)

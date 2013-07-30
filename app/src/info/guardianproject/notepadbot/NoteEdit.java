@@ -59,7 +59,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         if (savedInstanceState != null)
             mRowId = savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID);
 
-        mCacheWord = new CacheWordActivityHandler(this);
+        mCacheWord = new CacheWordActivityHandler(this, this);
 
     }
 
