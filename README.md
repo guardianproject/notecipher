@@ -14,6 +14,7 @@ Follow these steps to setup your dev environment:
 
     cd notepadbot
     git submodule update --init --recursive
+    ./setup-ant.sh
 
 3. Import Project
 
