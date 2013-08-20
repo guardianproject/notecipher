@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -108,7 +109,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         float pxSize = mBodyText.getTextSize();
         pxSize *= factor;
 
-        mBodyText.setTextSize(pxSize);
+        mBodyText.setTextSize(TypedValue.COMPLEX_UNIT_PX, pxSize);
     }
 
     private void setupView(boolean hasImage)
