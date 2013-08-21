@@ -44,6 +44,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     private NotesDbAdapter mDb;
 
     private long mRowId = -1;
+    private float mTextSize = 0;
 
     private static final int SAVE_ID = Menu.FIRST;
     private static final int SHARE_ID = Menu.FIRST + 1;
@@ -52,13 +53,16 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     private static final int SMALLER_ID = Menu.FIRST + 4;
 
     private final static String ZERO_TEXT = "*******************";
+    private final static String TEXT_SIZE = "text_size";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState != null)
+        if (savedInstanceState != null) {
             mRowId = savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID);
+            mTextSize = savedInstanceState.getFloat(TEXT_SIZE, 0);
+        }
 
         mCacheWord = new CacheWordActivityHandler(this, this);
 
@@ -106,10 +110,10 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
     private void changeTextSize(float factor)
     {
-        float pxSize = mBodyText.getTextSize();
-        pxSize *= factor;
+        mTextSize = mBodyText.getTextSize();
+        mTextSize *= factor;
 
-        mBodyText.setTextSize(TypedValue.COMPLEX_UNIT_PX, pxSize);
+        mBodyText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
     }
 
     private void setupView(boolean hasImage)
@@ -172,6 +176,8 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
                 mBodyText.setText(note.getString(
                         note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
 
+                if (mTextSize != 0)
+                    mBodyText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
             }
 
             mTitleText.setText(note.getString(
@@ -195,6 +201,9 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
         if (mRowId != -1)
             outState.putLong(NotesDbAdapter.KEY_ROWID, mRowId);
+
+        if (mTextSize != 0)
+            outState.putFloat(TEXT_SIZE, mTextSize);
 
     }
 
