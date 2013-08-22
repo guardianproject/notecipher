@@ -54,6 +54,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
     private final static String ZERO_TEXT = "*******************";
     private final static String TEXT_SIZE = "text_size";
+    private final static String PREFS_NAME = "NoteEditPrefs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,10 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
             mRowId = savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID);
             mTextSize = savedInstanceState.getFloat(TEXT_SIZE, 0);
         }
+
+        if (mTextSize == 0)
+            mTextSize = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                    .getFloat(TEXT_SIZE, 0);
 
         mCacheWord = new CacheWordActivityHandler(this, this);
 
@@ -114,6 +119,12 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         mTextSize *= factor;
 
         mBodyText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
+
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+            .edit()
+            .putFloat(TEXT_SIZE, mTextSize)
+            .commit();
+
     }
 
     private void setupView(boolean hasImage)
@@ -130,6 +141,10 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
             setContentView(R.layout.note_edit);
 
             mBodyText = (EditText) findViewById(R.id.body);
+
+            if (mTextSize != 0)
+                mBodyText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
+
         }
 
         mTitleText = (EditText) findViewById(R.id.title);
