@@ -2,31 +2,24 @@
 
 A simple and secure note taking app previously known as notepadbot.
 
-Showcase app for [SQLCipher](http://sqlcipher.net/sqlcipher-for-android) for
-Android and [CacheWord](https://github.com/guardianproject/cacheword).
+Showcase app for [SQLCipher for Android](http://sqlcipher.net/sqlcipher-for-android) and [CacheWord](https://github.com/guardianproject/cacheword).
+
+```
+ git clone https://github.com/guardianproject/notepadbot.git
+ cd notepadbot
+ git submodule update --init --recursive
+ ./setup-ant.sh
+ ant -buildfile app/build.xml clean debug
+ ls -l app/bin/NoteCipher*.apk
+```
 
 ## Development Setup
 
-Follow these steps to setup your dev environment:
+Follow these steps to setup your dev environment using Eclipse:
 
-1. Checkout the NoteCipher git repo
-2. Init and update git submodules
-
-    cd notepadbot
-    git submodule update --init --recursive
-    ./setup-ant.sh
-
-3. Import Project
-
-   **Using Eclipse**
-
-    Create a new Eclipse *workspace* in the root director of the repo.
-
-    For each of the following directories, "Import -> Android -> Existing Android Code Into Workspace":
-
-        external/cacheword/cachewordlib/
-
-    Then, "Import -> General -> Existing Projects Into Workspace" for the `app/` directory.
+1. create a new Eclipse *workspace* in the root director of the repo.
+2. For Cacheword, import this directory `external/cacheword/cachewordlib/`, using "Import -> Android -> Existing Android Code Into Workspace":
+3. Then, "Import -> General -> Existing Projects Into Workspace" for the `app/` directory.
 
 ## License and Credits 
 
