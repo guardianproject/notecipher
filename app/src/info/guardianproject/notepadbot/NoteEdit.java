@@ -198,6 +198,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
             mTitleText.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
 
+            stopManagingCursor(note);
             note.close();
 
         } catch (Exception e)
