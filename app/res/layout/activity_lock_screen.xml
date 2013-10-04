@@ -3,21 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
+    android:padding="20dp"
     android:orientation="vertical" >
-
-    <LinearLayout
-        android:id="@+id/frameRoot"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:orientation="vertical" >
-
         <ImageView
             android:id="@+id/imageView1"
             android:layout_width="162dp"
             android:layout_height="162dp"
             android:layout_gravity="center"
             android:adjustViewBounds="true"
+            android:contentDescription="@string/app_name"
             android:scaleType="centerCrop"
             android:src="@drawable/icon" />
 
@@ -56,7 +50,7 @@
 
                         <EditText
                             android:id="@+id/editNewPassphrase"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:ems="10"
@@ -72,7 +66,7 @@
 
                         <EditText
                             android:id="@+id/editConfirmNewPassphrase"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:ems="10"
@@ -86,6 +80,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="15dp"
+                    style="@style/ButtonTextSmall"
+			        android:background="@drawable/btn_green" 
                     android:text="@string/lock_screen_create_passphrase" />
 
             </LinearLayout>
@@ -121,10 +117,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="15dp"
+                    style="@style/ButtonTextSmall"
+			        android:background="@drawable/btn_green"
                     android:text="@string/lock_screen_open" />
 
             </LinearLayout>
         </FrameLayout>
-    </LinearLayout>
 
 </LinearLayout>
