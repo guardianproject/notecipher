@@ -16,8 +16,8 @@
 
 package info.guardianproject.notepadbot;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,6 +34,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.SimpleCursorAdapter;
@@ -48,7 +50,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
+public class NoteCipher extends Activity implements ICacheWordSubscriber {
     private static final int ACTIVITY_CREATE = 0;
     private static final int ACTIVITY_EDIT = 1;
 
@@ -69,6 +71,8 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     private final static int MAX_SIZE = 1000000;
 
     private CacheWordActivityHandler mCacheWord;
+    
+    private ListView notesListView;
 
     /** Called when the activity is first created. */
     @Override
@@ -85,10 +89,20 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
                 dataStream = getIntent().getData();
 
         }
-
+        
         SQLiteDatabase.loadLibs(this);
         setContentView(R.layout.notes_list);
-        registerForContextMenu(getListView());
+        notesListView = (ListView) findViewById(R.id.notesListView);
+        notesListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> ad, View v, int position,
+					long id) {
+				Intent i = new Intent(getApplication(), NoteEdit.class);
+	            i.putExtra(NotesDbAdapter.KEY_ROWID, id);
+	            startActivityForResult(i, ACTIVITY_EDIT);
+			}
+        });
+        registerForContextMenu(notesListView);
         mCacheWord = new CacheWordActivityHandler(this, this);
     }
 
@@ -170,7 +184,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         // Now create a simple cursor adapter and set it to display
         SimpleCursorAdapter notes =
                 new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
-        setListAdapter(notes);
+        notesListView.setAdapter(notes);
 
         if (notes.isEmpty())
         {
@@ -308,14 +322,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         startActivityForResult(i, ACTIVITY_CREATE);
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        Intent i = new Intent(this, NoteEdit.class);
-        i.putExtra(NotesDbAdapter.KEY_ROWID, id);
-        startActivityForResult(i, ACTIVITY_EDIT);
-    }
-
     /*
      * Called after the return from creating a new note (non-Javadoc)
      * @see android.app.Activity#onActivityResult(int, int,
@@ -345,7 +351,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
     }
 
     @Override
@@ -354,11 +359,9 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
         closeDatabase();
         NoteUtils.cleanupTmp(this);
-
     }
 
-    private void importDataStream()
-    {
+    private void importDataStream() {
         if (mCacheWord.isLocked())
             return;
 
@@ -370,13 +373,11 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
             byte[] data = NoteUtils.readBytesAndClose(is);
 
-            if (data.length > MAX_SIZE)
-            {
+            if (data.length > MAX_SIZE){
                 Toast.makeText(this, getString(R.string.err_size), Toast.LENGTH_LONG).show();
 
             }
-            else
-            {
+            else {
                 String title = dataStream.getLastPathSegment();
                 String body = dataStream.getPath();
 
@@ -402,12 +403,10 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
 
-        } catch (OutOfMemoryError e)
-        {
+        } catch (OutOfMemoryError e) {
             Toast.makeText(this, getString(R.string.err_size), Toast.LENGTH_LONG).show();
 
-        } finally
-        {
+        } finally {
             dataStream = null;
 
         }
@@ -487,7 +486,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
     void lock() {
         closeDatabase();
-        setListAdapter(null);
+        notesListView.setAdapter(null);
         System.gc();
         showLockScreen();
     }
