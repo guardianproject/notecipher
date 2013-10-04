@@ -39,6 +39,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import info.guardianproject.cacheword.CacheWordActivityHandler;
@@ -79,13 +80,10 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getIntent() != null)
-        {
-
+        if (getIntent() != null) {
             if (getIntent().hasExtra(Intent.EXTRA_STREAM)) {
                 dataStream = (Uri) getIntent().getExtras().get(Intent.EXTRA_STREAM);
-            }
-            else
+            } else
                 dataStream = getIntent().getData();
 
         }
@@ -101,7 +99,7 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
 	            i.putExtra(NotesDbAdapter.KEY_ROWID, id);
 	            startActivityForResult(i, ACTIVITY_EDIT);
 			}
-        });
+        }); 
         registerForContextMenu(notesListView);
         mCacheWord = new CacheWordActivityHandler(this, this);
     }
@@ -122,8 +120,7 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        findViewById(R.id.listlayout).setOnTouchListener(new OnTouchListener()
-        {
+        findViewById(R.id.listlayout).setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
@@ -132,24 +129,19 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
 
                 return false;
             }
-        }
-
-                );
+        });
     }
 
-    private void closeDatabase()
-    {
+    private void closeDatabase() {
         if (mDbHelper != null) {
             mDbHelper.close();
             mDbHelper = null;
         }
     }
 
-    private void unlockDatabase()
-    {
+    private void unlockDatabase() {
         mDbHelper = new NotesDbAdapter(mCacheWord, this);
-        try
-        {
+        try {
 
             mDbHelper.open();
 
@@ -158,8 +150,7 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
             else
                 fillData();
 
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, getString(R.string.err_pass), Toast.LENGTH_LONG).show();
         }
@@ -186,9 +177,9 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
                 new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
         notesListView.setAdapter(notes);
 
-        if (notes.isEmpty())
-        {
+        if (notes.isEmpty()) {
             Toast.makeText(this, getString(R.string.on_start), Toast.LENGTH_LONG).show();
+            ((TextView)findViewById(R.id.emptytext)).setText(getString(R.string.no_notes));
         }
     }
 
@@ -258,10 +249,11 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
         return super.onContextItemSelected(item);
     }
 
-    private void shareEntry(long id)
-    {
+    private void shareEntry(long id) {
         Cursor note = mDbHelper.fetchNote(id);
-        startManagingCursor(note);
+        // If you do startManagingCursor(note) here it crashes when the user
+        // returns to the app after sharing the text he wants
+        //startManagingCursor(note);
 
         byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
         String title = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
@@ -270,19 +262,15 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
         if (mimeType == null)
             mimeType = "text/plain";
 
-        if (blob != null)
-        {
-            try
-            {
+        if (blob != null) {
+            try {
                 NoteUtils.shareData(this, title, mimeType, blob);
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 Toast.makeText(this, getString(R.string.err_export) + e.getMessage(), Toast.LENGTH_LONG)
                         .show();
             }
         }
-        else
-        {
+        else {
             String body = note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY));
             NoteUtils.shareText(this, body);
@@ -291,8 +279,7 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
         note.close();
     }
 
-    private void viewEntry(long id)
-    {
+    private void viewEntry(long id) {
         Cursor note = mDbHelper.fetchNote(id);
         startManagingCursor(note);
 
@@ -302,8 +289,7 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
         if (mimeType == null)
             mimeType = "text/plain";
 
-        if (blob != null)
-        {
+        if (blob != null) {
             String title = note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
 
@@ -340,7 +326,6 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
     @Override
     protected void onStop() {
         super.onStop();
-
     }
 
     @Override
@@ -415,8 +400,7 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
     /*
      * Call this to delete the original image, will ask the user
      */
-    private void handleDelete()
-    {
+    private void handleDelete() {
         final AlertDialog.Builder b = new AlertDialog.Builder(this);
         b.setIcon(android.R.drawable.ic_dialog_alert);
         b.setTitle(getString(R.string.app_name));

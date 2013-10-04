@@ -45,10 +45,7 @@ public class NoteUtils {
 		
 	    }
 	    
-	    
-
 	public static File getExternalFilesDirEclair(Context ctx, Object object) {
-		
 		
 		String packageName = ctx.getPackageName();
 		File externalPath = Environment.getExternalStorageDirectory();
@@ -61,10 +58,9 @@ public class NoteUtils {
 		return appFiles;
 	}
 
-	public static boolean cleanupTmp (Context ctx)
-	{
+	public static boolean cleanupTmp (Context ctx) {
 
-		//delete temp share file
+		  //delete temp share file
 		  File file = new File(NoteUtils.getExternalFilesDirEclair(ctx, null), "nctemp.jpg");
 		  if (file.exists())
 		  {
