@@ -174,7 +174,7 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
 
         // Now create a simple cursor adapter and set it to display
         SimpleCursorAdapter notes =
-                new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
+                new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to,  SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER );
         notesListView.setAdapter(notes);
 
         if (notes.isEmpty()) {

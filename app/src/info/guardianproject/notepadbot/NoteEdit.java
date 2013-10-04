@@ -153,7 +153,8 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
     private void populateFields() {
 
-        try {
+        try
+        {
             Cursor note = mDb.fetchNote(mRowId);
             startManagingCursor(note);
 
@@ -200,7 +201,8 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
             stopManagingCursor(note);
             note.close();
 
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             Log.e("notepadbot", "error populating", e);
             Toast.makeText(this, "Something went wrong when loading your note: " + e.getMessage(),
                     Toast.LENGTH_LONG).show();
