@@ -94,8 +94,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
 
         startActivity(intent);
         finish();
-        LockScreenActivity.this.overridePendingTransition(0, 0);
-
+        overridePendingTransition(0, 0);
     }
 
     private boolean newEqualsConfirmation() {
@@ -131,8 +130,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
     private void initializePassphrase() {
         // Passphrase is not set, so allow the user to create one
 
-        View viewCreatePassphrase = findViewById(R.id.llCreatePassphrase);
-        viewCreatePassphrase.setVisibility(View.VISIBLE);
+        mViewCreatePassphrase.setVisibility(View.VISIBLE);
         mViewEnterPassphrase.setVisibility(View.GONE);
 
         mNewPassphrase.setOnEditorActionListener(new OnEditorActionListener() {
@@ -199,8 +197,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
         mViewEnterPassphrase.setVisibility(View.VISIBLE);
 
         mBtnOpen = (Button) findViewById(R.id.btnOpen);
-        mBtnOpen.setOnClickListener(new OnClickListener()
-        {
+        mBtnOpen.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v)
             {
