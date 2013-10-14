@@ -12,19 +12,19 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 		style="@style/padtext"
 		android:background="#33ffffff"
 		android:textColor="#cccccc"
-		android:hint="enter title"
+		android:hint="@string/enter_title"
 		/>
 
 	<EditText android:id="@+id/body" 
-	android:layout_width="fill_parent"
-		android:layout_height="wrap_content" 
+		android:layout_width="fill_parent"
+		android:layout_height="0dp" 
 		style="@style/padtext"
 		
 		android:layout_weight="1"
 		android:scrollbars="vertical"
 		android:gravity="top"
         android:singleLine="false"
-        android:hint="enter note text"
+        android:hint="@string/enter_note_text"
 		android:background="#00000000"
 		android:textColor="#cccccc"/>
 		 
