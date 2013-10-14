@@ -7,9 +7,7 @@
 	<EditText android:id="@+id/title" 
 	  	android:layout_width="fill_parent"
 		android:layout_height="wrap_content" 
-		style="@style/padtext"
-		android:background="#33ffffff"
-		android:textColor="#cccccc"
+		style="@style/padtitle"
 		android:hint="@string/enter_title" />
 	
 	<!-- Custom EditText that draws lines like in a notepad -->

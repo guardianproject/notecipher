@@ -7,7 +7,9 @@
     	>    
     <ListView android:id="@+id/notesListView"
           android:layout_width="fill_parent"
-          android:layout_height="wrap_content"/>
+          android:layout_height="wrap_content"
+          android:divider="@color/light_gray"
+    	  android:dividerHeight="1dp" />
         	    	
   	<TextView android:id="@+id/emptytext"
           android:layout_width="wrap_content"
