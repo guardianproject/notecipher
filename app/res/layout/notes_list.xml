@@ -3,8 +3,7 @@
       android:layout_width="fill_parent"
     	android:layout_height="fill_parent"
     	android:orientation="vertical"
-    	android:id="@+id/listlayout"
-    	>    
+    	android:id="@+id/listlayout" >    
     <ListView android:id="@+id/notesListView"
           android:layout_width="fill_parent"
           android:layout_height="wrap_content"
@@ -14,6 +13,5 @@
   	<TextView android:id="@+id/emptytext"
           android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
-			style="@style/padtext"
-        	/>
+			style="@style/padtext" />
 </LinearLayout>

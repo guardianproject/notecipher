@@ -2,7 +2,6 @@ package info.guardianproject.notepadbot;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -14,7 +13,6 @@ import android.widget.EditText;
 public class LinedEditText extends EditText {
     private Rect mRect;
     private Paint mPaint;
-    private final static String lineColor = "#cccccc";
 
     // we need this constructor for LayoutInflater
     public LinedEditText(Context context, AttributeSet attrs) {
@@ -23,7 +21,7 @@ public class LinedEditText extends EditText {
         mRect = new Rect();
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setColor(Color.parseColor(lineColor));
+        mPaint.setColor(getResources().getColor(R.color.gray));
     }
     
     @Override
