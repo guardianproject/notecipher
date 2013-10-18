@@ -1,3 +1,6 @@
 [submodule "external/cacheword"]
 	path = external/cacheword
 	url = https://github.com/guardianproject/cacheword.git
+[submodule "external/actionbarsherlock"]
+	path = external/actionbarsherlock
+	url = git@github.com:JakeWharton/ActionBarSherlock.git
