@@ -16,7 +16,6 @@
 
 package info.guardianproject.notepadbot;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
@@ -28,8 +27,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -51,7 +48,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class NoteCipher extends Activity implements ICacheWordSubscriber {
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+
+public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber {
     private static final int ACTIVITY_CREATE = 0;
     private static final int ACTIVITY_EDIT = 1;
 
@@ -226,9 +227,9 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(android.view.MenuItem item) {
         AdapterContextMenuInfo info;
-
+        
         switch (item.getItemId()) {
             case DELETE_ID:
                 info = (AdapterContextMenuInfo) item.getMenuInfo();

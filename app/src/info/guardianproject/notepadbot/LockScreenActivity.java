@@ -1,7 +1,6 @@
 
 package info.guardianproject.notepadbot;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,7 +26,9 @@ import info.guardianproject.cacheword.ICacheWordSubscriber;
 
 import java.security.GeneralSecurityException;
 
-public class LockScreenActivity extends Activity implements ICacheWordSubscriber {
+import com.actionbarsherlock.app.SherlockActivity;
+
+public class LockScreenActivity extends SherlockActivity implements ICacheWordSubscriber {
     private static final String TAG = "LockScreenActivity";
 
     private final static int MIN_PASS_LENGTH = 8;

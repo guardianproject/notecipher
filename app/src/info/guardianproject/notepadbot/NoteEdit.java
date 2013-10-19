@@ -16,15 +16,16 @@
 
 package info.guardianproject.notepadbot;
 
-import android.app.Activity;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -32,7 +33,7 @@ import android.widget.Toast;
 import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
 
-public class NoteEdit extends Activity implements ICacheWordSubscriber {
+public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
     // private final static String TAG = "NoteEdit";
 
     private EditText mTitleText;
@@ -146,7 +147,6 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     }
 
     private void populateFields() {
-
         try {
             Cursor note = mDb.fetchNote(mRowId);
             startManagingCursor(note);
