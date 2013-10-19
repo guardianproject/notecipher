@@ -1,25 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:background="@color/black">
-	
-	<EditText android:id="@+id/title" 
-		  android:layout_width="wrap_content"
-			android:layout_height="wrap_content" 
-			android:layout_weight="1"
-			style="@style/padtext"
-        android:background="#000000cc"
-        android:textColor="@color/gray"
-        android:layout_x="10px"
-        android:layout_y="10px"
-			/>
-		 
-		<ImageView android:id="@+id/odata"
-		 android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:layout_x="0px"
-			android:layout_y="0px"
-			 />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-</AbsoluteLayout>
+    <EditText
+        android:id="@+id/title"
+        style="@style/padtitle"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/enter_title" />
+
+    <ImageView
+        android:id="@+id/odata"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/image_data" />
+
+</LinearLayout>
