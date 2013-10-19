@@ -178,8 +178,8 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
         notesListView.setAdapter(notes);
 
         if (notes.isEmpty()) {
-            Toast.makeText(this, getString(R.string.on_start), Toast.LENGTH_LONG).show();
-            ((TextView)findViewById(R.id.emptytext)).setText(getString(R.string.no_notes));
+            Toast.makeText(this, R.string.on_start, Toast.LENGTH_LONG).show();
+            ((TextView)findViewById(R.id.emptytext)).setText(R.string.no_notes);
         }
     }
 
@@ -266,11 +266,10 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
             try {
                 NoteUtils.shareData(this, title, mimeType, blob);
             } catch (IOException e) {
-                Toast.makeText(this, getString(R.string.err_export) + e.getMessage(), Toast.LENGTH_LONG)
+                Toast.makeText(this, getString(R.string.err_export, e.getMessage()), Toast.LENGTH_LONG)
                         .show();
             }
-        }
-        else {
+        } else {
             String body = note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY));
             NoteUtils.shareText(this, body);
@@ -359,7 +358,7 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
             byte[] data = NoteUtils.readBytesAndClose(is);
 
             if (data.length > MAX_SIZE){
-                Toast.makeText(this, getString(R.string.err_size), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.err_size, Toast.LENGTH_LONG).show();
 
             }
             else {
@@ -368,7 +367,7 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
 
                 new NotesDbAdapter(mCacheWord, this).createNote(title, body, data, mimeType);
 
-                Toast.makeText(this, getString(R.string.on_import) + ": " + title, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.on_import, title), Toast.LENGTH_LONG).show();
 
                 // handleDelete();
 
@@ -389,7 +388,7 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
             Log.e(TAG, e.getMessage(), e);
 
         } catch (OutOfMemoryError e) {
-            Toast.makeText(this, getString(R.string.err_size), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.err_size, Toast.LENGTH_LONG).show();
 
         } finally {
             dataStream = null;
@@ -403,8 +402,8 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
     private void handleDelete() {
         final AlertDialog.Builder b = new AlertDialog.Builder(this);
         b.setIcon(android.R.drawable.ic_dialog_alert);
-        b.setTitle(getString(R.string.app_name));
-        b.setMessage(getString(R.string.confirm_delete));
+        b.setTitle(R.string.app_name);
+        b.setMessage(R.string.confirm_delete);
         b.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int whichButton) {
@@ -414,9 +413,8 @@ public class NoteCipher extends Activity implements ICacheWordSubscriber {
 
                 if (cr != null)
                     cr.delete(dataStream, null, null);
-                else
-                {
-                    Toast.makeText(NoteCipher.this, "Unable to delete originaL", Toast.LENGTH_SHORT).show();
+                else {
+                    Toast.makeText(NoteCipher.this, R.string.unable_to_delete_original, Toast.LENGTH_SHORT).show();
                 }
 
             }

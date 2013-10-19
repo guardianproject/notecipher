@@ -45,8 +45,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
     private TwoViewSlider mSlider;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lock_screen);
         mCacheWord = new CacheWordActivityHandler(this, this);
@@ -109,7 +108,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
 
     private void showInequalityError() {
         Toast.makeText(LockScreenActivity.this,
-                getString(R.string.lock_screen_passphrases_not_matching),
+                R.string.lock_screen_passphrases_not_matching,
                 Toast.LENGTH_SHORT).show();
         clearNewFields();
     }
@@ -136,10 +135,8 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
         mNewPassphrase.setOnEditorActionListener(new OnEditorActionListener() {
 
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
-            {
-                if (actionId == EditorInfo.IME_NULL || actionId == EditorInfo.IME_ACTION_DONE)
-                {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_NULL || actionId == EditorInfo.IME_ACTION_DONE) {
                     if (!isPasswordValid())
                         showValidationError();
                     else
@@ -152,10 +149,8 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
         mConfirmNewPassphrase.setOnEditorActionListener(new OnEditorActionListener() {
 
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
-            {
-                if (actionId == EditorInfo.IME_NULL || actionId == EditorInfo.IME_ACTION_DONE)
-                {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_NULL || actionId == EditorInfo.IME_ACTION_DONE) {
                     if (!newEqualsConfirmation()) {
                         showInequalityError();
                         mSlider.showNewPasswordField();
@@ -169,8 +164,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
         btnCreate.setOnClickListener(new OnClickListener()
         {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 // validate
                 if (!isPasswordValid()) {
                     showValidationError();
@@ -199,8 +193,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
         mBtnOpen = (Button) findViewById(R.id.btnOpen);
         mBtnOpen.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 if (mEnterPassphrase.getText().toString().length() == 0)
                     return;
                 // Check passphrase
@@ -228,8 +221,7 @@ public class LockScreenActivity extends Activity implements ICacheWordSubscriber
                             threadHandler)
                     {
                         @Override
-                        protected void onReceiveResult(int resultCode, Bundle resultData)
-                        {
+                        protected void onReceiveResult(int resultCode, Bundle resultData) {
                             super.onReceiveResult(resultCode, resultData);
                             mBtnOpen.performClick();
                         }

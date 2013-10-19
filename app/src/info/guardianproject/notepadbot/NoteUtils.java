@@ -20,33 +20,29 @@ public class NoteUtils {
 		 * When the user selects the Share menu item
 		 * Uses saveTmpImage (overwriting what is already there) and uses the standard Android Share Intent
 		 */
-	    public static void shareData(Context ctx, String filename, String mimeType, byte[] outdata) throws IOException
-	    {
-	    	
+	    public static void shareData(Context ctx, String filename, String mimeType, byte[] outdata) throws IOException {
 	    	Uri tmpImageUri = saveTmpFile(ctx, filename, mimeType, outdata);
 	    	
 	    	if (tmpImageUri != null) {
 	        	Intent share = new Intent(Intent.ACTION_SEND);
 	        	share.setType(mimeType);
 	        	share.putExtra(Intent.EXTRA_STREAM, tmpImageUri);
-	        	ctx.startActivity(Intent.createChooser(share, "Share File"));    	
+	        	ctx.startActivity(Intent.createChooser(share, ctx.getString(R.string.share_file)));    	
 	    	} else {
-	    		Toast t = Toast.makeText(ctx,"Saving Temporary File Failed!", Toast.LENGTH_SHORT); 
+	    		Toast t = Toast.makeText(ctx, R.string.saving_tmp_file_failed, Toast.LENGTH_SHORT); 
 	    		t.show();
 	    	}
 	    }
 	    
 	    public static void shareText(Context ctx, String outdata) {
-	    	
 	    	Intent share = new Intent(Intent.ACTION_SEND);
 	    	share.setType("text/plain");
 	    	share.putExtra(Intent.EXTRA_TEXT, outdata);
-	    	ctx.startActivity(Intent.createChooser(share, "Share Text"));    	
+	    	ctx.startActivity(Intent.createChooser(share, ctx.getString(R.string.share_text)));    	
 		
 	    }
 	    
 	public static File getExternalFilesDirEclair(Context ctx, Object object) {
-		
 		String packageName = ctx.getPackageName();
 		File externalPath = Environment.getExternalStorageDirectory();
 		File appFiles = new File(externalPath.getAbsolutePath() +
@@ -59,20 +55,16 @@ public class NoteUtils {
 	}
 
 	public static boolean cleanupTmp (Context ctx) {
-
 		  //delete temp share file
 		  File file = new File(NoteUtils.getExternalFilesDirEclair(ctx, null), "nctemp.jpg");
-		  if (file.exists())
-		  {
+		  if (file.exists()) {
 			  file.delete();
 			  return true;
-		  }
-		  else
+		  } else
 			  return false;
 	}
 	
-	public static Uri saveTmpFile(Context ctx, String filename, String mimeType, byte[] outdata) throws IOException
-	{
+	public static Uri saveTmpFile(Context ctx, String filename, String mimeType, byte[] outdata) throws IOException {
 		
         // Create a path where we will place our picture in the user's
         // public pictures directory.  Note that you should be careful about
@@ -134,9 +126,8 @@ public class NoteUtils {
             os.close();
             
             /*
-
-	    	  // Tell the media scanner about the new file so that it is
-	        // immediately available to the user.
+	    	   // Tell the media scanner about the new file so that it is
+	           // immediately available to the user.
 	        MediaScannerConnection.scanFile(this,
 	                new String[] { file.toString() }, null,
 	                new MediaScannerConnection.OnScanCompletedListener() {
