@@ -11,6 +11,7 @@
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         -->
+        <item name="numberPickerStyle">@style/NPWidget.Holo.NumberPicker</item>
     </style>
 
     <!-- Application theme. -->

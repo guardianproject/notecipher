@@ -62,7 +62,6 @@ public class LockScreenActivity extends SherlockActivity implements ICacheWordSu
         LinearLayout flipView2 = (LinearLayout) findViewById(R.id.flipView2);
 
         mSlider = new TwoViewSlider(vf, flipView1, flipView2, mNewPassphrase, mConfirmNewPassphrase);
-
     }
 
     @Override

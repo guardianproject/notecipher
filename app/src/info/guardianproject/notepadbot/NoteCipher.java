@@ -34,7 +34,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +41,7 @@ import android.widget.Toast;
 import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
 
+import net.simonvt.numberpicker.NumberPicker;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import java.io.FileNotFoundException;
@@ -175,7 +175,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
 
         // Now create a simple cursor adapter and set it to display
         SimpleCursorAdapter notes =
-                new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to,  SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER );
+                new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
         notesListView.setAdapter(notes);
 
         if (notes.isEmpty()) {
@@ -434,7 +434,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
         builder.setTitle(R.string.change_timeout_prompt_title);
         builder.setMessage(R.string.change_timeout_prompt);
         final NumberPicker input = new NumberPicker(this);
-        input.setMinValue(1);
+        input.setMinValue(1); 
         input.setMaxValue(60);
         input.setValue( mCacheWord.getTimeoutMinutes() );
         builder.setView(input);
@@ -459,7 +459,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
         builder.show();
     }
 
-    void showLockScreen() {
+    void showLockScreen() { 
         Intent intent = new Intent(this, LockScreenActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("originalIntent", getIntent());
