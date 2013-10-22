@@ -178,9 +178,12 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
                 new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
         notesListView.setAdapter(notes);
 
+        TextView emptyTV = (TextView) findViewById(R.id.emptytext);
         if (notes.isEmpty()) {
             Toast.makeText(this, R.string.on_start, Toast.LENGTH_LONG).show();
-            ((TextView)findViewById(R.id.emptytext)).setText(R.string.no_notes);
+            emptyTV.setText(R.string.no_notes);
+        } else {
+            emptyTV.setText("");
         }
     }
 
