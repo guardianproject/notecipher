@@ -78,15 +78,27 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
-        menu.add(0, SAVE_ID, 0, R.string.menu_save);
-
-        if (mBlob != null)
-            menu.add(0, VIEW_ID, 0, R.string.menu_view);
-
-        menu.add(0, SHARE_ID, 0, R.string.menu_share);
-        menu.add(0, SMALLER_ID, 0, R.string.menu_smaller);
-        menu.add(0, BIGGER_ID, 0, R.string.menu_bigger);
-
+        menu.add(0, SAVE_ID, 0, R.string.menu_save)
+	        .setIcon(R.drawable.save)
+	    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        menu.add(0, SHARE_ID, 0, R.string.menu_share)
+	        .setIcon(R.drawable.share)
+	    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        
+        // if it's an image add export button, else bigger/smaller buttons
+        if (mBlob != null) {
+            menu.add(0, VIEW_ID, 0, R.string.menu_view)
+				.setIcon(R.drawable.export)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        } else {
+        	menu.add(0, SMALLER_ID, 0, R.string.menu_smaller)
+		        .setIcon(R.drawable.smaller)
+		    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            menu.add(0, BIGGER_ID, 0, R.string.menu_bigger)
+		        .setIcon(R.drawable.bigger)
+		    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        }
+        
         return true;
     }
 

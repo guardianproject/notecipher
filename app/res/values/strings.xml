@@ -5,8 +5,8 @@
     <string name="menu_insert">Add Note</string>
     <string name="menu_delete">Delete Item</string>
     <string name="menu_rekey">Change Passphrase</string>
-    <string name="menu_share">Share&#8230;</string>
-    <string name="menu_view">Export&#8230;</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_view">Export</string>
     <string name="menu_save">Save Note</string>
     <string name="menu_lock">Lock Notes</string>
     <string name="menu_bigger">Bigger</string>

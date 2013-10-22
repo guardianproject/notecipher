@@ -190,11 +190,18 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add(0, INSERT_ID, 0, R.string.menu_insert);
-        // menu.add(0, REKEY_ID, 0, R.string.menu_rekey);
-        menu.add(0, LOCK_ID, 0, R.string.menu_lock);
-        menu.add(0, CHANGE_TIMEOUT, 0, R.string.menu_timeout);
-
+        menu.add(0, INSERT_ID, 0, R.string.menu_insert)
+        	.setIcon(R.drawable.new_content)
+        	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        //menu.add(0, REKEY_ID, 0, R.string.menu_rekey)
+        //	.setIcon(R.drawable.key_icon)
+        //	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        menu.add(0, LOCK_ID, 0, R.string.menu_lock)
+        	.setIcon(R.drawable.lock)
+        	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        menu.add(0, CHANGE_TIMEOUT, 0, R.string.menu_timeout)
+	        .setIcon(R.drawable.timeout)
+	    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         return true;
     }
 
