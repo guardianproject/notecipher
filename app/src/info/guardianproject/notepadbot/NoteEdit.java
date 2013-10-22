@@ -20,10 +20,12 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.EditText;
@@ -61,6 +63,9 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Show the Up button in the action bar.
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        
         if (savedInstanceState != null) {
             mRowId = savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID);
             mTextSize = savedInstanceState.getFloat(TEXT_SIZE, 0);
@@ -105,6 +110,9 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
+	        case android.R.id.home:
+	        	NavUtils.navigateUpTo(this, new Intent(this, NoteCipher.class));
+	            return true;
             case SAVE_ID:
                 saveState();
                 return true;
