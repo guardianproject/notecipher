@@ -4,3 +4,6 @@
 [submodule "external/actionbarsherlock"]
 	path = external/actionbarsherlock
 	url = git@github.com:JakeWharton/ActionBarSherlock.git
+[submodule "external/numberpicker"]
+	path = external/numberpicker
+	url = git@github.com:SimonVT/android-numberpicker.git
