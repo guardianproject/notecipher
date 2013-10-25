@@ -2,16 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
       android:layout_width="fill_parent"
     	android:layout_height="fill_parent"
-    	android:id="@+id/listlayout"
-    	>    
-    <ListView android:id="@+id/android:list"
+    	android:orientation="vertical"
+    	android:id="@+id/listlayout" >    
+    <ListView android:id="@+id/notesListView"
           android:layout_width="fill_parent"
-        	android:layout_height="wrap_content"/>
+          android:layout_height="wrap_content"
+          android:divider="@color/light_gray"
+    	  android:dividerHeight="1dp" />
         	    	
   	<TextView android:id="@+id/emptytext"
           android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
-        	android:text="No notes yet"
-			style="@style/padtext"
-        	/>
+			style="@style/padtext" />
 </LinearLayout>
