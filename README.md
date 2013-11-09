@@ -17,7 +17,7 @@ Showcase app for [SQLCipher for Android](http://sqlcipher.net/sqlcipher-for-andr
 
 Follow these steps to setup your dev environment using Eclipse:
 
-1. create a new Eclipse *workspace* in the root director of the repo.
+1. create a new Eclipse *workspace* in the root directory of the repo.
 2. For Cacheword, import this directory `external/cacheword/cachewordlib/`, using "Import -> Android -> Existing Android Code Into Workspace":
 3. Then, "Import -> General -> Existing Projects Into Workspace" for the `app/` directory.
 

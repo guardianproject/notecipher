@@ -21,3 +21,6 @@ app/proguard-project.txt
 local.properties
 
 android-support-v4.jar
+
+# Mac info
+.DS_Store
