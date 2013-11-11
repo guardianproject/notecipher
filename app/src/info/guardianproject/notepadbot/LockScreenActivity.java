@@ -21,12 +21,12 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.actionbarsherlock.app.SherlockActivity;
+
 import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
 
 import java.security.GeneralSecurityException;
-
-import com.actionbarsherlock.app.SherlockActivity;
 
 public class LockScreenActivity extends SherlockActivity implements ICacheWordSubscriber {
     private static final String TAG = "LockScreenActivity";

@@ -16,10 +16,6 @@
 
 package info.guardianproject.notepadbot;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -31,6 +27,10 @@ import android.util.TypedValue;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 
 import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
@@ -65,7 +65,7 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
 
         // Show the Up button in the action bar.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        
+
         if (savedInstanceState != null) {
             mRowId = savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID);
             mTextSize = savedInstanceState.getFloat(TEXT_SIZE, 0);
@@ -89,7 +89,7 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
         menu.add(0, SHARE_ID, 0, R.string.menu_share)
 	        .setIcon(R.drawable.share)
 	    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        
+
         // if it's an image add export button, else bigger/smaller buttons
         if (mBlob != null) {
             menu.add(0, VIEW_ID, 0, R.string.menu_view)
@@ -103,7 +103,7 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
 		        .setIcon(R.drawable.bigger)
 		    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         }
-        
+
         return true;
     }
 
@@ -198,7 +198,7 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
                 mImageView.setImageBitmap(blobb);
 
             } else {
-            	
+
                 mBodyText.setText(note.getString(
                         note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
 
