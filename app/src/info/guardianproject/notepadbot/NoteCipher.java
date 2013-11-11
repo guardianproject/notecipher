@@ -141,6 +141,8 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
     }
 
     private void unlockDatabase() {
+        if (mCacheWord.isLocked())
+            return;
         mDbHelper = new NotesDbAdapter(mCacheWord, this);
         try {
 
@@ -158,6 +160,8 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
     }
 
     private void fillData() {
+        if (mCacheWord.isLocked())
+            return;
         Cursor notesCursor = mDbHelper.fetchAllNotes();
         startManagingCursor(notesCursor);
 
@@ -261,6 +265,8 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
     }
 
     private void shareEntry(long id) {
+        if (mCacheWord.isLocked())
+            return;
         Cursor note = mDbHelper.fetchNote(id);
         // If you do startManagingCursor(note) here it crashes when the user
         // returns to the app after sharing the text he wants
@@ -290,6 +296,9 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
     }
 
     private void viewEntry(long id) {
+        if (mCacheWord.isLocked())
+            return;
+
         Cursor note = mDbHelper.fetchNote(id);
         startManagingCursor(note);
 
