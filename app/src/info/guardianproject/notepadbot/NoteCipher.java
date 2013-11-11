@@ -30,13 +30,17 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 
 import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
@@ -47,10 +51,6 @@ import net.sqlcipher.database.SQLiteDatabase;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 
 public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber {
     private static final int ACTIVITY_CREATE = 0;
@@ -73,7 +73,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
     private final static int MAX_SIZE = 1000000;
 
     private CacheWordActivityHandler mCacheWord;
-    
+
     private ListView notesListView;
 
     /** Called when the activity is first created. */
@@ -88,7 +88,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
                 dataStream = getIntent().getData();
 
         }
-        
+
         SQLiteDatabase.loadLibs(this);
         setContentView(R.layout.notes_list);
         notesListView = (ListView) findViewById(R.id.notesListView);
@@ -100,7 +100,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
 	            i.putExtra(NotesDbAdapter.KEY_ROWID, id);
 	            startActivityForResult(i, ACTIVITY_EDIT);
 			}
-        }); 
+        });
         registerForContextMenu(notesListView);
         mCacheWord = new CacheWordActivityHandler(this, this);
     }
@@ -239,7 +239,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item) {
         AdapterContextMenuInfo info;
-        
+
         switch (item.getItemId()) {
             case DELETE_ID:
                 info = (AdapterContextMenuInfo) item.getMenuInfo();
@@ -444,7 +444,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
         builder.setTitle(R.string.change_timeout_prompt_title);
         builder.setMessage(R.string.change_timeout_prompt);
         final NumberPicker input = new NumberPicker(this);
-        input.setMinValue(1); 
+        input.setMinValue(1);
         input.setMaxValue(60);
         input.setValue( mCacheWord.getTimeoutMinutes() );
         builder.setView(input);
@@ -469,7 +469,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
         builder.show();
     }
 
-    void showLockScreen() { 
+    void showLockScreen() {
         Intent intent = new Intent(this, LockScreenActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("originalIntent", getIntent());
@@ -477,7 +477,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
         finish();
     }
 
-    void lock() {
+    void clearViewsAndLock() {
         closeDatabase();
         notesListView.setAdapter(null);
         System.gc();
@@ -487,13 +487,13 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
     @Override
     public void onCacheWordUninitialized() {
         Log.d(TAG, "onCacheWordUninitialized");
-        showLockScreen();
+        clearViewsAndLock();
     }
 
     @Override
     public void onCacheWordLocked() {
         Log.d(TAG, "onCacheWordLocked");
-        lock();
+        clearViewsAndLock();
     }
 
     @Override
