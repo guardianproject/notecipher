@@ -102,7 +102,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
 			}
         });
         registerForContextMenu(notesListView);
-        mCacheWord = new CacheWordActivityHandler(this, this);
+        mCacheWord = new CacheWordActivityHandler(this, ((App)getApplication()).getCWSettings());
     }
 
     @Override

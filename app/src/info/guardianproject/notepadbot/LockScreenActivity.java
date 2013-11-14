@@ -49,7 +49,7 @@ public class LockScreenActivity extends SherlockActivity implements ICacheWordSu
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lock_screen);
-        mCacheWord = new CacheWordActivityHandler(this, this);
+        mCacheWord = new CacheWordActivityHandler(this, ((App)getApplication()).getCWSettings());
 
         mViewCreatePassphrase = findViewById(R.id.llCreatePassphrase);
         mViewEnterPassphrase = findViewById(R.id.llEnterPassphrase);

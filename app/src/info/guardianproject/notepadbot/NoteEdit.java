@@ -75,7 +75,7 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
             mTextSize = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                     .getFloat(TEXT_SIZE, 0);
 
-        mCacheWord = new CacheWordActivityHandler(this, this);
+        mCacheWord = new CacheWordActivityHandler(this, ((App)getApplication()).getCWSettings());
     }
 
 
