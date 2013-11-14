@@ -1,5 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- Notification Settings -->
     <string name="cacheword_notification_cached_title">NoteCipher Unlocked</string>
+    <string name="cacheword_notification_cached">NoteCipher is unlocked. Tap to return.</string>
+    <string name="cacheword_notification_cached_message">NoteCipher is unlocked. Tap to return.</string>
+    <bool name="cacheword_use_notification_default">true</bool>  <!--  true = show a notification -->
+
+    <!-- To configure the notification icon create a drawable resource named:
+           cacheword_notification_icon
+    -->
+
+    <!--
+          Timeout: How long to wait before automatically locking and wiping the secrets
+                   after all your activities are no longer visible
+                   This is the default setting, and can be changed at runtime via a preference
+                   A value of 0 represents instant timeout
+                   A value < 0  represents no timeout (or infinite timeout)
+    -->
+    <integer name="cacheword_timeout_minutes_default">5</integer>
+
+    <!--
+    In August 2013 a severe bug was found in Android's SecureRandom implementation. This affected all
+    versions of Android up to and including 4.3.
+
+    Cacheword will apply the suggested fix for this, unless you tell it not to.
+
+    The only reason to disable this is if (1) You already apply the fixes in your application or
+    (2) you are only running on Android > 4.3.
+
+    It is suggested that you apply the fixes yourself in onCreate of your Application class, to ensure
+    the PRNG is fixed as soon as possible. If you do this, change this value to false.
+
+     -->
+    <bool name="cacheword_apply_android_securerandom_fixes">true</bool>
+
+    <!--
+          Vibrate: Whether to vibrate phone when password is cached or not.
+                   This is the default setting, and can be changed at runtime via a preference
+                   Don't forget to add the vibrate permission!
+                    <uses-permission android:name="android.permission.VIBRATE" />
+    -->
+    <bool name="cacheword_vibrate_default">true</bool>
 </resources>
 
