@@ -16,6 +16,7 @@
 
 package info.guardianproject.notepadbot;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -27,15 +28,19 @@ import android.util.TypedValue;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
 
-public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
+public class NoteEdit extends SherlockFragmentActivity implements 
+						ICacheWordSubscriber, LoaderManager.LoaderCallbacks<Cursor>  {
     // private final static String TAG = "NoteEdit";
 
     private EditText mTitleText;
@@ -58,14 +63,15 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
     private final static String ZERO_TEXT = "*******************";
     private final static String TEXT_SIZE = "text_size";
     private final static String PREFS_NAME = "NoteEditPrefs";
-
+    private final static int LOADER_ID = 33245;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Show the Up button in the action bar.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        
         if (savedInstanceState != null) {
             mRowId = savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID);
             mTextSize = savedInstanceState.getFloat(TEXT_SIZE, 0);
@@ -76,6 +82,8 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
                     .getFloat(TEXT_SIZE, 0);
 
         mCacheWord = new CacheWordActivityHandler(this, ((App)getApplication()).getCWSettings());
+        
+        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
 
@@ -166,11 +174,12 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
 
     }
 
-    private void populateFields() {
+    private void populateFields(Cursor note) {
         try {
-            Cursor note = mDb.fetchNote(mRowId);
-            startManagingCursor(note);
-
+            //Cursor note = 
+            //startManagingCursor(note);
+        	if (note == null)
+        		return;
             mBlob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
 
             mMimeType = note.getString(
@@ -208,9 +217,6 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
 
             mTitleText.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
-
-            stopManagingCursor(note);
-            note.close();
 
         } catch (Exception e) {
             Log.e("notepadbot", "error populating", e);
@@ -253,7 +259,12 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
 
         closeDatabase();
 
-        if (mTitleText != null)
+        resetViews();
+
+    }
+    
+    private void resetViews() {
+    	if (mTitleText != null)
             mTitleText.setText(ZERO_TEXT);
 
         if (mBodyText != null)
@@ -261,7 +272,6 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
 
         if (mImageView != null)
             mImageView.setImageBitmap(null);
-
     }
 
     @Override
@@ -280,7 +290,7 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
             if (mBodyText != null)
                 body = mBodyText.getText().toString();
 
-            if (title != null && title.length() > 0) {
+            if (!title.isEmpty()) {
                 if (mRowId == -1) {
                     long id = mDb.createNote(title, body, null, null);
                     if (id > 0) {
@@ -344,13 +354,52 @@ public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
         Bundle extras = getIntent().getExtras();
 
         if (mRowId != -1) {
-            populateFields();
+            getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
         } else if (extras != null) {
             mRowId = extras.getLong(NotesDbAdapter.KEY_ROWID);
-            populateFields();
+            getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
         } else {
             setupView(false);
         }
     }
 
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		return new NoteContentLoader(this, mDb, mRowId);
+	}
+
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		populateFields(cursor);
+	}
+
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		resetViews();
+	}
+	
+	private static class NoteContentLoader extends CursorLoader {
+		NotesDbAdapter db;
+		long rowId;
+		
+		public NoteContentLoader(Context context) {
+			super(context);
+		}
+		
+		public NoteContentLoader(Context context, NotesDbAdapter db, long rowId) {
+			super(context);
+			this.db = db;
+			this.rowId = rowId;
+		}
+		
+		 @Override
+		 public Cursor loadInBackground() {
+			 if (db == null)
+				 return null;
+			 return db.fetchNote(rowId);
+		 }
+	}
 }
