@@ -94,7 +94,6 @@ public class NoteEdit extends SherlockFragmentActivity implements
         
         mCacheWord = new CacheWordActivityHandler(this, ((App)getApplication()).getCWSettings());
         
-        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
 
@@ -167,9 +166,9 @@ public class NoteEdit extends SherlockFragmentActivity implements
 
     private void populateFields(Cursor note) {
         try {
-            
         	if (note == null)
         		return;
+        	
             mBlob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
 
             mMimeType = note.getString(
@@ -207,7 +206,8 @@ public class NoteEdit extends SherlockFragmentActivity implements
 
             mTitleText.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
-
+            note.close();
+            
         } catch (Exception e) {
             Log.e("notepadbot", "error populating", e);
             Toast.makeText(this, getString(R.string.err_loading_note, e.getMessage()),
@@ -366,7 +366,7 @@ public class NoteEdit extends SherlockFragmentActivity implements
 		resetViews();
 	}
 	
-	private static class NoteContentLoader extends CursorLoader {
+	public static class NoteContentLoader extends CursorLoader {
 		NotesDbAdapter db;
 		long rowId;
 		
