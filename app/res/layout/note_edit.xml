@@ -27,4 +27,11 @@
         android:singleLine="false"
         android:hint="@string/enter_note_text" />
 		 
+	<ImageView
+        android:id="@+id/odata"
+        android:layout_margin="4dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone"
+        android:contentDescription="@string/image_data" />
 </LinearLayout>

@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -68,7 +69,14 @@ public class NoteEdit extends SherlockFragmentActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        
+        setContentView(R.layout.note_edit);
+        
+        // Find all the views now to save time searching later multiple times
+        mImageView = (ImageView) findViewById(R.id.odata);
+        mBodyText = (EditText) findViewById(R.id.body);
+        mTitleText = (EditText) findViewById(R.id.title);
+        
         // Show the Up button in the action bar.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
@@ -80,7 +88,10 @@ public class NoteEdit extends SherlockFragmentActivity implements
         if (mTextSize == 0)
             mTextSize = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                     .getFloat(TEXT_SIZE, 0);
-
+        
+        if (mTextSize != 0)
+            mBodyText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
+        
         mCacheWord = new CacheWordActivityHandler(this, ((App)getApplication()).getCWSettings());
         
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
@@ -154,30 +165,9 @@ public class NoteEdit extends SherlockFragmentActivity implements
 
     }
 
-    private void setupView(boolean hasImage) {
-
-        if (hasImage) {
-            setContentView(R.layout.note_edit_image);
-
-            mImageView = (ImageView) findViewById(R.id.odata);
-        } else {
-            setContentView(R.layout.note_edit);
-
-            mBodyText = (EditText) findViewById(R.id.body);
-
-            if (mTextSize != 0)
-                mBodyText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
-
-        }
-
-        mTitleText = (EditText) findViewById(R.id.title);
-
-    }
-
     private void populateFields(Cursor note) {
         try {
-            //Cursor note = 
-            //startManagingCursor(note);
+            
         	if (note == null)
         		return;
             mBlob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
@@ -189,8 +179,6 @@ public class NoteEdit extends SherlockFragmentActivity implements
                 mMimeType = "text/plain";
 
             boolean isImage = mMimeType.startsWith("image");
-
-            setupView(isImage);
 
             if (isImage) {
 
@@ -205,6 +193,7 @@ public class NoteEdit extends SherlockFragmentActivity implements
                 Bitmap blobb = BitmapFactory.decodeByteArray(mBlob, 0, mBlob.length, bmpFactoryOptions);
 
                 mImageView.setImageBitmap(blobb);
+                mImageView.setVisibility(View.VISIBLE);
 
             } else {
 
@@ -213,6 +202,7 @@ public class NoteEdit extends SherlockFragmentActivity implements
 
                 if (mTextSize != 0)
                     mBodyText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
+                mImageView.setVisibility(View.GONE);
             }
 
             mTitleText.setText(note.getString(
@@ -318,13 +308,10 @@ public class NoteEdit extends SherlockFragmentActivity implements
     }
 
     private void viewEntry() {
-
         if (mBlob != null) {
             String title = mTitleText.getText().toString();
             NoteUtils.savePublicFile(this, title, mMimeType, mBlob);
-
         }
-
     }
 
     private void closeDatabase() {
@@ -359,7 +346,7 @@ public class NoteEdit extends SherlockFragmentActivity implements
             mRowId = extras.getLong(NotesDbAdapter.KEY_ROWID);
             getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
         } else {
-            setupView(false);
+        	mImageView.setVisibility(View.GONE);
         }
     }
 
@@ -369,12 +356,10 @@ public class NoteEdit extends SherlockFragmentActivity implements
 		return new NoteContentLoader(this, mDb, mRowId);
 	}
 
-
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 		populateFields(cursor);
 	}
-
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> loader) {
