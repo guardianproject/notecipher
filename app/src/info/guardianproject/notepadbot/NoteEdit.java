@@ -16,23 +16,26 @@
 
 package info.guardianproject.notepadbot;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+
 import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
 
-public class NoteEdit extends Activity implements ICacheWordSubscriber {
+public class NoteEdit extends SherlockActivity implements ICacheWordSubscriber {
     // private final static String TAG = "NoteEdit";
 
     private EditText mTitleText;
@@ -60,6 +63,9 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Show the Up button in the action bar.
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         if (savedInstanceState != null) {
             mRowId = savedInstanceState.getLong(NotesDbAdapter.KEY_ROWID);
             mTextSize = savedInstanceState.getFloat(TEXT_SIZE, 0);
@@ -69,8 +75,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
             mTextSize = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                     .getFloat(TEXT_SIZE, 0);
 
-        mCacheWord = new CacheWordActivityHandler(this, this);
-
+        mCacheWord = new CacheWordActivityHandler(this, ((App)getApplication()).getCWSettings());
     }
 
 
@@ -78,14 +83,26 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
-        menu.add(0, SAVE_ID, 0, R.string.menu_save);
+        menu.add(0, SAVE_ID, 0, R.string.menu_save)
+	        .setIcon(R.drawable.save)
+	    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        menu.add(0, SHARE_ID, 0, R.string.menu_share)
+	        .setIcon(R.drawable.share)
+	    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
-        if (mBlob != null)
-            menu.add(0, VIEW_ID, 0, R.string.menu_view);
-
-        menu.add(0, SHARE_ID, 0, R.string.menu_share);
-        menu.add(0, SMALLER_ID, 0, R.string.menu_smaller);
-        menu.add(0, BIGGER_ID, 0, R.string.menu_bigger);
+        // if it's an image add export button, else bigger/smaller buttons
+        if (mBlob != null) {
+            menu.add(0, VIEW_ID, 0, R.string.menu_view)
+				.setIcon(R.drawable.export)
+				.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        } else {
+        	menu.add(0, SMALLER_ID, 0, R.string.menu_smaller)
+		        .setIcon(R.drawable.smaller)
+		    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            menu.add(0, BIGGER_ID, 0, R.string.menu_bigger)
+		        .setIcon(R.drawable.bigger)
+		    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        }
 
         return true;
     }
@@ -93,6 +110,9 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
+	        case android.R.id.home:
+	        	NavUtils.navigateUpTo(this, new Intent(this, NoteCipher.class));
+	            return true;
             case SAVE_ID:
                 saveState();
                 return true;
@@ -113,8 +133,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         return super.onMenuItemSelected(featureId, item);
     }
 
-    private void changeTextSize(float factor)
-    {
+    private void changeTextSize(float factor) {
         mTextSize = mBodyText.getTextSize();
         mTextSize *= factor;
 
@@ -127,17 +146,13 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
     }
 
-    private void setupView(boolean hasImage)
-    {
+    private void setupView(boolean hasImage) {
 
-        if (hasImage)
-        {
+        if (hasImage) {
             setContentView(R.layout.note_edit_image);
 
             mImageView = (ImageView) findViewById(R.id.odata);
-        }
-        else
-        {
+        } else {
             setContentView(R.layout.note_edit);
 
             mBodyText = (EditText) findViewById(R.id.body);
@@ -152,9 +167,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
     }
 
     private void populateFields() {
-
-        try
-        {
+        try {
             Cursor note = mDb.fetchNote(mRowId);
             startManagingCursor(note);
 
@@ -170,8 +183,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
             setupView(isImage);
 
-            if (isImage)
-            {
+            if (isImage) {
 
                 // Load up the image's dimensions not the image itself
                 BitmapFactory.Options bmpFactoryOptions = new BitmapFactory.Options();
@@ -185,9 +197,8 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
                 mImageView.setImageBitmap(blobb);
 
-            }
-            else
-            {
+            } else {
+
                 mBodyText.setText(note.getString(
                         note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
 
@@ -201,10 +212,9 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
             stopManagingCursor(note);
             note.close();
 
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             Log.e("notepadbot", "error populating", e);
-            Toast.makeText(this, "Something went wrong when loading your note: " + e.getMessage(),
+            Toast.makeText(this, getString(R.string.err_loading_note, e.getMessage()),
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -220,7 +230,6 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
         if (mTextSize != 0)
             outState.putFloat(TEXT_SIZE, mTextSize);
-
     }
 
     @Override
@@ -271,8 +280,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
             if (mBodyText != null)
                 body = mBodyText.getText().toString();
 
-            if (title != null && title.length() > 0)
-            {
+            if (title != null && title.length() > 0) {
                 if (mRowId == -1) {
                     long id = mDb.createNote(title, body, null, null);
                     if (id > 0) {
@@ -286,32 +294,22 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         }
     }
 
-    private void shareEntry()
-    {
-        if (mBlob != null)
-        {
-            try
-            {
+    private void shareEntry() {
+        if (mBlob != null) {
+            try {
                 NoteUtils.shareData(this, mTitleText.getText().toString(), mMimeType, mBlob);
-            } catch (Exception e)
-            {
-                Toast.makeText(this, "Error exporting image: " + e.getMessage(), Toast.LENGTH_LONG).show();
-
+            } catch (Exception e) {
+                Toast.makeText(this, getString(R.string.err_export, e.getMessage()), Toast.LENGTH_LONG).show();
             }
-        }
-        else
-        {
+        } else {
             String body = mBodyText.getText().toString();
             NoteUtils.shareText(this, body);
         }
-
     }
 
-    private void viewEntry()
-    {
+    private void viewEntry() {
 
-        if (mBlob != null)
-        {
+        if (mBlob != null) {
             String title = mTitleText.getText().toString();
             NoteUtils.savePublicFile(this, title, mMimeType, mBlob);
 
@@ -319,8 +317,7 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
 
     }
 
-    private void closeDatabase()
-    {
+    private void closeDatabase() {
         if (mDb != null) {
             mDb.close();
             mDb = null;
@@ -354,7 +351,6 @@ public class NoteEdit extends Activity implements ICacheWordSubscriber {
         } else {
             setupView(false);
         }
-
     }
 
 }

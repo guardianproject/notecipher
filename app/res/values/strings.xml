@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="rn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">NoteCipher</string>
     <string name="no_notes">No Notes Yet</string>
     <string name="menu_insert">Add Note</string>
     <string name="menu_delete">Delete Item</string>
     <string name="menu_rekey">Change Passphrase</string>
-    <string name="menu_share">Share...</string>
-    <string name="menu_view">Export...</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_view">Export</string>
     <string name="menu_save">Save Note</string>
     <string name="menu_lock">Lock Notes</string>
     <string name="menu_bigger">Bigger</string>
@@ -18,15 +18,15 @@
     <string name="confirm">Save Note</string>
     <string name="edit_note">Edit Note</string>
     <string name="confirm_delete">Do you want to delete the original, unencrypted file?</string>
-    <string name="on_import">Imported new file</string>
+    <string name="on_import">Imported new file: <xliff:g id="file_name">%1$s</xliff:g></string>
     <string name="err_size">Imported file size is too large</string>
-    <string name="err_export">Error exporting image</string>
+    <string name="err_export">Error exporting image: <xliff:g id="img_name">%1$s</xliff:g></string>
     <string name="on_start">Tap anywhere to create a new note</string>
     <string name="err_pass">Unable to unlock your notes. Are you sure you entered the right passphrase?</string>
     <string name="button_ok">Okay</string>
     <string name="button_cancel">Cancel</string>
     <string name="rekey_message">Enter a *new* passphrase. It must contain at least one uppercase, one lowercase and one number, and be longer than six characters.</string>
-    <string name="do_rekey">Encrypting your existing notes with the new passphrase (patience...)</string>
+    <string name="do_rekey">Encrypting your existing notes with the new passphrase (patience&#8230;)</string>
     <string name="enter_pass">Enter your passphrase:</string>
     <string name="new_pass">Welcome! Enter a strong passphrase to secure your notes. It must contain at least one uppercase, one lowercase and one number, and be longer than six characters.</string>
     <string name="pass_err_length">Your passphrase was not long enough</string>
@@ -45,4 +45,13 @@
 	<string name="change_timeout_prompt_title">Change Lock Timeout</string>
 	<string name="change_timeout_prompt">After how many minutes of inactivity should NoteCipher lock itself?</string>
     
+	<string name="enter_title">Enter title</string>
+	<string name="enter_note_text">Enter note text</string>
+	<string name="share_file">Share File</string>
+	<string name="saving_tmp_file_failed">Saving Temporary File Failed!</string>
+	<string name="share_text">Share Text</string>
+	<string name="image_data">Image Data</string>
+	<string name="err_loading_note">Something went wrong when loading your note: <xliff:g id="error_msg">%1$s</xliff:g></string>
+	<string name="unable_to_delete_original">Unable to delete original</string>
+	
 </resources>

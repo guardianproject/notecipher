@@ -17,7 +17,6 @@
 package info.guardianproject.notepadbot;
 
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,27 +27,32 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 
 import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
 
+import net.simonvt.numberpicker.NumberPicker;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
+public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber {
     private static final int ACTIVITY_CREATE = 0;
     private static final int ACTIVITY_EDIT = 1;
 
@@ -70,26 +74,35 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
     private CacheWordActivityHandler mCacheWord;
 
+    private ListView notesListView;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getIntent() != null)
-        {
-
+        if (getIntent() != null) {
             if (getIntent().hasExtra(Intent.EXTRA_STREAM)) {
                 dataStream = (Uri) getIntent().getExtras().get(Intent.EXTRA_STREAM);
-            }
-            else
+            } else
                 dataStream = getIntent().getData();
 
         }
 
         SQLiteDatabase.loadLibs(this);
         setContentView(R.layout.notes_list);
-        registerForContextMenu(getListView());
-        mCacheWord = new CacheWordActivityHandler(this, this);
+        notesListView = (ListView) findViewById(R.id.notesListView);
+        notesListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> ad, View v, int position,
+					long id) {
+				Intent i = new Intent(getApplication(), NoteEdit.class);
+	            i.putExtra(NotesDbAdapter.KEY_ROWID, id);
+	            startActivityForResult(i, ACTIVITY_EDIT);
+			}
+        });
+        registerForContextMenu(notesListView);
+        mCacheWord = new CacheWordActivityHandler(this, ((App)getApplication()).getCWSettings());
     }
 
     @Override
@@ -108,8 +121,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        findViewById(R.id.listlayout).setOnTouchListener(new OnTouchListener()
-        {
+        findViewById(R.id.listlayout).setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
@@ -118,24 +130,21 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
                 return false;
             }
-        }
-
-                );
+        });
     }
 
-    private void closeDatabase()
-    {
+    private void closeDatabase() {
         if (mDbHelper != null) {
             mDbHelper.close();
             mDbHelper = null;
         }
     }
 
-    private void unlockDatabase()
-    {
+    private void unlockDatabase() {
+        if (mCacheWord.isLocked())
+            return;
         mDbHelper = new NotesDbAdapter(mCacheWord, this);
-        try
-        {
+        try {
 
             mDbHelper.open();
 
@@ -144,14 +153,15 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
             else
                 fillData();
 
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, getString(R.string.err_pass), Toast.LENGTH_LONG).show();
         }
     }
 
     private void fillData() {
+        if (mCacheWord.isLocked())
+            return;
         Cursor notesCursor = mDbHelper.fetchAllNotes();
         startManagingCursor(notesCursor);
 
@@ -170,22 +180,32 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         // Now create a simple cursor adapter and set it to display
         SimpleCursorAdapter notes =
                 new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
-        setListAdapter(notes);
+        notesListView.setAdapter(notes);
 
-        if (notes.isEmpty())
-        {
-            Toast.makeText(this, getString(R.string.on_start), Toast.LENGTH_LONG).show();
+        TextView emptyTV = (TextView) findViewById(R.id.emptytext);
+        if (notes.isEmpty()) {
+            Toast.makeText(this, R.string.on_start, Toast.LENGTH_LONG).show();
+            emptyTV.setText(R.string.no_notes);
+        } else {
+            emptyTV.setText("");
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add(0, INSERT_ID, 0, R.string.menu_insert);
-        // menu.add(0, REKEY_ID, 0, R.string.menu_rekey);
-        menu.add(0, LOCK_ID, 0, R.string.menu_lock);
-        menu.add(0, CHANGE_TIMEOUT, 0, R.string.menu_timeout);
-
+        menu.add(0, INSERT_ID, 0, R.string.menu_insert)
+        	.setIcon(R.drawable.new_content)
+        	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        //menu.add(0, REKEY_ID, 0, R.string.menu_rekey)
+        //	.setIcon(R.drawable.key_icon)
+        //	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        menu.add(0, LOCK_ID, 0, R.string.menu_lock)
+        	.setIcon(R.drawable.lock)
+        	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        menu.add(0, CHANGE_TIMEOUT, 0, R.string.menu_timeout)
+	        .setIcon(R.drawable.timeout)
+	    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         return true;
     }
 
@@ -221,7 +241,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(android.view.MenuItem item) {
         AdapterContextMenuInfo info;
 
         switch (item.getItemId()) {
@@ -244,10 +264,13 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         return super.onContextItemSelected(item);
     }
 
-    private void shareEntry(long id)
-    {
+    private void shareEntry(long id) {
+        if (mCacheWord.isLocked())
+            return;
         Cursor note = mDbHelper.fetchNote(id);
-        startManagingCursor(note);
+        // If you do startManagingCursor(note) here it crashes when the user
+        // returns to the app after sharing the text he wants
+        //startManagingCursor(note);
 
         byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
         String title = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
@@ -256,19 +279,14 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         if (mimeType == null)
             mimeType = "text/plain";
 
-        if (blob != null)
-        {
-            try
-            {
+        if (blob != null) {
+            try {
                 NoteUtils.shareData(this, title, mimeType, blob);
-            } catch (IOException e)
-            {
-                Toast.makeText(this, getString(R.string.err_export) + e.getMessage(), Toast.LENGTH_LONG)
+            } catch (IOException e) {
+                Toast.makeText(this, getString(R.string.err_export, e.getMessage()), Toast.LENGTH_LONG)
                         .show();
             }
-        }
-        else
-        {
+        } else {
             String body = note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY));
             NoteUtils.shareText(this, body);
@@ -277,8 +295,10 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         note.close();
     }
 
-    private void viewEntry(long id)
-    {
+    private void viewEntry(long id) {
+        if (mCacheWord.isLocked())
+            return;
+
         Cursor note = mDbHelper.fetchNote(id);
         startManagingCursor(note);
 
@@ -288,8 +308,7 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         if (mimeType == null)
             mimeType = "text/plain";
 
-        if (blob != null)
-        {
+        if (blob != null) {
             String title = note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
 
@@ -306,14 +325,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
         Intent i = new Intent(this, NoteEdit.class);
         startActivityForResult(i, ACTIVITY_CREATE);
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        Intent i = new Intent(this, NoteEdit.class);
-        i.putExtra(NotesDbAdapter.KEY_ROWID, id);
-        startActivityForResult(i, ACTIVITY_EDIT);
     }
 
     /*
@@ -334,7 +345,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     @Override
     protected void onStop() {
         super.onStop();
-
     }
 
     @Override
@@ -345,7 +355,6 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
     }
 
     @Override
@@ -354,11 +363,9 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
         closeDatabase();
         NoteUtils.cleanupTmp(this);
-
     }
 
-    private void importDataStream()
-    {
+    private void importDataStream() {
         if (mCacheWord.isLocked())
             return;
 
@@ -370,19 +377,17 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
             byte[] data = NoteUtils.readBytesAndClose(is);
 
-            if (data.length > MAX_SIZE)
-            {
-                Toast.makeText(this, getString(R.string.err_size), Toast.LENGTH_LONG).show();
+            if (data.length > MAX_SIZE){
+                Toast.makeText(this, R.string.err_size, Toast.LENGTH_LONG).show();
 
             }
-            else
-            {
+            else {
                 String title = dataStream.getLastPathSegment();
                 String body = dataStream.getPath();
 
                 new NotesDbAdapter(mCacheWord, this).createNote(title, body, data, mimeType);
 
-                Toast.makeText(this, getString(R.string.on_import) + ": " + title, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.on_import, title), Toast.LENGTH_LONG).show();
 
                 // handleDelete();
 
@@ -402,12 +407,10 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
 
-        } catch (OutOfMemoryError e)
-        {
-            Toast.makeText(this, getString(R.string.err_size), Toast.LENGTH_LONG).show();
+        } catch (OutOfMemoryError e) {
+            Toast.makeText(this, R.string.err_size, Toast.LENGTH_LONG).show();
 
-        } finally
-        {
+        } finally {
             dataStream = null;
 
         }
@@ -416,12 +419,11 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     /*
      * Call this to delete the original image, will ask the user
      */
-    private void handleDelete()
-    {
+    private void handleDelete() {
         final AlertDialog.Builder b = new AlertDialog.Builder(this);
         b.setIcon(android.R.drawable.ic_dialog_alert);
-        b.setTitle(getString(R.string.app_name));
-        b.setMessage(getString(R.string.confirm_delete));
+        b.setTitle(R.string.app_name);
+        b.setMessage(R.string.confirm_delete);
         b.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int whichButton) {
@@ -431,9 +433,8 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
 
                 if (cr != null)
                     cr.delete(dataStream, null, null);
-                else
-                {
-                    Toast.makeText(NoteCipher.this, "Unable to delete originaL", Toast.LENGTH_SHORT).show();
+                else {
+                    Toast.makeText(NoteCipher.this, R.string.unable_to_delete_original, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -485,9 +486,9 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
         finish();
     }
 
-    void lock() {
+    void clearViewsAndLock() {
         closeDatabase();
-        setListAdapter(null);
+        notesListView.setAdapter(null);
         System.gc();
         showLockScreen();
     }
@@ -495,13 +496,13 @@ public class NoteCipher extends ListActivity implements ICacheWordSubscriber {
     @Override
     public void onCacheWordUninitialized() {
         Log.d(TAG, "onCacheWordUninitialized");
-        showLockScreen();
+        clearViewsAndLock();
     }
 
     @Override
     public void onCacheWordLocked() {
         Log.d(TAG, "onCacheWordLocked");
-        lock();
+        clearViewsAndLock();
     }
 
     @Override
