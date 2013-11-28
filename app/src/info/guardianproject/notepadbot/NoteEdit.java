@@ -275,26 +275,33 @@ public class NoteEdit extends SherlockFragmentActivity implements
     }
 
     private void saveState() {
-        if ((mTitleText != null && mTitleText.getText() != null && mTitleText.getText().length() > 0)
-                || (mBodyText != null && mBodyText.getText() != null && mBodyText.getText().length() > 0))
-        {
-            String title = mTitleText.getText().toString();
-            String body = "";
-
-            if (mBodyText != null)
-                body = mBodyText.getText().toString();
-
-            if (!title.isEmpty()) {
-                if (mRowId == -1) {
-                    long id = mDb.createNote(title, body, null, null);
-                    if (id > 0) {
-                        mRowId = id;
-                    }
-                } else {
-                    mDb.updateNote(mRowId, title, body, null, null);
+        String title = "";
+        String body = "";
+        
+        int defTitleSize = 8;
+        
+        // Get the text from body if it exists
+        if (mBodyText != null && mBodyText.length() > 0)
+            body = mBodyText.getText().toString();
+        
+        // Get the text from title if it exists
+        if (mTitleText != null) {
+        	title = mTitleText.getText().toString();
+        	// if the title is empty get the first defTitleSize characters 
+        	// from the Body and use that as a title
+        	if(title.isEmpty() && !body.isEmpty())
+        		title = (body.length() > defTitleSize) ? body.substring(0, defTitleSize) : body;
+        }
+        
+        if (!title.isEmpty()) {
+            if (mRowId == -1) {
+                long id = mDb.createNote(title, body, null, null);
+                if (id > 0) {
+                    mRowId = id;
                 }
+            } else {
+                mDb.updateNote(mRowId, title, body, null, null);
             }
-
         }
     }
 
