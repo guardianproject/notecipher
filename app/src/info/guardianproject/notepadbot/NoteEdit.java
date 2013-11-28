@@ -45,7 +45,7 @@ public class NoteEdit extends SherlockFragmentActivity implements
     // private final static String TAG = "NoteEdit";
 
     private EditText mTitleText;
-    private EditText mBodyText;
+    private LinedEditText mBodyText;
     private ImageView mImageView;
     private byte[] mBlob;
     private String mMimeType;
@@ -74,7 +74,7 @@ public class NoteEdit extends SherlockFragmentActivity implements
         
         // Find all the views now to save time searching later multiple times
         mImageView = (ImageView) findViewById(R.id.odata);
-        mBodyText = (EditText) findViewById(R.id.body);
+        mBodyText = (LinedEditText) findViewById(R.id.body);
         mTitleText = (EditText) findViewById(R.id.title);
         
         // Show the Up button in the action bar.
@@ -198,6 +198,10 @@ public class NoteEdit extends SherlockFragmentActivity implements
 
                 mBodyText.setText(note.getString(
                         note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
+                
+                // Focus by default on the body of the note
+                mBodyText.requestFocus();
+                mBodyText.setSelection(mBodyText.length());
 
                 if (mTextSize != 0)
                     mBodyText.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
