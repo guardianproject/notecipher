@@ -18,12 +18,17 @@ package info.guardianproject.notepadbot;
 
 import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -34,11 +39,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
@@ -52,7 +56,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber {
+public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSubscriber {
     private static final int ACTIVITY_CREATE = 0;
     private static final int ACTIVITY_EDIT = 1;
 
@@ -75,7 +79,8 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
     private CacheWordActivityHandler mCacheWord;
 
     private ListView notesListView;
-
+    private SimpleCursorAdapter notesCursorAdapter;
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -103,6 +108,18 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
         });
         registerForContextMenu(notesListView);
         mCacheWord = new CacheWordActivityHandler(this, ((App)getApplication()).getCWSettings());
+        
+        // Create an array to specify the fields we want to display in the list (only TITLE)
+        String[] from = new String[] { NotesDbAdapter.KEY_TITLE };
+
+        // and an array of the fields we want to bind those fields to (in this
+        // case just text1)
+        int[] to = new int[] { R.id.row_text };
+        
+        // Now create an empty simple cursor adapter that later will display the notes
+        notesCursorAdapter = new SimpleCursorAdapter(this, R.layout.notes_row, null, from, to
+        				, SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        notesListView.setAdapter(notesCursorAdapter);
     }
 
     @Override
@@ -162,33 +179,30 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
     private void fillData() {
         if (mCacheWord.isLocked())
             return;
-        Cursor notesCursor = mDbHelper.fetchAllNotes();
-        startManagingCursor(notesCursor);
+        
+        getSupportLoaderManager().restartLoader(VIEW_ID, null, new LoaderManager.LoaderCallbacks<Cursor>() {
 
-        // Create an array to specify the fields we want to display in the list
-        // (only TITLE)
-        String[] from = new String[] {
-            NotesDbAdapter.KEY_TITLE
-        };
+			@Override
+			public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+				return new NotesLoader(NoteCipher.this, mDbHelper);
+			}
+ 
+			@Override
+			public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+				notesCursorAdapter.swapCursor(cursor);
+				
+		        TextView emptyTV = (TextView) findViewById(R.id.emptytext);
+		        if (notesCursorAdapter.isEmpty()) {
+		            Toast.makeText(NoteCipher.this, R.string.on_start, Toast.LENGTH_LONG).show();
+		            emptyTV.setText(R.string.no_notes);
+		        } else {
+		            emptyTV.setText("");
+		        }
+			}
 
-        // and an array of the fields we want to bind those fields to (in this
-        // case just text1)
-        int[] to = new int[] {
-            R.id.text1
-        };
-
-        // Now create a simple cursor adapter and set it to display
-        SimpleCursorAdapter notes =
-                new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
-        notesListView.setAdapter(notes);
-
-        TextView emptyTV = (TextView) findViewById(R.id.emptytext);
-        if (notes.isEmpty()) {
-            Toast.makeText(this, R.string.on_start, Toast.LENGTH_LONG).show();
-            emptyTV.setText(R.string.no_notes);
-        } else {
-            emptyTV.setText("");
-        }
+			@Override
+			public void onLoaderReset(Loader<Cursor> loader) { }
+		});
     }
 
     @Override
@@ -264,59 +278,77 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
         return super.onContextItemSelected(item);
     }
 
-    private void shareEntry(long id) {
+    private void shareEntry(final long id) {
         if (mCacheWord.isLocked())
             return;
-        Cursor note = mDbHelper.fetchNote(id);
-        // If you do startManagingCursor(note) here it crashes when the user
-        // returns to the app after sharing the text he wants
-        //startManagingCursor(note);
+        
+        getSupportLoaderManager().restartLoader(SHARE_ID, null, new LoaderManager.LoaderCallbacks<Cursor>() {
 
-        byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
-        String title = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
-        String mimeType = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
+			@Override
+			public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+				return new NoteEdit.NoteContentLoader(NoteCipher.this, mDbHelper, id);
+			}
+ 
+			@Override
+			public void onLoadFinished(Loader<Cursor> loader, Cursor note) {
+				byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
+		        String title = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
+		        String mimeType = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
 
-        if (mimeType == null)
-            mimeType = "text/plain";
+		        if (mimeType == null)
+		            mimeType = "text/plain";
 
-        if (blob != null) {
-            try {
-                NoteUtils.shareData(this, title, mimeType, blob);
-            } catch (IOException e) {
-                Toast.makeText(this, getString(R.string.err_export, e.getMessage()), Toast.LENGTH_LONG)
-                        .show();
-            }
-        } else {
-            String body = note.getString(
-                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY));
-            NoteUtils.shareText(this, body);
-        }
+		        if (blob != null) {
+		            try {
+		                NoteUtils.shareData(NoteCipher.this, title, mimeType, blob);
+		            } catch (IOException e) {
+		                Toast.makeText(NoteCipher.this, getString(R.string.err_export, e.getMessage()), Toast.LENGTH_LONG)
+		                        .show();
+		            }
+		        } else {
+		            String body = note.getString( note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY) );
+		            NoteUtils.shareText(NoteCipher.this, body);
+		        }
+		        note.close();
+			}
 
-        note.close();
+			@Override
+			public void onLoaderReset(Loader<Cursor> loader) { }
+		});
     }
 
-    private void viewEntry(long id) {
+    private void viewEntry(final long id) {
         if (mCacheWord.isLocked())
             return;
 
-        Cursor note = mDbHelper.fetchNote(id);
-        startManagingCursor(note);
+        getSupportLoaderManager().restartLoader(VIEW_ID, null, new LoaderManager.LoaderCallbacks<Cursor>() {
 
-        byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
-        String mimeType = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
+			@Override
+			public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+				return new NoteEdit.NoteContentLoader(NoteCipher.this, mDbHelper, id);
+			}
+ 
+			@Override
+			public void onLoadFinished(Loader<Cursor> loader, Cursor note) {
+				byte[] blob = note.getBlob(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DATA));
+		        String mimeType = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TYPE));
 
-        if (mimeType == null)
-            mimeType = "text/plain";
+		        if (mimeType == null)
+		            mimeType = "text/plain";
+		        
+		        if (blob != null) {
+		            String title = note.getString(
+		                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
 
-        if (blob != null) {
-            String title = note.getString(
-                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
+		            NoteUtils.savePublicFile(NoteCipher.this, title, mimeType, blob);
 
-            NoteUtils.savePublicFile(this, title, mimeType, blob);
+		        }
+		        note.close();
+			}
 
-        }
-
-        note.close();
+			@Override
+			public void onLoaderReset(Loader<Cursor> loader) { }
+		});
     }
 
     private void createNote() {
@@ -379,9 +411,7 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
 
             if (data.length > MAX_SIZE){
                 Toast.makeText(this, R.string.err_size, Toast.LENGTH_LONG).show();
-
-            }
-            else {
+            } else {
                 String title = dataStream.getLastPathSegment();
                 String body = dataStream.getPath();
 
@@ -518,4 +548,23 @@ public class NoteCipher extends SherlockActivity implements ICacheWordSubscriber
         }
     }
 
+    public static class NotesLoader extends CursorLoader {
+		NotesDbAdapter db;
+		
+		public NotesLoader(Context context) {
+			super(context);
+		}
+		
+		public NotesLoader(Context context, NotesDbAdapter db) {
+			super(context);
+			this.db = db;
+		}
+		
+		 @Override
+		 public Cursor loadInBackground() {
+			 if (db == null)
+				 return null;
+			 return db.fetchAllNotes();
+		 }
+	}
 }

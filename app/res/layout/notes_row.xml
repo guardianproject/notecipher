@@ -1,5 +1,5 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/text1"
+    android:id="@+id/row_text"
     style="@style/padtext"
     android:drawableLeft="@drawable/icon_small"
     android:layout_width="fill_parent"
