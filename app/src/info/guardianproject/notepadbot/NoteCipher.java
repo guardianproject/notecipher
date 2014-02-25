@@ -49,7 +49,6 @@ import com.actionbarsherlock.view.MenuItem;
 import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
 
-import net.simonvt.numberpicker.NumberPicker;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import java.io.FileNotFoundException;
@@ -57,6 +56,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSubscriber {
+	
     private static final int ACTIVITY_CREATE = 0;
     private static final int ACTIVITY_EDIT = 1;
 
@@ -89,9 +89,9 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
         if (getIntent() != null) {
             if (getIntent().hasExtra(Intent.EXTRA_STREAM)) {
                 dataStream = (Uri) getIntent().getExtras().get(Intent.EXTRA_STREAM);
-            } else
+            } else {
                 dataStream = getIntent().getData();
-
+            }
         }
 
         SQLiteDatabase.loadLibs(this);
@@ -236,7 +236,6 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
                     mCacheWord.manuallyLock();
                 return true;
             case SETTINGS_ID:
-                //changeTimeoutPrompt();
             	startActivity(new Intent(this, Settings.class));
                 return true;
         }
@@ -476,36 +475,6 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
             }
         });
         b.show();
-    }
-
-    void changeTimeoutPrompt() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.change_timeout_prompt_title);
-        builder.setMessage(R.string.change_timeout_prompt);
-        final NumberPicker input = new NumberPicker(this);
-        input.setMinValue(1);
-        input.setMaxValue(60);
-        input.setValue( mCacheWord.getTimeoutMinutes() );
-        builder.setView(input);
-
-        builder.setPositiveButton("OK",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        int timeout = input.getValue();
-                        mCacheWord.setTimeoutMinutes(timeout);
-                        dialog.dismiss();
-                    }
-                });
-        builder.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-        builder.show();
     }
 
     void showLockScreen() {
