@@ -150,6 +150,8 @@ public class NotesDbAdapter {
     public void close() {
         if( mDbHelper != null )
             mDbHelper.close();
+        if( mDb !=null && mDb.isOpen() )
+        	mDb.close();
     }
 
 
