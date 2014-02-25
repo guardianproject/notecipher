@@ -13,7 +13,8 @@ import android.widget.EditText;
 public class LinedEditText extends EditText {
     private Rect mRect;
     private Paint mPaint;
-
+    private boolean showLines;
+    
     // we need this constructor for LayoutInflater
     public LinedEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -22,6 +23,8 @@ public class LinedEditText extends EditText {
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setColor(getResources().getColor(R.color.gray));
+        
+        showLines = Settings.getNoteLinesOption(context);
     }
     
     @Override
@@ -29,8 +32,10 @@ public class LinedEditText extends EditText {
         int height = canvas.getHeight();
         int curHeight = 0;
         int baseline = getLineBounds(0, mRect);
-        for (curHeight = baseline + 3; curHeight < height; curHeight += getLineHeight()) {
-            canvas.drawLine(mRect.left, curHeight, mRect.right, curHeight, mPaint);
+        if(showLines) {
+	        for (curHeight = baseline + 3; curHeight < height; curHeight += getLineHeight()) {
+	            canvas.drawLine(mRect.left, curHeight, mRect.right, curHeight, mPaint);
+	        }
         }
         super.onDraw(canvas);
     }

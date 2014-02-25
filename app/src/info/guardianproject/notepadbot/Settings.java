@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
@@ -77,5 +78,10 @@ public class Settings extends SherlockPreferenceActivity {
 						
 						return true;
 					}
-		};
+	};
+	
+	public static final boolean getNoteLinesOption(Context context) {
+		boolean defValue = context.getResources().getBoolean(R.bool.notecipher_uselines_default);
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(NConstants.SHARED_PREFS_NOTELINES, defValue);
+	}
 }
