@@ -69,7 +69,7 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			NavUtils.navigateUpFromSameTask(this);
+			NavUtils.navigateUpTo(this, new Intent(this, NoteCipher.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
