@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+        <PreferenceCategory
+                android:title="@string/general_settings" >
+         		<Preference 
+			        android:key="cacheword_timeout"
+			        android:title="@string/change_timeout_prompt_title" />
+         		<CheckBoxPreference
+			        android:key="use_lines_in_notes"
+			        android:title="@string/use_lines_in_notes"
+			        android:summary="@string/use_lines_in_notes_summ"
+			        android:defaultValue="@bool/notecipher_uselines_default" />
+        </PreferenceCategory>
+</PreferenceScreen>

@@ -66,7 +66,7 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
     private static final int SHARE_ID = Menu.FIRST + 3;
     private static final int VIEW_ID = Menu.FIRST + 4;
     private static final int LOCK_ID = Menu.FIRST + 5;
-    private static final int CHANGE_TIMEOUT = Menu.FIRST + 6;
+    private static final int SETTINGS_ID = Menu.FIRST + 6;
 
     public static final String TAG = "notecipher";
 
@@ -217,8 +217,8 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
         menu.add(0, LOCK_ID, 0, R.string.menu_lock)
         	.setIcon(R.drawable.lock)
         	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        menu.add(0, CHANGE_TIMEOUT, 0, R.string.menu_timeout)
-	        .setIcon(R.drawable.timeout)
+        menu.add(0, SETTINGS_ID, 0, R.string.settings)
+	        .setIcon(R.drawable.settings)
 	    	.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         return true;
     }
@@ -235,10 +235,10 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
                 if (!mCacheWord.isLocked())
                     mCacheWord.manuallyLock();
                 return true;
-            case CHANGE_TIMEOUT:
-                changeTimeoutPrompt();
+            case SETTINGS_ID:
+                //changeTimeoutPrompt();
+            	startActivity(new Intent(this, Settings.class));
                 return true;
-
         }
 
         return super.onMenuItemSelected(featureId, item);
