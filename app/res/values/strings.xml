@@ -11,7 +11,6 @@
     <string name="menu_lock">Lock Notes</string>
     <string name="menu_bigger">Bigger</string>
     <string name="menu_smaller">Smaller</string>
-    <string name="menu_timeout">Change Lock Timeout</string>
 
     <string name="title">Summary</string>
     <string name="body">Note Text</string>
@@ -42,9 +41,6 @@
 	<string name="lock_screen_passphrase_not_set_confirm">Confirm new passphrase</string>
 	<string name="lock_screen_passphrases_not_matching">Passphrases did not match, please try again</string>
 	
-	<string name="change_timeout_prompt_title">Change Lock Timeout</string>
-	<string name="change_timeout_prompt">After how many minutes of inactivity should NoteCipher lock itself?</string>
-    
 	<string name="enter_title">Enter title</string>
 	<string name="enter_note_text">Enter note text</string>
 	<string name="share_file">Share File</string>
@@ -53,5 +49,13 @@
 	<string name="image_data">Image Data</string>
 	<string name="err_loading_note">Something went wrong when loading your note: <xliff:g id="error_msg">%1$s</xliff:g></string>
 	<string name="unable_to_delete_original">Unable to delete original</string>
+	
+	<!-- Settings Strings -->
+	<string name="settings">Settings</string>
+	<string name="general_settings">General Settings</string>
+	<string name="change_timeout_prompt_title">Change Lock Timeout</string>
+	<string name="change_timeout_prompt">After how many minutes of inactivity should NoteCipher lock itself?</string>
+	<string name="use_lines_in_notes">Use lines in notes</string>
+	<string name="use_lines_in_notes_summ">If enabled, empty lines will be displayed on all notes to resemble a notepad</string>
 	
 </resources>
