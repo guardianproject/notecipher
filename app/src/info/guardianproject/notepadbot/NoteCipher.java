@@ -68,13 +68,9 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
     private static final int LOCK_ID = Menu.FIRST + 5;
     private static final int SETTINGS_ID = Menu.FIRST + 6;
 
-    public static final String TAG = "notecipher";
-
     private NotesDbAdapter mDbHelper;
 
     private Uri dataStream;
-
-    private final static int MAX_SIZE = 1000000;
 
     private CacheWordActivityHandler mCacheWord;
 
@@ -408,7 +404,7 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
 
             byte[] data = NoteUtils.readBytesAndClose(is);
 
-            if (data.length > MAX_SIZE){
+            if (data.length > NConstants.MAX_STREAM_SIZE) {
                 Toast.makeText(this, R.string.err_size, Toast.LENGTH_LONG).show();
             } else {
                 String title = dataStream.getLastPathSegment();
@@ -431,10 +427,10 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
             }
 
         } catch (FileNotFoundException e) {
-            Log.e(TAG, e.getMessage(), e);
+            Log.e(NConstants.TAG, e.getMessage(), e);
 
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
+            Log.e(NConstants.TAG, e.getMessage(), e);
 
         } catch (OutOfMemoryError e) {
             Toast.makeText(this, R.string.err_size, Toast.LENGTH_LONG).show();
@@ -494,19 +490,19 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
 
     @Override
     public void onCacheWordUninitialized() {
-        Log.d(TAG, "onCacheWordUninitialized");
+        Log.d(NConstants.TAG, "onCacheWordUninitialized");
         clearViewsAndLock();
     }
 
     @Override
     public void onCacheWordLocked() {
-        Log.d(TAG, "onCacheWordLocked");
+        Log.d(NConstants.TAG, "onCacheWordLocked");
         clearViewsAndLock();
     }
 
     @Override
     public void onCacheWordOpened() {
-        Log.d(TAG, "onCacheWordOpened");
+        Log.d(NConstants.TAG, "onCacheWordOpened");
         unlockDatabase();
 
         if (mDbHelper.isOpen()) {
