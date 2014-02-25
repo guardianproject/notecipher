@@ -10,5 +10,10 @@
 			        android:title="@string/use_lines_in_notes"
 			        android:summary="@string/use_lines_in_notes_summ"
 			        android:defaultValue="@bool/notecipher_uselines_default" />
+         		<CheckBoxPreference
+			        android:key="cacheword_vibrate"
+			        android:title="@string/vibrate_when_unlocked"
+			        android:summary="@string/vibrate_when_unlocked_summ"
+			        android:defaultValue="@bool/cacheword_vibrate_default" />
         </PreferenceCategory>
 </PreferenceScreen>

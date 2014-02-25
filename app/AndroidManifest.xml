@@ -55,11 +55,9 @@
 		<activity
             android:name=".Settings"
             android:label="@string/settings"
-            android:screenOrientation="portrait"    
+            android:screenOrientation="portrait"
+            android:parentActivityName="info.guardianproject.notepadbot.NoteCipher"
             android:configChanges="orientation|keyboardHidden"  >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".NoteCipher" />
         </activity>
         
         <service

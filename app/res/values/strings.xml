@@ -57,5 +57,7 @@
 	<string name="change_timeout_prompt">After how many minutes of inactivity should NoteCipher lock itself?</string>
 	<string name="use_lines_in_notes">Use lines in notes</string>
 	<string name="use_lines_in_notes_summ">If enabled, empty lines will be displayed on all notes to resemble a notepad</string>
+	<string name="vibrate_when_unlocked">Vibrate when unlocked</string>
+	<string name="vibrate_when_unlocked_summ">If enabled, the device will vibrate every time NoteCipher is unlocked with a passphrase</string>
 	
 </resources>
