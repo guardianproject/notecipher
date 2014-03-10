@@ -3,7 +3,7 @@
 	url = https://github.com/guardianproject/cacheword.git
 [submodule "external/actionbarsherlock"]
 	path = external/actionbarsherlock
-	url = git@github.com:JakeWharton/ActionBarSherlock.git
+	url = https://github.com/JakeWharton/ActionBarSherlock.git
 [submodule "external/numberpicker"]
 	path = external/numberpicker
-	url = git@github.com:SimonVT/android-numberpicker.git
+	url = https://github.com/SimonVT/android-numberpicker.git
