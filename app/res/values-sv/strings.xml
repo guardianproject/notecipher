@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="app_name">NoteCipher</string>
+  <string name="no_notes">Inga anteckningar än</string>
+  <string name="menu_insert">Lägg till anteckning</string>
+  <string name="menu_delete">Radera</string>
+  <string name="menu_rekey">Ändra lösenfras</string>
+  <string name="menu_share">Dela...</string>
+  <string name="menu_view">Exportera bild</string>
+  <string name="menu_save">Spara anteckning</string>
+  <string name="menu_lock">Lås anteckningar</string>
+  <string name="title">Sammanfattning</string>
+  <string name="body">Anteckningstext</string>
+  <string name="confirm">Spara anteckningar</string>
+  <string name="edit_note">Redigera</string>
+  <string name="confirm_delete">Vill du radera den okrypterade originalfilen?</string>
+  <string name="on_import">Importera ny fil</string>
+  <string name="err_size">Den importerade filen är för stor</string>
+  <string name="err_export">Fel vid bildexport</string>
+  <string name="on_start">Tryck var som helst för att skapa en anteckning</string>
+  <string name="err_pass">Kan inte låsa upp anteckningarna. Är du säker att du angav rätt lösenfras?</string>
+  <string name="button_ok">Okej</string>
+  <string name="button_cancel">Avbryt</string>
+  <string name="rekey_message">Ange ett *nytt* lösenord. Det måste vara längre än 6 tecken och ha minst en stor och en liten bokstav och ett nummer.</string>
+  <string name="do_rekey">Krypterar dina existerande anteckningar med ny lösenfras (var vänlig vänta...)</string>
+  <string name="enter_pass">Ange lösenfrasen:</string>
+  <string name="new_pass">Välkommen! Ange ett starkt lösenord för att säkra dina anteckningar. Det måste vara längre än 6 tecken och ha minst en stor och en liten bokstav och ett nummer.</string>
+  <string name="pass_err_length">Lösenfrasen var inte lång nog.</string>
+  <string name="pass_err_upper">Lösenfrasen innehåller inga stora bokstäver.</string>
+  <string name="pass_err_lower">Lösenfrasen innehåller inga små bokstäver.</string>
+  <string name="pass_err_num">Lösenfrasen innehåller inga nummer.</string>
+</resources>

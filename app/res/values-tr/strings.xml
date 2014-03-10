@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="app_name">NoteCipher</string>
+  <string name="no_notes">Henüz bir notunuz yok</string>
+  <string name="menu_insert">Not Ekle</string>
+  <string name="menu_delete">Öğe Sil</string>
+  <string name="menu_rekey">Parola Değiştir</string>
+  <string name="menu_share">Paylaş...</string>
+  <string name="menu_view">Resim Dışarı Aktar</string>
+  <string name="menu_save">Not Kaydet</string>
+  <string name="menu_lock">Notları Kilitle</string>
+  <string name="title">Özet</string>
+  <string name="body">Not Metn</string>
+  <string name="confirm">Not Kaydet</string>
+  <string name="edit_note">Not Düzenle</string>
+  <string name="confirm_delete">Şifrelenmemiş asıl dosyayı silmek istiyor musun?</string>
+  <string name="on_import">Yeni dosya içeri aktarıldı</string>
+  <string name="err_size">İçeri aktarılan dosya boyutu çok büyük</string>
+  <string name="err_export">Resim dışarı aktarma hatası</string>
+  <string name="on_start">Yeni bir not oluşturmak için herhangi biryere dokunun</string>
+  <string name="err_pass">Notunuz açılamadı. Parolayı doğru girdiğinizden emin misiniz?</string>
+  <string name="button_ok">Tamam</string>
+  <string name="button_cancel">İptal</string>
+  <string name="rekey_message">*Yeni* bir parola girin. Altı karakterden fazla ve en az bir büyük harf, bir küçük harf ve bir rakam içermelidir.</string>
+  <string name="enter_pass">Parolanızı girin:</string>
+  <string name="new_pass">Hoşgeldin! Notlarının güvenliği için güçlü bir paralo girin. Altı karakterden fazla ve en az bir büyük harf, bir küçük harf ve bir rakam içermelidir.</string>
+  <string name="pass_err_length">Parolanız yeteri kadar uzun değil</string>
+  <string name="pass_err_upper">Parolanız hiç büyük harf içermiyor</string>
+  <string name="pass_err_lower">Parolanız hiç küçük harf içermiyor</string>
+  <string name="pass_err_num">Parolanız hiç rakam içermiyor</string>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="app_name">NoteCipher</string>
+  <string name="no_notes">Encara no hi cap nota</string>
+  <string name="menu_insert">Afegeix una nota</string>
+  <string name="menu_delete">Esborra element</string>
+  <string name="menu_rekey">Canvia la contrasenya</string>
+  <string name="menu_share">Comparteix...</string>
+  <string name="menu_view">Exporta la imatge</string>
+  <string name="menu_save">Desa la nota</string>
+  <string name="menu_lock">Bloca la nota</string>
+  <string name="title">Resum</string>
+  <string name="body">Text de la nota</string>
+  <string name="confirm">Desa la nota</string>
+  <string name="edit_note">Edita la nota</string>
+  <string name="confirm_delete">Voleu esborrar el fitxer original (sense xifrar)?</string>
+  <string name="on_import">Fitxer nou importat</string>
+  <string name="err_size">La mida del fitxer importat és massa gran</string>
+  <string name="err_export">Error en l\'exportació de la imatge</string>
+  <string name="on_start">Toqueu per a crear una nota nova</string>
+  <string name="err_pass">No ha estat possible desblocar les vostres notes. Esteu segur que heu introduït la contrasenya correcta?</string>
+  <string name="button_ok">D\'acord</string>
+  <string name="button_cancel">Cancel·la</string>
+  <string name="rekey_message">Introduïu una contrasenya *nova*. Ha de contenir almenys una majúscula, una minúscula i un número, i tenir més de sis caràcters.</string>
+  <string name="do_rekey">S\'estan xifrant les vostres notes amb la nova contrasenya: tingueu paciència...</string>
+  <string name="enter_pass">Escriviu la contrasenya:</string>
+  <string name="new_pass">Benvingut! Introduïu una contrasenya forta per a assegurar les vostres notes. Ha de contenir si més no una majúscula, una minúscula i una xifra, i ha de tenir més de sis caràcters.</string>
+  <string name="pass_err_length">La contrasenya no és prou llarga</string>
+  <string name="pass_err_upper">La contrasenya no conté cap majúscula</string>
+  <string name="pass_err_lower">La contrasenya no conté cap minúscula</string>
+  <string name="pass_err_num">La vostra contrasenya no conté cap nombre</string>
+</resources>

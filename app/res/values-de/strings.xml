@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="app_name">NoteCipher</string>
+  <string name="no_notes">Noch keine Notizen</string>
+  <string name="menu_insert">Notiz hinzufügen</string>
+  <string name="menu_delete">Löschen</string>
+  <string name="menu_rekey">Passphrase ändern</string>
+  <string name="menu_share">Teilen...</string>
+  <string name="menu_view">Bild exportieren</string>
+  <string name="menu_save">Notiz speichern</string>
+  <string name="menu_lock">Notizen sperren</string>
+  <string name="title">Zusammenfassung</string>
+  <string name="body">Notiztext</string>
+  <string name="confirm">Notiz speichern</string>
+  <string name="edit_note">Notiz bearbeiten</string>
+  <string name="confirm_delete">Möchten Sie die unverschlüsselte Originaldatei löschen?</string>
+  <string name="on_import">Neue Datei importiert</string>
+  <string name="err_size">Grösse der importierten Datei zu gross</string>
+  <string name="err_export">Fehler beim Exportieren des Bilds</string>
+  <string name="on_start">Irgendwo tippen um eine neue Notiz anzulegen</string>
+  <string name="err_pass">Unmöglich, Ihre Notizen zu entsperren. Sind Sie sicher, dass Sie die richtige Passphrase eingegeben haben?</string>
+  <string name="button_ok">Okay</string>
+  <string name="button_cancel">Abbrechen</string>
+  <string name="rekey_message">Geben Sie eine *neue* Passphrase ein. Sie muss mindestens einen Grossbuchstaben, einen Kleinbuchstaben und eine Zahl enthalten und muss länger als sechs Zeichen sein.</string>
+  <string name="do_rekey">Verschlüsseln Ihrer bestehenden Mitteilungen mit der neuen Passphrase (ein wenig Geduld...)</string>
+  <string name="enter_pass">Eingabe Ihrer Passphrase:</string>
+  <string name="new_pass">Willkommen! Geben Sie  zur Sicherung Ihrer Mitteilungen eine starke Passphrase ein. Sie muss mindestens einen Großbuchstaben, einen Kleinbuchstaben und eine Zahl enthalten und muss länger als sechs Zeichen sein.</string>
+  <string name="pass_err_length">Ihre Passphrase war nicht lang genug</string>
+  <string name="pass_err_upper">Ihre Passphrase enthält keine Grossbuchstaben</string>
+  <string name="pass_err_lower">Ihre Passphrase enthält keine Kleinbuchstaben</string>
+  <string name="pass_err_num">Ihre Passphrase enthält keine Zahlen</string>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="app_name">NoteCipher</string>
+  <string name="no_notes">Aún no hay ninguna nota</string>
+  <string name="menu_insert">Añadir una nota</string>
+  <string name="menu_delete">Eliminar elemento</string>
+  <string name="menu_rekey">Cambiar la contraseña</string>
+  <string name="menu_share">Compartir...</string>
+  <string name="menu_view">Exportar imagen</string>
+  <string name="menu_save">Guardar </string>
+  <string name="menu_lock">Cifrar</string>
+  <string name="title">índice</string>
+  <string name="body">Texto</string>
+  <string name="confirm">Guardar</string>
+  <string name="edit_note">Editar</string>
+  <string name="confirm_delete">¿Quiere borrar el archivo original sin cifrar?</string>
+  <string name="on_import">Importar un nuevo archivo</string>
+  <string name="err_size">El fichero a importar es demasiado grande</string>
+  <string name="err_export">Error exportando la imagen</string>
+  <string name="on_start">Pulse en cualquier parte para crear una nueva nota</string>
+  <string name="err_pass">No se pueden desbloquear sus notas. ¿Ha introducido la contraseña de manera correcta?</string>
+  <string name="button_ok">Aceptar</string>
+  <string name="button_cancel">Cancelar</string>
+  <string name="rekey_message">Introduzca una *nueva* contraseña. Debe contener al menos una letra mayúscula, una letra minúscula y un número. Además, debe contar con más de seis caracteres.</string>
+  <string name="do_rekey">Cifrando sus notas con la nueva contraseña (espere...)</string>
+  <string name="enter_pass">Introduzca su contraseña:</string>
+  <string name="new_pass">¡Bienvenido! Introduzca una contraseña segura para cifrar sus notas. Debe contener al menos una letra mayúscula, una minúscula y un número. Además, debe contar con más de seis caracteres.</string>
+  <string name="pass_err_length">Su contraseña no es suficientemente larga</string>
+  <string name="pass_err_upper">Su contraseña no contiene ninguna letra mayúscula</string>
+  <string name="pass_err_lower">Su contraseña no contiene ninguna letra minúscula</string>
+  <string name="pass_err_num">Su contraseña no contiene ningún número</string>
+</resources>

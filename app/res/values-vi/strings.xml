@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="app_name">NoteCipher</string>
+  <string name="no_notes">Hiện chưa có ghi chú nào</string>
+  <string name="menu_insert">Thêm ghi chú</string>
+  <string name="menu_delete">Xóa đối tượng</string>
+  <string name="menu_rekey">Thay đổi cụm từ bảo mật</string>
+  <string name="menu_share">Chia sẻ...</string>
+  <string name="menu_view">Xuất dữ liệu hình ảnh</string>
+  <string name="menu_save">Lưu ghi chú</string>
+  <string name="menu_lock">Khóa lại các ghi chú</string>
+  <string name="title">Tóm tắt</string>
+  <string name="body">Nội dung ghi chú</string>
+  <string name="confirm">Lưu lại ghi chú</string>
+  <string name="edit_note">Chỉnh sửa ghi chú</string>
+  <string name="confirm_delete">Bạn có muốn xóa tập tin nguyên gốc, chưa được mã hóa?</string>
+  <string name="on_import">Đã nhập dữ kiện từ tập tin mới</string>
+  <string name="err_size">Kích thước tập tin đã nhập vào quá lớn</string>
+  <string name="err_export">Xảy ra lỗi khi xuất dữ liệu dạng hình ảnh</string>
+  <string name="on_start">Chạm vào bất kỳ vị trí nào để tạo một ghi chú mới</string>
+  <string name="err_pass">Không thể mở khóa các ghi chú của bạn. Bạn có chắc rằng bạn đã điền vào đúng cụm từ bảo mật hay chưa?</string>
+  <string name="button_ok">Đồng Ý</string>
+  <string name="button_cancel">Hủy Bỏ</string>
+  <string name="rekey_message">Điền vào các ký tự của cụm từ bảo mật, nên nhớ, ký tự trong cụm từ bảo mật được hiển thị sẽ ở dạng *. Phần cụm từ bảo mật của bạn ít nhất phải có độ dài tối thiểu là sáu ký tự, trong đó có ít nhất một chữ cái được in hoa, một chữ cái in thường và một con số kèm theo. Việc làm này nhằm tăng tính bảo mật của mật khẩu.</string>
+  <string name="do_rekey">Đang mã hóa các ghi chú hiện có của bạn với các cụm từ bảo mật mới (hãy kiên nhẫn đợi trong giây lát...)</string>
+  <string name="enter_pass">Điền vào cụm từ bảo mật:</string>
+  <string name="new_pass">Chào bạn! Hãy điền vào các cụm từ bảo mật để giúp cho ghi chú của bạn được an toàn hơn. Các cụm từ này ít nhất phải có độ dài tối thiểu là sáu ký tự, trong đó có ít nhất một chữ cái được in hoa, một chữ cái in thường và một con số kèm theo.</string>
+  <string name="pass_err_length">Cụm từ bảo mật không đạt yêu cầu về độ dài ký tự</string>
+  <string name="pass_err_upper">Cụm từ bảo mật không chứa bất kỳ ký tự nào được in hoa</string>
+  <string name="pass_err_lower">Cụm từ bảo mật không chứa bất kỳ ký tự in thường nào</string>
+  <string name="pass_err_num">Cụm từ bảo mật không chứa bất kỳ ký tự là chữ số nào</string>
+</resources>

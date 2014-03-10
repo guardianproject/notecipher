@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="app_name">NoteCipher</string>
+  <string name="no_notes">Ingen notater foreløpig</string>
+  <string name="menu_insert">Legg til notat</string>
+  <string name="menu_delete">Slett enhet</string>
+  <string name="menu_rekey">Bytt passord</string>
+  <string name="menu_share">Del...</string>
+  <string name="menu_view">Eksporter bilde</string>
+  <string name="menu_save">Lagre notat</string>
+  <string name="menu_lock">Lås notater</string>
+  <string name="title">Sammendrag</string>
+  <string name="body">Notat-tekst</string>
+  <string name="confirm">Lagre notat</string>
+  <string name="edit_note">Endre notat</string>
+  <string name="confirm_delete">Vil du slette den orginale, ukrypterte filen?</string>
+  <string name="on_import">Ny fil lagt til</string>
+  <string name="err_size">Summen av filstørrelsen til import er for stor</string>
+  <string name="err_export">Feil under eksport av bilde</string>
+  <string name="on_start">Trykk hvor som helst for å lage nytt notat</string>
+  <string name="err_pass">Fikk ikke tilgang til dine notater. Er du sikker på at du brukte rett passord?</string>
+  <string name="button_ok">Okei</string>
+  <string name="button_cancel">Avbryt</string>
+  <string name="rekey_message">Skriv inn *nytt* passord. Det må inneholde minst én stor bokstav, én liten, samt ett tal, og i sum være lengre enn seks bokstaver.</string>
+  <string name="do_rekey">Krypterer dine notater med ditt nye passord (vær tolmodig...)</string>
+  <string name="enter_pass">Skriv inn ditt passord:</string>
+  <string name="new_pass">Velkommen! Skriv inn et passord for å hegne om dine notater. Det må inneholde i hvert fall minst én stor bokstav, én liten, samt ett tal, og i sum være lengre enn seks bokstaver.</string>
+  <string name="pass_err_length">Valgt passord hadde ikke tilstrekkelig lengde.</string>
+  <string name="pass_err_upper">Valgt passord inneholdt ingen store bokstaver.</string>
+  <string name="pass_err_lower">Valgt passord inneholdt ingen små bokstaver.</string>
+  <string name="pass_err_num">Valgt passord inneholdt ingen tall.</string>
+</resources>

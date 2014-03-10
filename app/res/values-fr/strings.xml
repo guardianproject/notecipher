@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="app_name">NoteCipher</string>
+  <string name="no_notes">Pas encore de note</string>
+  <string name="menu_insert">Ajouter une note</string>
+  <string name="menu_delete">Effacer l\'élément</string>
+  <string name="menu_rekey">Changer la phrase de passe</string>
+  <string name="menu_share">Partager...</string>
+  <string name="menu_view">Exporter l\'image</string>
+  <string name="menu_save">Enregistrer la note</string>
+  <string name="menu_lock">Verrouiller les notes</string>
+  <string name="title">Résumé</string>
+  <string name="body">Texte de la note</string>
+  <string name="confirm">Enregistrer la note</string>
+  <string name="edit_note">Modifier la note</string>
+  <string name="confirm_delete">Voulez- vous supprimer le fichier original non chiffré ?</string>
+  <string name="on_import">Nouveau fichier importé</string>
+  <string name="err_size">La taille du fichier importé est trop grande</string>
+  <string name="err_export">Erreur lors de l\'exportation de l\'image</string>
+  <string name="on_start">Toquer n\'importe où pour créer une nouvelle note</string>
+  <string name="err_pass">Impossible de déverrouiller vos notes. Êtes-vous sûr d\'avoir saisi la bonne phrase de passe ?</string>
+  <string name="button_ok">Ok</string>
+  <string name="button_cancel">Annuler</string>
+  <string name="rekey_message">Saisir une *nouvelle* phrase de passe. Elle doit contenir au moins une majuscule, une minuscule, un chiffre et plus de six caractères.</string>
+  <string name="do_rekey">Chiffrement de vos notes existantes avec la nouvelle phrase de de passe (patience. ..)</string>
+  <string name="enter_pass">Saisir votre phrase de passe :</string>
+  <string name="new_pass">Bienvenue ! Saisir une phrase de passe forte pour sécuriser vos notes. Elle doit contenir au moins une majuscule, une minuscule, un chiffre et plus de six caractères.</string>
+  <string name="pass_err_length">Votre phrase de passe est trop courte</string>
+  <string name="pass_err_upper">Votre phrase de passe ne contenait aucune majuscule</string>
+  <string name="pass_err_lower">Votre phrase de passe ne contenait aucune minuscule</string>
+  <string name="pass_err_num">Votre phrase de passe ne contenait aucun chiffre</string>
+</resources>
