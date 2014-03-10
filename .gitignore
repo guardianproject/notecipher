@@ -3,14 +3,6 @@
 *.ap_
 build.xml
 
-# files for the dex VM
-*.dex
-
-# Java class files
-*.class
-.classpath
-.metadata
-
 # generated files
 bin/
 gen/
