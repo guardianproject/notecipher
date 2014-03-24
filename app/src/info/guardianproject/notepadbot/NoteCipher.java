@@ -232,7 +232,9 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
                     mCacheWord.manuallyLock();
                 return true;
             case SETTINGS_ID:
-            	startActivity(new Intent(this, Settings.class));
+            	if ( !mCacheWord.isLocked()) {
+            		startActivity(new Intent(this, Settings.class));
+            	}
                 return true;
         }
 
@@ -274,8 +276,9 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
     }
 
     private void shareEntry(final long id) {
-        if (mCacheWord.isLocked())
+        if (mCacheWord.isLocked()) {
             return;
+        }
         
         getSupportLoaderManager().restartLoader(SHARE_ID, null, new LoaderManager.LoaderCallbacks<Cursor>() {
 
@@ -445,6 +448,9 @@ public class NoteCipher extends SherlockFragmentActivity implements ICacheWordSu
      * Call this to delete the original image, will ask the user
      */
     private void handleDelete() {
+    	if (mCacheWord.isLocked()) {
+            return;
+        }
         final AlertDialog.Builder b = new AlertDialog.Builder(this);
         b.setIcon(android.R.drawable.ic_dialog_alert);
         b.setTitle(R.string.app_name);

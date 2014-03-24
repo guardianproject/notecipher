@@ -77,17 +77,7 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 
 	@Override
 	public void onDestroy() {
-		// reload preferences on exit from settings screen
-		Context context = getApplicationContext();
-		loadSettings(context);
 		super.onDestroy();
-	}
-
-	/** Loads user settings to app. Called when settings change and users exits from 
-	 *  settings screen or when the app first starts. 
-	 *  */
-	public static void loadSettings(Context context) {
-		
 	}
 	
 	private Preference.OnPreferenceClickListener changeLockTimeoutListener = 
@@ -115,6 +105,9 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 	}
 	
 	private void changeTimeoutPrompt() {
+		if (mCacheWord.isLocked())
+            return;
+		
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.change_timeout_prompt_title);
         builder.setMessage(R.string.change_timeout_prompt);
