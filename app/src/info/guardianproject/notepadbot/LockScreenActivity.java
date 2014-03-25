@@ -31,10 +31,6 @@ import java.security.GeneralSecurityException;
 public class LockScreenActivity extends SherlockActivity implements ICacheWordSubscriber {
     private static final String TAG = "LockScreenActivity";
 
-    private final static int MIN_PASS_LENGTH = 8;
-    // private final static int MAX_PASS_ATTEMPTS = 3;
-    // private final static int PASS_RETRY_WAIT_TIMEOUT = 30000;
-
     private EditText mEnterPassphrase;
     private EditText mNewPassphrase;
     private EditText mConfirmNewPassphrase;
@@ -119,7 +115,10 @@ public class LockScreenActivity extends SherlockActivity implements ICacheWordSu
     }
 
     private boolean isPasswordValid() {
-        return validatePassword(mNewPassphrase.getText().toString().toCharArray());
+    	boolean valid = NConstants.validatePassword(mNewPassphrase.getText().toString().toCharArray());
+    	if(!valid)
+    		mPasswordError = getString(R.string.pass_err_length);
+        return valid;
     }
 
     private boolean isConfirmationFieldEmpty() {
@@ -231,16 +230,6 @@ public class LockScreenActivity extends SherlockActivity implements ICacheWordSu
                 return false;
             }
         });
-    }
-
-    private boolean validatePassword(char[] pass)
-    {
-        if (pass.length < MIN_PASS_LENGTH) {
-            // should we support some user string message here?
-            mPasswordError = getString(R.string.pass_err_length);
-            return false;
-        }
-        return true;
     }
 
     public class TwoViewSlider {

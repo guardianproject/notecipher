@@ -5,6 +5,10 @@
          		<Preference 
 			        android:key="cacheword_timeout"
 			        android:title="@string/change_timeout_prompt_title" />
+         		<EditTextPreference
+		            android:key="encrypted_secrets"
+		            android:title="@string/change_passphrase"
+		            android:dialogTitle="@string/change_passphrase" />
          		<CheckBoxPreference
 			        android:key="use_lines_in_notes"
 			        android:title="@string/use_lines_in_notes"

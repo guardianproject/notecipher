@@ -1,10 +1,14 @@
 package info.guardianproject.notepadbot;
 
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 import net.simonvt.numberpicker.NumberPicker;
 import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.Constants;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
+import info.guardianproject.cacheword.PassphraseSecrets;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -19,6 +23,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -50,6 +55,9 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 								.setOnPreferenceClickListener(changeLockTimeoutListener);
 							findPreference(Constants.SHARED_PREFS_VIBRATE)
 								.setOnPreferenceChangeListener(vibrateChangeListener);
+							findPreference(Constants.SHARED_PREFS_SECRETS)
+								.setOnPreferenceChangeListener(passphraseChangeListener);
+							
 						}
 					})
 					.commit();
@@ -60,6 +68,8 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 				.setOnPreferenceClickListener(changeLockTimeoutListener);
 			findPreference(Constants.SHARED_PREFS_VIBRATE)
 				.setOnPreferenceChangeListener(vibrateChangeListener);
+			findPreference(Constants.SHARED_PREFS_SECRETS)
+				.setOnPreferenceChangeListener(passphraseChangeListener);
 		}
 	}
 	
@@ -96,6 +106,26 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 			// save option internally in cacheword as well
 			mCacheWord.setVibrateSetting((Boolean) newValue);
 			return true;
+		}
+	};
+	
+	private Preference.OnPreferenceChangeListener passphraseChangeListener = 
+			new OnPreferenceChangeListener(){
+		@Override
+		public boolean onPreferenceChange(Preference pref, Object newValue) {
+			try {
+				char[] pass = ((String) newValue).toCharArray();
+				if (NConstants.validatePassword(pass)) {
+					mCacheWord.changePassphrase((PassphraseSecrets) mCacheWord.getCachedSecrets(), pass);
+				} else {
+					Toast.makeText(getApplicationContext(), 
+							R.string.pass_err_length, Toast.LENGTH_SHORT).show();
+				}
+			} catch (IOException e) {
+				Toast.makeText(getApplicationContext(), 
+						R.string.pass_err, Toast.LENGTH_SHORT).show();
+			}
+			return false;
 		}
 	};
 	

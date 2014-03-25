@@ -32,6 +32,7 @@
     <string name="pass_err_upper">Your passphrase did not contain any uppercase letters</string>
     <string name="pass_err_lower">Your passphrase did not contain any lowercase letters</string>
     <string name="pass_err_num">Your passphrase did not contain any numbers</string>
+    <string name="pass_err">Error during passphrase change!</string>
     
     <string name="lock_screen_open">Open</string>
     <string name="title_activity_lock_screen">NoteCipher Locked</string>
@@ -59,5 +60,6 @@
 	<string name="use_lines_in_notes_summ">If enabled, empty lines will be displayed on all notes to resemble a notepad</string>
 	<string name="vibrate_when_unlocked">Vibrate when unlocked</string>
 	<string name="vibrate_when_unlocked_summ">If enabled, the device will vibrate every time NoteCipher is unlocked with a passphrase</string>
+	<string name="change_passphrase">Change Passphrase</string>
 	
 </resources>
