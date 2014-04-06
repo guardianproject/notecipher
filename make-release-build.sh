@@ -32,6 +32,7 @@ else
 fi
 
 ./setup-ant.sh
+./fix-support-library.sh
 cd app/
 ant release
 
