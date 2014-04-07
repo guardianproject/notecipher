@@ -1,15 +1,14 @@
 package info.guardianproject.notepadbot;
 
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
-import net.simonvt.numberpicker.NumberPicker;
 import info.guardianproject.cacheword.CacheWordActivityHandler;
 import info.guardianproject.cacheword.Constants;
 import info.guardianproject.cacheword.ICacheWordSubscriber;
 import info.guardianproject.cacheword.PassphraseSecrets;
 
+import java.io.IOException;
+
+import net.simonvt.numberpicker.NumberPicker;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -31,18 +30,18 @@ import com.actionbarsherlock.view.MenuItem;
 @SuppressLint("NewApi")
 @SuppressWarnings("deprecation")
 public class Settings extends SherlockPreferenceActivity implements ICacheWordSubscriber {
-	
+
 	public static final String LANG_SEL_KEY = "langSelected";
-	
+
 	private CacheWordActivityHandler mCacheWord;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		
+
 		mCacheWord = new CacheWordActivityHandler(this, ((App)getApplication()).getCWSettings());
-		
+
 		// If in android 3+ use a preference fragment which is the new recommended way
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			getFragmentManager().beginTransaction()
@@ -51,20 +50,20 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 						public void onCreate(final Bundle savedInstanceState) {
 							super.onCreate(savedInstanceState);
 							addPreferencesFromResource(R.xml.settings);
-							findPreference(Constants.SHARED_PREFS_TIMEOUT)
+							findPreference(Constants.SHARED_PREFS_TIMEOUT_SECONDS)
 								.setOnPreferenceClickListener(changeLockTimeoutListener);
 							findPreference(Constants.SHARED_PREFS_VIBRATE)
 								.setOnPreferenceChangeListener(vibrateChangeListener);
 							findPreference(Constants.SHARED_PREFS_SECRETS)
 								.setOnPreferenceChangeListener(passphraseChangeListener);
-							
+
 						}
 					})
 					.commit();
 		} else {
 			// Otherwise load the preferences.xml in the Activity like in previous android versions
 			addPreferencesFromResource(R.xml.settings);
-			findPreference(Constants.SHARED_PREFS_TIMEOUT)
+			findPreference(Constants.SHARED_PREFS_TIMEOUT_SECONDS)
 				.setOnPreferenceClickListener(changeLockTimeoutListener);
 			findPreference(Constants.SHARED_PREFS_VIBRATE)
 				.setOnPreferenceChangeListener(vibrateChangeListener);
@@ -72,9 +71,9 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 				.setOnPreferenceChangeListener(passphraseChangeListener);
 		}
 	}
-	
-	
-	
+
+
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -89,8 +88,8 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 	public void onDestroy() {
 		super.onDestroy();
 	}
-	
-	private Preference.OnPreferenceClickListener changeLockTimeoutListener = 
+
+	private Preference.OnPreferenceClickListener changeLockTimeoutListener =
 			new Preference.OnPreferenceClickListener() {
 					@Override
 					public boolean onPreferenceClick(Preference pref) {
@@ -98,8 +97,8 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 						return true;
 					}
 	};
-	
-	private Preference.OnPreferenceChangeListener vibrateChangeListener = 
+
+	private Preference.OnPreferenceChangeListener vibrateChangeListener =
 			new OnPreferenceChangeListener(){
 		@Override
 		public boolean onPreferenceChange(Preference pref, Object newValue) {
@@ -108,43 +107,45 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 			return true;
 		}
 	};
-	
-	private Preference.OnPreferenceChangeListener passphraseChangeListener = 
+
+	private Preference.OnPreferenceChangeListener passphraseChangeListener =
 			new OnPreferenceChangeListener(){
 		@Override
 		public boolean onPreferenceChange(Preference pref, Object newValue) {
+			// save option internally in cacheword as well
 			try {
 				char[] pass = ((String) newValue).toCharArray();
 				if (NConstants.validatePassword(pass)) {
 					mCacheWord.changePassphrase((PassphraseSecrets) mCacheWord.getCachedSecrets(), pass);
 				} else {
-					Toast.makeText(getApplicationContext(), 
+					Toast.makeText(getApplicationContext(),
 							R.string.pass_err_length, Toast.LENGTH_SHORT).show();
 				}
 			} catch (IOException e) {
-				Toast.makeText(getApplicationContext(), 
+				Toast.makeText(getApplicationContext(),
 						R.string.pass_err, Toast.LENGTH_SHORT).show();
 			}
 			return false;
 		}
 	};
-	
+
 	public static final boolean getNoteLinesOption(Context context) {
 		boolean defValue = context.getResources().getBoolean(R.bool.notecipher_uselines_default);
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(NConstants.SHARED_PREFS_NOTELINES, defValue);
 	}
-	
+
 	private void changeTimeoutPrompt() {
-		if (mCacheWord.isLocked())
-            return;
-		
+		if (mCacheWord.isLocked()) {
+			return;
+		}
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.change_timeout_prompt_title);
         builder.setMessage(R.string.change_timeout_prompt);
         final NumberPicker input = new NumberPicker(this);
         input.setMinValue(1);
         input.setMaxValue(60);
-        input.setValue( mCacheWord.getTimeoutMinutes() );
+        input.setValue( mCacheWord.getTimeoutSeconds() );
         builder.setView(input);
 
         builder.setPositiveButton("OK",
@@ -152,7 +153,7 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         int timeout = input.getValue();
-                        mCacheWord.setTimeoutMinutes(timeout);
+                        mCacheWord.setTimeoutSeconds(timeout);
                         dialog.dismiss();
                     }
                 });
@@ -182,10 +183,10 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
 	}
 
 	@Override
-	public void onCacheWordOpened() { 
+	public void onCacheWordOpened() {
 		Log.d(NConstants.TAG, "onCacheWordOpened");
 	}
-	
+
 	@Override
     protected void onPause() {
         super.onPause();
@@ -197,7 +198,7 @@ public class Settings extends SherlockPreferenceActivity implements ICacheWordSu
         super.onResume();
         mCacheWord.onResume();
     }
-    
+
     void showLockScreen() {
         Intent intent = new Intent(this, LockScreenActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
