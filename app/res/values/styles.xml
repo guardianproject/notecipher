@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+           xmlns:tools="http://schemas.android.com/tools">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -18,13 +19,13 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="actionBarStyle">@style/Widget.NoteCipherTheme.ActionBar</item>
-    	<item name="android:actionBarStyle">@style/Widget.NoteCipherTheme.ActionBar</item>
+    	<item name="android:actionBarStyle" tools:targetApi="11">@style/Widget.NoteCipherTheme.ActionBar</item>
     </style>
     
     <style name="Widget.NoteCipherTheme.ActionBar" parent="Widget.Sherlock.ActionBar">
 	    <item name="android:background">@color/dark_green_actionbar</item>
 	    <item name="background">@color/dark_green_actionbar</item>
-	    <item name="android:titleTextStyle">@style/NoteCipherTheme.ActionBar.TitleTextStyle</item>
+	    <item name="android:titleTextStyle" tools:targetApi="11">@style/NoteCipherTheme.ActionBar.TitleTextStyle</item>
 		<item name="titleTextStyle">@style/NoteCipherTheme.ActionBar.TitleTextStyle</item>
 	</style>
 
