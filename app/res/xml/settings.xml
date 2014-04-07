@@ -3,7 +3,7 @@
         <PreferenceCategory
                 android:title="@string/general_settings" >
          		<Preference 
-			        android:key="cacheword_timeout"
+			        android:key="cacheword_timeout_seconds"
 			        android:title="@string/change_timeout_prompt_title" />
          		<EditTextPreference
 		            android:key="encrypted_secrets"
